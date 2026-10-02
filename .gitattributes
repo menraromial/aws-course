@@ -1,0 +1,4 @@
+# Sources LaTeX (figures TikZ, diapositives) : exclues des statistiques
+# de langages de GitHub (Linguist)
+*.tex linguist-detectable=false
+*.sty linguist-detectable=false
