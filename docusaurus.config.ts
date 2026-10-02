@@ -28,6 +28,8 @@ const config: Config = {
           showLastUpdateTime: false,
         },
         blog: false,
+        // le guide de l'enseignant est généré mais absent des barres et du plan du site
+        sitemap: {ignorePatterns: ['/aws-course/cours/guide-enseignant']},
         theme: {customCss: ['./src/css/custom.css', './src/css/figures.css']},
         svgr: {svgrConfig: {svgo: false}},
       } satisfies Preset.Options,

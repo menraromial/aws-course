@@ -4,6 +4,10 @@ sidebar_label: "Guide de l'enseignant"
 description: "Points à dessiner au tableau, questions à poser, corrigés et pannes fréquentes des TP."
 ---
 
+<head>
+  <meta name="robots" content="noindex, nofollow" />
+</head>
+
 Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la peine de dessiner au tableau, les questions qui font réagir une salle, les corrigés et les pannes que l'on rencontre le plus souvent en TP. Elle suit l'ordre des modules.
 
 ## Avant le premier module
