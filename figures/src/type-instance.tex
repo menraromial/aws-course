@@ -1,0 +1,48 @@
+% Lire un nom de type d'instance
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % le nom décomposé
+  \node[font=\ttfamily\fontsize{40}{40}\selectfont, text=Compute, inner sep=0pt] (s) at (0,0) {m};
+  \node[font=\ttfamily\fontsize{40}{40}\selectfont, text=Network, inner sep=0pt, anchor=west] (g) at (s.east) {7};
+  \node[font=\ttfamily\fontsize{40}{40}\selectfont, text=Integration, inner sep=0pt, anchor=west] (o) at (g.east) {i};
+  \node[font=\ttfamily\fontsize{40}{40}\selectfont, text=Grey, inner sep=0pt, anchor=west] (p) at (o.east) {.};
+  \node[font=\ttfamily\fontsize{40}{40}\selectfont, text=Storage, inner sep=0pt, anchor=west] (t) at (p.east) {large};
+  \draw[fleche=Compute] (s.south) -- ++(0,-10) node[below, align=center, text=Compute, font=\sffamily\small, xshift=-8mm]{\textbf{série}\\ usage général};
+  \draw[fleche=Network] (g.north) -- ++(0,8) node[above, align=center, text=Network, font=\sffamily\small]{\textbf{génération}\\ plus c'est élevé, plus c'est récent};
+  \draw[fleche=Integration] (o.south) -- ++(0,-10) node[below, align=center, text=Integration, font=\sffamily\small, xshift=12mm]{\textbf{options}\\ processeur Intel};
+  \draw[fleche=Storage] (t.north) -- ++(0,8) node[above, align=center, text=Storage, font=\sffamily\small]{\textbf{taille}\\ vCPU et mémoire};
+  % séries courantes
+  \node[anchor=north west, font=\sffamily\small] at (-6,-36) {%
+    \begin{tabular}{@{}l@{\quad}l@{}}
+    \multicolumn{2}{@{}l}{\textbf{Séries courantes}}\\[.8mm]
+    \code{t} & performances extensibles (par crédits) \\
+    \code{m} & usage général \\
+    \code{c} & optimisée calcul \\
+    \code{r} & optimisée mémoire \\
+    \code{i} & optimisée stockage \\
+    \code{g}, \code{p} & processeurs graphiques
+    \end{tabular}};
+  \node[anchor=north west, font=\sffamily\small] at (62,-36) {%
+    \begin{tabular}{@{}l@{\quad}l@{}}
+    \multicolumn{2}{@{}l}{\textbf{Options fréquentes}}\\[.8mm]
+    \code{a} & processeur AMD \\
+    \code{g} & processeur Graviton (Arm) \\
+    \code{i} & processeur Intel \\
+    \code{d} & disques locaux (\emph{instance store}) \\
+    \code{n} & réseau renforcé \\
+    \code{flex} & variante « flex », moins chère
+    \end{tabular}};
+  \node[anchor=north west, font=\sffamily\small] at (134,-36) {%
+    \begin{tabular}{@{}lrr@{}}
+    \multicolumn{3}{@{}l}{\textbf{Tailles de la famille m7i}}\\[.8mm]
+    & vCPU & mémoire\\
+    \code{m7i.large} & 2 & 8 Gio\\
+    \code{m7i.xlarge} & 4 & 16 Gio\\
+    \code{m7i.2xlarge} & 8 & 32 Gio\\
+    \code{m7i.4xlarge} & 16 & 64 Gio\\
+    \multicolumn{3}{@{}l}{\small\itshape\color{Grey} chaque taille double la précédente}
+    \end{tabular}};
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,24 @@
+% Comment AWS décide d'accepter ou de refuser une requête
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\tikzset{
+  question/.style={draw=Ink, line width=.8pt, fill=Paper, rounded corners=3pt, align=center, inner sep=2.5mm, text width=52mm},
+  verdict/.style={draw=#1, fill=#1Bg, text=#1, line width=1pt, rounded corners=3pt, font=\sffamily\normalsize\bfseries, align=center, inner sep=2.5mm, minimum width=40mm},
+}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[boite=Ink, text width=60mm] (req) at (0,0) {\textbf{Une requête arrive}\\ \small qui ? quelle action ? sur quelle ressource ?};
+  \node[question] (q0) at (0,-24) {AWS rassemble toutes les stratégies qui concernent cette identité et cette ressource};
+  \node[question] (q1) at (0,-50) {L'une d'elles contient-elle un \textbf{Deny} qui correspond ?};
+  \node[question] (q2) at (0,-78) {L'une d'elles contient-elle un \textbf{Allow} qui correspond ?};
+  \node[verdict=Rouge] (r1) at (78,-50) {REFUSÉ\\ \small\mdseries rien ne peut l'autoriser};
+  \node[verdict=Vert] (r2) at (78,-78) {AUTORISÉ};
+  \node[verdict=Rouge] (r3) at (0,-104) {REFUSÉ\\ \small\mdseries par défaut};
+  \draw[fleche] (req) -- (q0);
+  \draw[fleche] (q0) -- (q1);
+  \draw[fleche=Rouge] (q1) -- node[etiq]{oui} (r1);
+  \draw[fleche] (q1) -- node[etiq, right=1mm, fill=none]{non} (q2);
+  \draw[fleche=Vert] (q2) -- node[etiq]{oui} (r2);
+  \draw[fleche=Rouge] (q2) -- node[etiq, right=1mm, fill=none]{non} (r3);
+\end{tikzpicture}
+\end{document}

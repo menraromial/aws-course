@@ -1,0 +1,33 @@
+% Stockage en bloc, en fichiers, en objets
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \x/\titre/\sous in {0/En bloc/Amazon EBS, 80/En fichiers/Amazon EFS, 160/En objets/Amazon S3}{
+    \draw[cadre] (\x,0) rectangle (\x+74,-80);
+    \node[titrecadre=Ink, font=\sffamily\large\bfseries] at (\x,0) {\titre};
+    \node[font=\sffamily\small, text=Muted, anchor=north east] at (\x+72,-2) {\sous};
+  }
+  % bloc
+  \icone[10mm]{b1}{37,-20}{r-instance}{une instance}
+  \icone[9mm]{bv}{37,-46}{r-volume}{un volume}
+  \draw[draw=Vert, line width=1pt] (b1-l.south) -- (bv.north);
+  \node[note, anchor=north west, text width=68mm] at (3,-62) {vu comme un disque local ; attaché à une seule instance, dans une seule zone};
+  % fichiers
+  \icone[10mm]{f1}{100,-20}{r-instance}{instance 1}
+  \icone[10mm]{f2}{134,-20}{r-instance}{instance 2}
+  \icone[9mm]{fe}{117,-48}{efs}{système de fichiers}
+  \draw[draw=Vert, line width=1pt] (f1-l.south) |- (117,-36) -| (f2-l.south);
+  \draw[draw=Vert, line width=1pt] (117,-36) -- (fe.north);
+  \node[note, anchor=north west, text width=68mm] at (83,-62) {monté comme un dossier partagé (NFS) par plusieurs instances, sur plusieurs zones};
+  % objets
+  \icone[8mm]{o1}{174,-14}{r-instance}{}
+  \icone[8mm]{o2}{174,-30}{r-client}{}
+  \icone[8mm]{o3}{174,-46}{lambda}{}
+  \draw[draw=Vert, line width=.8pt] (192,-14) -- (192,-46);
+  \foreach \o in {o1,o2,o3} \draw[draw=Vert, line width=.8pt] (\o.east) -- (\o.east -| 192,0);
+  \icone[10mm]{os}{218,-30}{r-bucket}{bucket}
+  \draw[fl=Vert] (192,-30) -- node[etiq, above]{HTTPS} (os.west);
+  \node[note, anchor=north west, text width=68mm] at (163,-62) {objets entiers, lus et écrits par requêtes HTTPS, depuis n'importe quel programme autorisé};
+\end{tikzpicture}
+\end{document}

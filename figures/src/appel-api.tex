@@ -1,0 +1,29 @@
+% Tout est appel d'API : quatre outils, une porte d'entrée, deux contrôles
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \nom/\f/\l [count=\i from 0] in {con/console/Console web, cli/cli/AWS CLI, sdk/sdk/{SDK (boto3)}, cfn/cloudformation/CloudFormation}{
+    \icone[9mm]{\nom}{0,-\i*20}{\f}{\l}
+    \draw[draw=Trait, line width=.8pt] (\nom.east) -- (24,-\i*20);
+  }
+  \draw[draw=Trait, line width=.8pt] (24,0) -- (24,-60);
+  \node[boite, minimum width=42mm, minimum height=16mm] (api) at (62,-30) {\textbf{API AWS}\\[.5mm]\code{https://ec2.eu-west-3}\\[-.5mm]\code{.amazonaws.com}};
+  \draw[fl] (24,-30) -- node[etiq, above]{requête signée} (api.west);
+  \icone[11mm]{iam}{115,-30}{iam}{IAM : qui es-tu ?\\ en as-tu le droit ?}
+  \draw[fl] (api.east) -- (iam.west);
+  % autorisé : vers les services
+  \draw[draw=Vert, line width=.8pt] (iam.east) -- node[etiq, above, text=Vert]{autorisé} (140,-30);
+  \draw[draw=Vert, line width=.8pt] (140,-8) -- (140,-52);
+  \foreach \nom/\f/\l/\y in {s1/ec2/Amazon EC2/-8, s2/s3/Amazon S3/-30, s3/sqs/Amazon SQS/-52}{
+    \icone[9mm]{\nom}{168,\y}{\f}{\l}
+    \draw[fl=Vert] (140,\y) -- (\nom.west);
+  }
+  % refusé
+  \node[boitec=Rouge, font=\ttfamily\small] (deny) at (115,-66) {AccessDenied};
+  \draw[fl=Rouge] (iam-l.south) -- node[etiq, right, text=Rouge]{refusé} (deny.north);
+  % journal
+  \icone[9mm]{trail}{62,-66}{cloudtrail}{CloudTrail : chaque appel est journalisé}
+  \draw[pfl] (api.south) -- (trail.north);
+\end{tikzpicture}
+\end{document}

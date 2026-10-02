@@ -1,0 +1,35 @@
+% Qui gère quoi, sur trois services concrets
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \def\w{50}\def\h{10}
+  % libellés des couches
+  \foreach \l [count=\j from 0] in {Centres de données, Matériel et réseau physique, Hyperviseur, Système d'exploitation, Logiciel serveur, Exposition réseau, Données et droits d'accès}{
+    \node[anchor=east, font=\sffamily\small] at (-3,\j*\h+\h/2) {\l};
+  }
+  % colonnes : icône, nb de couches AWS, annotations des couches client
+  \foreach \ic/\nom/\k/\notes [count=\i from 0] in {
+      ec2/Amazon EC2/3/{{\code{sudo dnf upgrade}},{Nginx, votre application},{Security Group},{IAM, comptes Linux}},
+      rds/Amazon RDS/5/{{},{},{Security Group},{IAM, utilisateurs SQL}},
+      s3/Amazon S3/5/{{},{},{blocage de l'accès public},{IAM, stratégie de bucket}}}{
+    \pgfmathsetmacro{\x}{\i*(\w+6)}
+    \node at (\x+\w/2, 7*\h+10) {\svc[11mm]{\ic}{\textbf{\nom}}};
+    \foreach \j in {0,...,6}{
+      \pgfmathtruncatemacro{\aws}{\j<\k ? 1 : 0}
+      \ifnum\aws=1
+        \draw[draw=Line, fill=Soft] (\x,\j*\h) rectangle ++(\w,\h);
+        \pgfmathtruncatemacro{\moteur}{(\k==5 && \j==4) ? 1 : 0}
+        \ifnum\moteur=0 \node[font=\sffamily\small, text=Grey] at (\x+\w/2,\j*\h+\h/2) {AWS}; \fi
+      \else
+        \draw[draw=Bleu, fill=BleuBg] (\x,\j*\h) rectangle ++(\w,\h);
+      \fi
+    }
+    \foreach \n [count=\m from 3] in \notes {
+      \node[font=\sffamily\small, text=Bleu, align=center] at (\x+\w/2,\m*\h+\h/2) {\n};
+    }
+    \ifnum\k=5 \node[font=\sffamily\small, text=Grey, align=center] at (\x+\w/2,4*\h+\h/2) {AWS (correctifs compris)}; \fi
+  }
+  \node[remarque, anchor=north west] at (-60,-3) {en bleu : ce que vous configurez et surveillez ; en gris : ce qu'AWS prend en charge};
+\end{tikzpicture}
+\end{document}

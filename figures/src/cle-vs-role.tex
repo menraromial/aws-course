@@ -1,0 +1,25 @@
+% Clé d'accès permanente contre rôle et identifiants temporaires
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % panneau gauche
+  \draw[cadre=Rouge] (0,0) rectangle (112,-70);
+  \node[titrecadre=Rouge] at (0,0) {Clé d'accès écrite dans le code};
+  \icone[10mm]{code}{16,-30}{r-document}{\code{app.py}\\ \code{AKIA...}}
+  \icone[10mm]{git}{56,-30}{r-git}{dépôt public}
+  \icone[10mm]{att}{96,-30}{r-user}{n'importe qui}
+  \draw[fl] (code.east) -- node[etiq, above]{\code{git push}} (git.west);
+  \draw[fl=Rouge] (git.east) -- node[etiq, above]{copie} (att.west);
+  \node[note, anchor=north west, text width=104mm] at (4,-52) {clé permanente : valable jusqu'à sa désactivation, avec tous les droits de son propriétaire};
+  % panneau droit
+  \draw[cadre=Vert] (120,0) rectangle (232,-70);
+  \node[titrecadre=Vert] at (120,0) {Rôle endossé par l'instance};
+  \icone[10mm]{sts}{142,-16}{r-sts}{AWS STS}
+  \icone[10mm]{inst}{142,-42}{r-instance}{instance EC2}
+  \icone[10mm]{s3}{212,-42}{r-bucket}{bucket S3}
+  \draw[fl=Rouge] (sts-l.south) -- node[etiq, right]{identifiants temporaires} (inst.north);
+  \draw[fl=Vert] (inst.east) -- node[etiq, above]{requête signée} (s3.west);
+  \node[note, anchor=north west, text width=104mm] at (124,-58) {aucun secret écrit ; identifiants expirés après quelques heures, renouvelés automatiquement};
+\end{tikzpicture}
+\end{document}

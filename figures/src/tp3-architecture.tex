@@ -1,0 +1,28 @@
+% TP 3 : une instance dans le sous-réseau public du VPC par défaut
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{nav}{-36,-30}{r-users}{navigateur \code{http://IP}}
+  \icone[10mm]{pc}{-36,-70}{r-client}{votre terminal \code{ssh}}
+  \draw[cadre=Ink] (0,0) rectangle (176,-90);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-cloud}};
+  \node[titrecadre=Ink] at (6,0) {AWS Cloud, région \code{eu-west-3}};
+  \draw[cadre=Violet] (18,-10) rectangle (170,-84);
+  \node[titrecadre=Violet] at (18,-10) {VPC par défaut \code{172.31.0.0/16}};
+  \icone[9mm]{igw}{18,-50}{r-igw}{}
+  \node[font=\fontsize{8.5}{10}\selectfont, anchor=north west, align=flush left] at (20,-56) {passerelle\\ Internet};
+  \draw[pcadre=Bleu] (40,-18) rectangle (164,-78);
+  \node[titrecadre=Bleu] at (40,-18) {zone \code{eu-west-3a}};
+  \draw[cadre=Vert, fill=VertBg] (46,-26) rectangle (158,-72);
+  \node[titrecadre=Vert] at (46,-26) {sous-réseau public};
+  \draw[cadre=Rouge, fill=Paper] (70,-36) rectangle (124,-66);
+  \node[titrecadre=Rouge] at (70,-36) {\code{sg-web-<prenom>}};
+  \icone[11mm]{inst}{97,-50}{r-instance}{\code{web-<prenom>}\\ Nginx}
+  \icone[9mm]{vol}{142,-50}{r-volume}{EBS 8 Gio}
+  \draw[draw=Vert, line width=1pt] (inst.east) -- (vol.west);
+  \draw[fl] (nav.east) -- ++(12,0) |- node[etiq, above, pos=.8]{HTTP 80} ([yshift=2mm]igw.west);
+  \draw[fl=Orange] (pc.east) -- ++(12,0) |- node[etiq, below, pos=.8]{SSH 22} ([yshift=-2mm]igw.west);
+  \draw[fl] (igw.east) -- (inst.west);
+\end{tikzpicture}
+\end{document}

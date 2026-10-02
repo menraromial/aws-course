@@ -1,0 +1,242 @@
+% =====================================================================
+%  Module 3 : Calcul, Amazon EC2
+% =====================================================================
+\section{Calcul : Amazon EC2}
+
+\begin{frame}{Amazon EC2 : Elastic Compute Cloud}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Machines virtuelles (\emph{instances}) à la demande : service IaaS, lancé en 2006
+    \item Démarrage en quelques dizaines de secondes à partir d'une image (AMI)
+    \item Plus de 1 200 types d'instances : usage général, calcul, mémoire, stockage, GPU
+    \item Linux, Windows, macOS ; processeurs Intel, AMD, AWS Graviton (Arm)
+    \item Facturation à la seconde pour Linux (minimum 60 s)
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html}
+\end{frame}
+
+\begin{frame}{Caractéristiques d'une instance}
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Calcul} & nombre de vCPU, génération et fabricant du processeur \\
+    \textbf{Mémoire} & de 0,5 Gio (\texttt{t3.nano}) à plusieurs Tio \\
+    \textbf{Stockage} & volumes EBS (réseau) et, selon le type, disques locaux (\emph{instance store}) \\
+    \textbf{Réseau} & bande passante, de quelques Gbit/s à plusieurs centaines \\
+    \textbf{Placement} & une région, une AZ, un sous-réseau \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Nomenclature des types d'instances}
+  \centering
+  \includegraphics[width=.96\textwidth]{type-instance}
+  \lien{https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-type-names.html}
+\end{frame}
+
+\begin{frame}{Familles d'instances}
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Exemples} & \textbf{Famille} & \textbf{Usages} \\ \midrule
+    \texttt{t3}, \texttt{t4g} & extensible (crédits CPU) & petits sites, tests \\
+    \texttt{m7i}, \texttt{m8g} & usage général & serveurs d'applications \\
+    \texttt{c7i}, \texttt{c8g} & optimisée calcul & calcul intensif, encodage \\
+    \texttt{r7i}, \texttt{r8g} & optimisée mémoire & bases de données, caches \\
+    \texttt{i4i}, \texttt{d3} & optimisée stockage & bases NoSQL, entrepôts \\
+    \texttt{g6}, \texttt{p5} & accélérée (GPU) & apprentissage automatique \\
+    \texttt{inf2}, \texttt{trn2} & puces Inferentia, Trainium & inférence, entraînement \\ \bottomrule
+  \end{tabularx}
+  \smallskip
+  \attention Changer de type demande d'arrêter puis redémarrer l'instance
+\end{frame}
+
+\begin{frame}{Instances à performances extensibles (T)}
+  \begin{columns}[c]
+    \begin{column}{.58\textwidth}
+      \includegraphics[width=\textwidth]{credits-cpu}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.5em}
+        \item Ligne de base : 10 \% par vCPU pour une \texttt{t3.micro}
+        \item Crédits accumulés sous la ligne de base (12 par heure), dépensés au-dessus
+        \item Mode \texttt{standard} : bridage une fois les crédits épuisés
+        \item Mode \texttt{unlimited} (défaut des \texttt{t3}) : surplus facturé
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \lien{https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-performance-instances.html}
+\end{frame}
+
+\begin{frame}{Modes d'achat}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{2.6cm}@{}}
+    \toprule
+    \textbf{Mode} & \textbf{Principe} & \textbf{Remise} \\ \midrule
+    On-Demand & à la seconde, sans engagement & aucune \\
+    Savings Plans & engagement de dépense horaire sur 1 ou 3 ans & jusqu'à 72 \% \\
+    Instances réservées & engagement sur un type d'instance, 1 ou 3 ans & jusqu'à 72 \% \\
+    Spot & capacité inutilisée, reprise avec préavis de 2 minutes & jusqu'à 90 \% \\
+    Hôtes dédiés & serveur physique réservé (licences, conformité) & \\ \bottomrule
+  \end{tabularx}
+  \lien{https://aws.amazon.com/ec2/pricing/}
+\end{frame}
+
+\begin{frame}{AMI : Amazon Machine Image}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Modèle de démarrage : système d'exploitation, configuration, logiciels
+    \item Propre à une région (identifiant \texttt{ami-...}) et à une architecture (x86\_64 ou arm64)
+    \item Sources : AWS, AWS Marketplace, communauté, AMI personnalisées
+    \item AMI personnalisée : EC2 Image Builder, Packer, ou instantané d'une instance
+    \item Amazon Linux 2023 : distribution d'AWS, \texttt{dnf}, utilisateur \texttt{ec2-user}, CLI \texttt{aws} incluse
+  \end{itemize}
+  \bigskip
+  \attention Amazon Linux 2 n'est plus maintenu depuis le 30/06/2026
+  \par\attention Une AMI de la Marketplace est une dépendance externe : vérifier son éditeur
+  \source{AWS, \emph{Amazon Linux 2 FAQs}.}
+\end{frame}
+
+\begin{frame}{AMI, instances et volumes}
+  \centering
+  \includegraphics[width=.95\textwidth]{ami-instance-ebs}
+\end{frame}
+
+\begin{frame}{Stockage d'une instance}
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{Volume EBS} & \textbf{Instance store} \\ \midrule
+    Nature & disque réseau & disque physique du serveur hôte \\
+    Persistance & survit à l'arrêt de l'instance & perdu à l'arrêt ou à la résiliation \\
+    Instantané & oui (stocké dans S3) & non \\
+    Usage & disque racine, données & cache, fichiers temporaires \\ \bottomrule
+  \end{tabularx}
+  \bigskip
+  \begin{itemize}
+    \item Volume racine supprimé à la résiliation par défaut (\emph{DeleteOnTermination})
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Paires de clés et connexion}
+  \begin{columns}[c]
+    \begin{column}{.56\textwidth}
+      \includegraphics[width=\textwidth]{ssh-cles}
+    \end{column}
+    \begin{column}{.42\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.45em}
+        \item Types : RSA ou ED25519
+        \item Clé privée remise une seule fois, non conservée par AWS
+        \item Clé publique copiée dans \texttt{authorized\_keys} au démarrage
+        \item Permissions du fichier : \texttt{chmod 400}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Se connecter à une instance Linux}
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Méthode} & \textbf{Prérequis} & \textbf{Remarque} \\ \midrule
+    SSH & clé privée, port 22 ouvert à votre adresse & méthode de référence \\
+    EC2 Instance Connect & port 22 ouvert aux adresses d'AWS & clé temporaire poussée par l'API \\
+    Session Manager & rôle avec \texttt{AmazonSSMManagedInstanceCore} & aucun port entrant \\
+    EC2 Serial Console & droits IAM dédiés & dépannage (démarrage, réseau) \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Cycle de vie d'une instance}
+  \centering
+  \includegraphics[height=.78\textheight]{cycle-vie}
+\end{frame}
+
+\begin{frame}{Adresses IP}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item \textbf{Adresse privée} : dans le sous-réseau, conservée jusqu'à la résiliation
+    \item \textbf{IPv4 publique} : attribuée au démarrage, \textbf{change} après un arrêt puis un démarrage
+    \item \textbf{Elastic IP} : adresse publique fixe, réservée dans le compte
+    \item \textbf{IPv6} : adresses publiques, non facturées
+    \item Toute IPv4 publique est facturée, Elastic IP non attachée comprise
+  \end{itemize}
+  \bigskip
+  \attention L'instance ne voit que son adresse privée : la passerelle Internet traduit l'adresse publique
+\end{frame}
+
+\begin{frame}[fragile]{User data}
+  \begin{itemize}
+    \item Script exécuté par \texttt{cloud-init}, en \texttt{root}, au premier démarrage
+    \item Installation et configuration automatiques
+    \item Journal : \texttt{/var/log/cloud-init-output.log}
+  \end{itemize}
+  \begin{terminal}
+\#!/bin/bash\\
+dnf install -y nginx\\
+systemctl enable --now nginx
+  \end{terminal}
+  \begin{itemize}
+    \item Instance reproductible : on la remplace au lieu de la réparer
+  \end{itemize}
+  \attention Ne pas mettre de secret dans le user data : il est lisible via le service de métadonnées
+\end{frame}
+
+\begin{frame}{Service de métadonnées (IMDS)}
+  \centering
+  \includegraphics[width=.84\textwidth]{imds}\par\medskip
+  \raggedright
+  \begin{itemize}
+    \item \texttt{169.254.169.254} : identifiant, type, AZ, adresses, identifiants du rôle
+    \item IMDSv2 (2019) : jeton obtenu par \texttt{PUT}, puis en-tête obligatoire ; exigé par défaut sur Amazon Linux 2023
+  \end{itemize}
+  \source{C. MacCárthaigh, « Add defense in depth against open firewalls, reverse proxies, and SSRF vulnerabilities », AWS Security Blog, 2019.}
+\end{frame}
+
+\begin{frame}{Tags}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Paires clé-valeur sur presque toutes les ressources (\texttt{Name}, \texttt{Proprietaire}, \texttt{Projet}...)
+    \item Usages :
+    \begin{itemize}
+      \item retrouver et grouper des ressources
+      \item répartition des coûts par projet ou par équipe
+      \item contrôle d'accès par attributs (ABAC) : conditions \texttt{aws:ResourceTag}
+    \end{itemize}
+    \item Convention de nommage à définir dès le départ
+  \end{itemize}
+  \bigskip
+  \attention Pas de données sensibles dans les tags
+\end{frame}
+
+\begin{frame}{Supervision}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item \textbf{Status checks} : contrôles système (hôte) et instance (système d'exploitation)
+    \item \textbf{CloudWatch} : métriques CPU, réseau, disque toutes les 5 minutes (1 minute en option)
+    \item Mémoire et espace disque : agent CloudWatch à installer
+    \item Alarmes : notification ou action (arrêt, redémarrage, mise à l'échelle)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple de coût : \texttt{t3.micro} à Paris}
+  \begin{center}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{@{}lrr@{}}
+    \toprule
+    & \textbf{Une semaine} & \textbf{Un mois} \\ \midrule
+    Instance (\(\approx\) 0,012 \$/h) & 2,02 \$ & 8,76 \$ \\
+    IPv4 publique (0,005 \$/h) & 0,84 \$ & 3,65 \$ \\
+    EBS gp3 8 Go (\(\approx\) 0,09 \$/Go-mois) & 0,17 \$ & 0,72 \$ \\ \midrule
+    \textbf{Total} & \textbf{\(\approx\) 3 \$} & \textbf{\(\approx\) 13 \$} \\ \bottomrule
+  \end{tabular}
+  \end{center}
+  \source{ordres de grandeur des tarifs à la demande ; valeurs exactes sur \url{https://aws.amazon.com/ec2/pricing/on-demand/}}
+\end{frame}
+
+\diapotp{3}{Un serveur web sur EC2}{%
+  \item Paire de clés, lancement d'une instance Amazon Linux 2023
+  \item Connexion SSH, installation de Nginx
+  \item Lecture des métadonnées (IMDSv2)
+  \item Arrêt, redémarrage, relance par user data}
+

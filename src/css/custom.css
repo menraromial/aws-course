@@ -1,0 +1,114 @@
+/* =====================================================================
+   Charte du cours « Introduction à AWS »
+   Inspirée de la console : barre « squid ink », accent orange, liens bleus.
+   Tout en Inter (lecture et interface), code en IBM Plex Mono.
+   ===================================================================== */
+@import '@fontsource-variable/inter/index.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
+:root {
+  --c-squid: #232f3e;
+  --c-orange: #ec7211;
+  --c-ink: #16191f;
+  --c-muted: #5f6b7a;
+  --c-line: #d1d5db;
+  --c-soft: #f4f4f4;
+  --c-link: #0972d3;
+  --c-console-bg: #f2f3f3;
+  --c-bleu-bg: #f0f8ff;
+  --c-vert-bg: #f2fcf3;
+  --c-orange-bg: #fff8f0;
+  --c-rouge-bg: #fff5f5;
+  --c-violet-bg: #f8f4ff;
+
+  --ifm-color-primary: #0972d3;
+  --ifm-color-primary-dark: #0867be;
+  --ifm-color-primary-darker: #0761b3;
+  --ifm-color-primary-darkest: #065094;
+  --ifm-color-primary-light: #0a7de8;
+  --ifm-color-primary-lighter: #0b83f2;
+  --ifm-color-primary-lightest: #2c95f5;
+
+  --ifm-font-family-base: 'Inter Variable', Inter, system-ui, sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-family-monospace: 'IBM Plex Mono', ui-monospace, monospace;
+  --ifm-font-size-base: 106%;
+  --ifm-line-height-base: 1.72;
+  --ifm-font-color-base: var(--c-ink);
+  --ifm-heading-color: #0f141a;
+  --ifm-heading-font-weight: 700;
+  --ifm-background-color: #ffffff;
+  --ifm-code-font-size: 88%;
+  --ifm-code-background: #f2f3f3;
+  --ifm-navbar-background-color: var(--c-squid);
+  --ifm-navbar-link-color: #e9ebed;
+  --ifm-navbar-link-hover-color: #ff9900;
+  --ifm-footer-background-color: #f2f3f3;
+  --ifm-table-stripe-background: transparent;
+  --ifm-toc-border-color: var(--c-line);
+  --docusaurus-highlighted-code-line-bg: rgba(9, 114, 211, .08);
+}
+
+[data-theme='dark'] {
+  --c-ink: #e9ebed;
+  --c-muted: #9ba7b6;
+  --c-line: #414d5c;
+  --c-soft: #192534;
+  --c-console-bg: #1b2533;
+  --c-bleu-bg: #0f2135;
+  --c-vert-bg: #0f2a18;
+  --c-orange-bg: #2b1d0e;
+  --c-rouge-bg: #2e1215;
+  --c-violet-bg: #22183a;
+  --c-link: #539fe5;
+  --ifm-color-primary: #539fe5;
+  --ifm-color-primary-dark: #3a91e2;
+  --ifm-color-primary-darker: #2d8ae0;
+  --ifm-color-primary-darkest: #1d73c4;
+  --ifm-color-primary-light: #6cade8;
+  --ifm-color-primary-lighter: #79b4ea;
+  --ifm-color-primary-lightest: #9fc9f0;
+  --ifm-background-color: #0f1b2a;
+  --ifm-heading-color: #ffffff;
+  --ifm-code-background: #1b2533;
+  --ifm-navbar-background-color: #0b131e;
+  --ifm-footer-background-color: #0b131e;
+}
+
+/* ---------- barre de navigation façon console ---------- */
+.navbar { box-shadow: none; border-bottom: 3px solid var(--c-orange); }
+.navbar__title { color: #fff; font-weight: 700; letter-spacing: -.01em; }
+.navbar__toggle, .navbar .clean-btn { color: #fff; }
+.navbar-sidebar__brand .navbar__title { color: var(--ifm-heading-color); }
+
+/* ---------- colonne de lecture ---------- */
+.theme-doc-markdown { max-width: 47rem; }
+.markdown h1:first-child { font-size: 2.3rem; letter-spacing: -.025em; line-height: 1.15; margin-bottom: 1rem; }
+.markdown h2 { font-size: 1.55rem; letter-spacing: -.015em; margin-top: 2.8rem; }
+.markdown h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+.markdown p { hyphens: manual; }
+.markdown > p:first-of-type { font-size: 1.08rem; }
+.menu { font-size: .92rem; }
+.menu__link--active:not(.menu__link--sublist) { font-weight: 600; }
+
+/* ---------- tableaux ---------- */
+.markdown table { display: table; width: 100%; border-collapse: collapse; font-size: .92rem; }
+.markdown table thead tr { border-bottom: 2px solid var(--c-squid); }
+[data-theme='dark'] .markdown table thead tr { border-bottom-color: var(--c-muted); }
+.markdown table tr { border: 0; border-bottom: 1px solid var(--c-line); }
+.markdown table th, .markdown table td { border: 0; padding: .5rem .75rem; vertical-align: top; }
+.markdown table th { text-align: left; }
+
+/* ---------- code ---------- */
+.theme-code-block { box-shadow: none; border: 1px solid var(--c-line); }
+code { border: 0; }
+code, pre, .prism-code { font-variant-ligatures: none; }
+
+/* ---------- étapes de TP : listes numérotées plus aérées ---------- */
+.markdown ol > li { margin-bottom: .45rem; }
+
+/* ---------- notes de bas de page ---------- */
+.footnotes { font-size: .86rem; color: var(--c-muted); }
+
+kbd { font-family: var(--ifm-font-family-base); font-size: .8em; box-shadow: none; border: 1px solid var(--c-line); border-bottom-width: 2px; }

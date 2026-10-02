@@ -1,0 +1,30 @@
+% Topologie réseau type : un VPC, deux zones, sous-réseaux publics et privés
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{users}{96,24}{r-internet}{Internet}
+  \draw[pcadre=Sarcelle] (0,6) rectangle (192,-96);
+  \node[titrecadre=Sarcelle] at (0,6) {Région \code{eu-west-3}};
+  \draw[cadre=Violet] (6,-2) rectangle (186,-90);
+  \node[titrecadre=Violet] at (6,-2) {VPC \code{10.0.0.0/16}};
+  \icone[9mm]{igw}{96,-2}{r-igw}{}
+  \node[font=\fontsize{8.5}{10}\selectfont, anchor=west] at (101,3) {passerelle Internet};
+  \draw[fl] (users-l.south) -- (igw.north);
+  \foreach \z/\x/\n in {a/12/1, b/100/2}{
+    \draw[pcadre=Bleu] (\x,-14) rectangle (\x+80,-84);
+    \node[titrecadre=Bleu] at (\x,-14) {zone \code{eu-west-3\z}};
+    \draw[cadre=Vert, fill=VertBg] (\x+5,-22) rectangle (\x+75,-48);
+    \node[titrecadre=Vert] at (\x+5,-22) {public \code{10.0.\n.0/24}};
+    \draw[cadre=Bleu, fill=BleuBg] (\x+5,-54) rectangle (\x+75,-80);
+    \node[titrecadre=Bleu, anchor=south west] at (\x+5,-80) {privé \code{10.0.1\n.0/24}};
+    \icone[9mm]{w\z}{\x+56,-36}{r-instance}{serveur web}
+    \icone[9mm]{d\z}{\x+56,-68}{r-rdsinst}{base de données}
+  }
+  \icone[8mm]{nat}{32,-36}{vpc}{NAT Gateway}
+  \draw[fl] (igw.south) -- (96,-10) -| (wa.north);
+  \draw[fl] (96,-10) -| (wb.north);
+  \draw[pfl] (da.west) -- (32,-68) -- node[etiq, left]{sortie} (nat-l.south);
+  \node[note, anchor=north west, text width=186mm] at (0,-99) {public : route vers la passerelle Internet ; privé : aucune route entrante depuis Internet, sortie éventuelle par une NAT Gateway (payante)};
+\end{tikzpicture}
+\end{document}

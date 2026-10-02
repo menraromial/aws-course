@@ -1,0 +1,33 @@
+% Les identités IAM d'un compte : groupes, utilisateurs, stratégies, rôle
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \draw[cadre=Rouge] (0,0) rectangle (214,-92);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-account}};
+  \node[titrecadre=Rouge] at (6,0) {Compte AWS \code{123456789012}};
+  % groupes et membres
+  \draw[cadre, fill=Soft] (8,-10) rectangle (80,-44);
+  \node[titrecadre] at (8,-10) {groupe \code{developpeurs}};
+  \icone[8mm]{a}{22,-26}{r-user}{alice}
+  \icone[8mm]{b}{44,-26}{r-user}{bob}
+  \icone[8mm]{c}{66,-26}{r-user}{camille}
+  \draw[cadre, fill=Soft] (8,-52) rectangle (80,-86);
+  \node[titrecadre] at (8,-52) {groupe \code{stagiaires}};
+  \icone[8mm]{c2}{44,-68}{r-user}{camille}
+  % stratégies
+  \icone[9mm]{p1}{112,-27}{r-permissions}{\code{ec2-complet}}
+  \icone[9mm]{p2}{112,-69}{r-permissions}{\code{lecture-ec2}}
+  \draw[pfl=Rouge] (p1.west) -- node[etiq, above]{attachée} (80,-27);
+  \draw[pfl=Rouge] (p2.west) -- node[etiq, above]{attachée} (80,-69);
+  % rôle
+  \draw[draw=Rule, line width=.6pt] (132,-8) -- (132,-88);
+  \node[titrecadre] at (136,-10) {rôle};
+  \icone[10mm]{role}{186,-50}{r-role}{\code{role-galerie}}
+  \icone[10mm]{inst}{150,-50}{r-instance}{instance EC2}
+  \icone[9mm]{p3}{186,-24}{r-permissions}{\code{galerie-s3}}
+  \draw[fl=Orange] (inst.east) -- node[etiq, above]{endosse} (role.west);
+  \draw[pfl=Rouge] (p3-l.south) -- node[etiq, right]{permissions} (role.north);
+  \node[note, anchor=north, text width=70mm, align=flush center] at (173,-70) {aucun mot de passe, aucune clé : des identifiants temporaires};
+\end{tikzpicture}
+\end{document}

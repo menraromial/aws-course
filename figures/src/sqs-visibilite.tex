@@ -1,0 +1,31 @@
+% Délai de visibilité : un message reçu mais pas supprimé réapparaît
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \n/\y/\l in {q/0/file SQS, a/-22/consommateur A, b/-44/consommateur B}{
+    \node[anchor=east, font=\sffamily\small\bfseries] at (-3,\y) {\l};
+    \draw[draw=Line, line width=.8pt] (0,\y) -- (196,\y);
+  }
+  \draw[fleche=Grey] (0,-58) -- (198,-58) node[right, font=\sffamily\small, text=Grey]{temps};
+  % message visible puis invisible
+  \fill[RoseBg] (8,-3) rectangle (40,3);
+  \node[font=\sffamily\scriptsize] at (24,0) {visible};
+  \fill[Soft] (40,-3) rectangle (110,3);
+  \draw[draw=Muted, dash pattern=on 2pt off 1.5pt] (40,-3) rectangle (110,3);
+  \node[font=\sffamily\scriptsize, text=Grey] at (75,0) {invisible pendant le délai de visibilité (30 s par défaut)};
+  \fill[RoseBg] (110,-3) rectangle (132,3);
+  \node[font=\sffamily\scriptsize] at (121,0) {visible};
+  \fill[Soft] (132,-3) rectangle (170,3);
+  \node[font=\sffamily\scriptsize, text=Grey] at (151,0) {invisible};
+  % événements
+  \node[pastille=Integration] at (8,7) {1};
+  \node[font=\sffamily\scriptsize, anchor=south west] at (10,5) {message envoyé};
+  \draw[fleche=Integration] (40,-3) -- node[etiq, right, font=\sffamily\scriptsize]{2. reçu par A} (40,-20);
+  \node[text=Security, font=\sffamily\Large\bfseries] at (58,-22) {$\times$};
+  \node[font=\sffamily\scriptsize, text=Security, anchor=north] at (58,-25) {3. A plante};
+  \draw[fleche=Integration] (132,-3) -- node[etiq, right, font=\sffamily\scriptsize, pos=.8]{4. reçu par B} (132,-42);
+  \draw[fleche=Storage] (170,-44) -- node[etiq, right, font=\sffamily\scriptsize]{5. traité, puis \code{DeleteMessage}} (170,-3);
+  \node[font=\sffamily\scriptsize, text=Storage, anchor=west] at (172,4) {supprimé};
+\end{tikzpicture}
+\end{document}

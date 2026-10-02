@@ -1,0 +1,276 @@
+% =====================================================================
+%  Module 2 : Sécurité et gestion des accès
+% =====================================================================
+\section{Sécurité et gestion des accès}
+
+\begin{frame}{IAM : Identity and Access Management}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Contrôle l'accès aux services et ressources AWS
+    \item \textbf{Authentification} : qui envoie la requête ?
+    \item \textbf{Autorisation} : cette identité a-t-elle le droit de faire cette action sur cette ressource ?
+    \item S'applique à toutes les requêtes : console, CLI, SDK
+    \item Service global (pas de région), gratuit
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html}
+\end{frame}
+
+\begin{frame}{Vocabulaire}
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Principal} & entité qui envoie une requête : utilisateur racine, utilisateur IAM, rôle, service AWS \\
+    \textbf{Utilisateur IAM} & identité permanente d'une personne ou d'une application ; mot de passe et/ou clés d'accès \\
+    \textbf{Groupe} & ensemble d'utilisateurs qui partagent les mêmes stratégies ; ne peut pas se connecter \\
+    \textbf{Rôle} & identité sans identifiants permanents, endossée temporairement \\
+    \textbf{Stratégie} (\emph{policy}) & document JSON qui autorise ou interdit des actions sur des ressources \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Utilisateur racine}
+  \begin{itemize}
+    \setlength{\itemsep}{.6em}
+    \item Créé avec le compte, identifié par l'adresse électronique d'inscription
+    \item Tous les droits, non restreignables par IAM
+    \item MFA obligatoire pour tous les types de comptes depuis juin 2025
+    \item À réserver aux tâches qui l'exigent (fermeture du compte, plan de support...)
+    \item Pas de clé d'accès pour l'utilisateur racine
+  \end{itemize}
+  \bigskip
+  Dans ce cours : accès par un utilisateur IAM fourni, jamais par le compte racine
+  \source{AWS, « AWS IAM now enforces MFA for root users across all account types », 2025.}
+\end{frame}
+
+\begin{frame}{Utilisateurs, groupes, rôles}
+  \centering
+  \includegraphics[width=.95\textwidth]{iam-identites}
+\end{frame}
+
+\begin{frame}{Rôles}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Pas de mot de passe ni de clé permanente
+    \item Endossé par une entité autorisée : service AWS (EC2, Lambda), utilisateur, autre compte, utilisateur fédéré
+    \item Identifiants temporaires délivrés par AWS STS, renouvelés automatiquement
+    \item Deux stratégies :
+    \begin{itemize}
+      \item \textbf{stratégie de confiance} : qui peut endosser le rôle
+      \item \textbf{stratégie de permissions} : ce que le rôle autorise
+    \end{itemize}
+    \item Instance EC2 : rôle associé via un \emph{instance profile}
+  \end{itemize}
+  \bigskip
+  \attention Une application sur AWS n'a jamais besoin de clé d'accès : elle utilise un rôle
+\end{frame}
+
+\begin{frame}{Structure d'une stratégie}
+  \centering
+  \includegraphics[width=.96\textwidth]{politique-annotee}
+\end{frame}
+
+\begin{frame}[fragile]{Stratégie avec condition}
+  Exemple : interdire toute action EC2 en dehors de la région de Paris
+\begin{lstlisting}[language=json]
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "UniquementParis",
+    "Effect": "Deny",
+    "Action": "ec2:*",
+    "Resource": "*",
+    "Condition": {
+      "StringNotEquals": { "aws:RequestedRegion": "eu-west-3" }
+    }
+  }]
+}
+\end{lstlisting}
+  Autres clés de condition courantes : \texttt{aws:SourceIp}, \texttt{aws:MultiFactorAuthPresent}, \texttt{aws:ResourceTag/...}
+\end{frame}
+
+\begin{frame}{Types de stratégies}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Gérée par AWS} & prête à l'emploi (\texttt{AdministratorAccess}, \texttt{AmazonS3ReadOnlyAccess}) ; souvent trop large \\
+    \textbf{Gérée par le client} & écrite par le client, réutilisable ; adaptée au moindre privilège \\
+    \textbf{En ligne} (\emph{inline}) & intégrée à une seule identité, supprimée avec elle \\
+    \textbf{Basée sur la ressource} & attachée à une ressource : stratégie de bucket S3, de file SQS \\
+    \textbf{SCP}, limite de permissions & plafonnent les droits possibles (organisation, utilisateur) \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Logique d'évaluation}
+  \begin{columns}[c]
+    \begin{column}{.45\textwidth}
+      \centering
+      \includegraphics[height=.64\textheight]{evaluation-iam}
+    \end{column}
+    \begin{column}{.52\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.6em}
+        \item Par défaut : tout est refusé
+        \item Un \texttt{Allow} explicite lève le refus
+        \item Un \texttt{Deny} explicite l'emporte toujours
+        \item Toutes les stratégies applicables sont évaluées ensemble
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \lien{https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html}
+\end{frame}
+
+\begin{frame}{ARN : Amazon Resource Name}
+  \begin{itemize}
+    \item Identifiant unique de toute ressource AWS
+    \item Format : \texttt{arn:aws:\emph{service}:\emph{région}:\emph{compte}:\emph{ressource}}
+  \end{itemize}
+  \medskip
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \texttt{arn:aws:iam::123456789012:user/camille} & IAM : global, pas de région \\
+    \texttt{arn:aws:ec2:eu-west-3:123456789012:instance/i-0abc} & une instance à Paris \\
+    \texttt{arn:aws:s3:::galerie-camille} & un bucket : ni région ni compte \\
+    \texttt{arn:aws:s3:::galerie-camille/*} & les objets du bucket \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Clés d'accès et identifiants temporaires}
+  \centering
+  \includegraphics[width=.7\textwidth]{cle-vs-role}\par\medskip
+  \raggedright
+  \begin{itemize}
+    \item Clé permanente (\texttt{AKIA...}) : valable jusqu'à sa désactivation
+    \item Identifiant temporaire (\texttt{ASIA...}) : expire après quelques heures
+    \item Clé publiée sur GitHub : mise en quarantaine par AWS en une dizaine de secondes
+  \end{itemize}
+  \source{Unit 42, « From Exposure to Lockdown » ; Meli et al., « How Bad Can It Git? », NDSS 2019.}
+\end{frame}
+
+\begin{frame}{Bonnes pratiques IAM}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Moindre privilège : uniquement les droits nécessaires à la tâche
+    \item Droits attribués aux groupes, pas aux utilisateurs
+    \item Rôles et identifiants temporaires plutôt que clés d'accès
+    \item MFA pour toutes les personnes
+    \item Fédération d'identités (IAM Identity Center) pour les personnes en entreprise
+    \item Suppression des utilisateurs, clés et droits inutilisés
+    \item Comptes séparés par environnement (développement, production)
+  \end{itemize}
+  \bigskip
+  \attention Ne jamais versionner de clé d'accès dans un dépôt Git
+  \lien{https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html}
+\end{frame}
+
+\begin{frame}{Outils IAM}
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{IAM Policy Simulator} & tester une stratégie sans exécuter d'action \\
+    \textbf{IAM Access Analyzer} & détecter les accès publics ou externes, générer des stratégies à partir de l'activité \\
+    \textbf{Dernier accès} (\emph{last accessed}) & services utilisés par une identité, droits superflus \\
+    \textbf{CloudTrail} & journal des appels d'API : qui, quoi, quand, d'où (90 jours gratuits) \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+% ---- réseau ---------------------------------------------------------------
+\begin{frame}{VPC : Virtual Private Cloud}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Réseau virtuel privé et isolé, propre au compte, dans une région
+    \item Plage d'adresses en notation CIDR, par exemple \texttt{10.0.0.0/16}
+    \item Contient les sous-réseaux, tables de routage, passerelles
+    \item Socle de toutes les ressources réseau : EC2, RDS, ELB...
+    \item Plusieurs VPC par compte (5 par région par défaut)
+  \end{itemize}
+  \bigskip
+  \textbf{VPC par défaut} : créé dans chaque région, \texttt{172.31.0.0/16}, un sous-réseau public par AZ, passerelle Internet déjà attachée
+\end{frame}
+
+\begin{frame}{Sous-réseaux et accès Internet}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Sous-réseau : plage d'adresses du VPC, dans \textbf{une seule} AZ (ex. \texttt{10.0.1.0/24})
+    \item \textbf{Public} : route vers une passerelle Internet
+    \item \textbf{Privé} : pas d'accès entrant depuis Internet
+    \item \textbf{Internet Gateway} : relie le VPC à Internet, gratuite
+    \item \textbf{NAT Gateway} : sortie vers Internet pour les sous-réseaux privés ; environ 0,045 \$/h + 0,045 \$/Go traité (\texttt{us-east-1})
+    \item Adresse IPv4 publique : facturée 0,005 \$/h
+  \end{itemize}
+  \source{AWS, \emph{Amazon VPC pricing}.}
+\end{frame}
+
+\begin{frame}{Topologie réseau type}
+  \centering
+  \includegraphics[height=.8\textheight]{vpc-topologie}
+\end{frame}
+
+\begin{frame}{Notation CIDR}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabular}{@{}l l r@{}}
+    \toprule
+    \textbf{Notation} & \textbf{Signification} & \textbf{Adresses} \\ \midrule
+    \texttt{10.0.0.0/16} & bloc d'un VPC & 65 536 \\
+    \texttt{10.0.1.0/24} & bloc d'un sous-réseau & 256 (251 utilisables sur AWS) \\
+    \texttt{203.0.113.25/32} & une seule adresse & 1 \\
+    \texttt{0.0.0.0/0} & toutes les adresses IPv4 & \\
+    \texttt{::/0} & toutes les adresses IPv6 & \\ \bottomrule
+  \end{tabular}
+  \bigskip
+  \begin{itemize}
+    \item AWS réserve 5 adresses par sous-réseau
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Security Groups}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Pare-feu virtuel attaché à l'interface réseau d'une ressource (instance, base RDS...)
+    \item Règles : protocole, port, source (CIDR ou autre Security Group)
+    \item Uniquement des autorisations
+    \item Par défaut : entrant interdit, sortant autorisé
+    \item \textbf{Avec état} (\emph{stateful}) : la réponse à une connexion autorisée est autorisée
+    \item Modifications appliquées immédiatement
+    \item Plusieurs Security Groups par ressource : règles cumulées
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html}
+\end{frame}
+
+\begin{frame}{Security Group d'un serveur web}
+  \centering
+  \includegraphics[width=.95\textwidth]{security-group}
+\end{frame}
+
+\begin{frame}{Security Groups et NACL}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{Security Group} & \textbf{Network ACL} \\ \midrule
+    Portée & interface réseau (instance) & sous-réseau \\
+    Règles & autorisations seulement & autorisations et interdictions \\
+    État & avec état & sans état : trafic retour à autoriser \\
+    Évaluation & toutes les règles & par numéro de règle, la première qui correspond \\
+    Par défaut & entrant refusé, sortant autorisé & NACL par défaut : tout autorisé \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Bonnes pratiques réseau}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item N'ouvrir que les ports nécessaires
+    \item SSH (22) limité à une adresse précise, jamais \texttt{0.0.0.0/0}
+    \item Bases de données dans des sous-réseaux privés
+    \item Source = Security Group plutôt que plage d'adresses entre niveaux d'une application
+    \item Session Manager (Systems Manager) : administration sans port SSH ouvert
+  \end{itemize}
+  \bigskip
+  \attention L'espace IPv4 complet peut être balayé en moins de 45 minutes depuis une seule machine (ZMap)
+  \source{Durumeric et al., « ZMap: Fast Internet-Wide Scanning and its Security Applications », USENIX Security 2013.}
+\end{frame}
+
+\diapotp{2}{Utilisateurs, droits et pare-feu}{%
+  \item Stratégie sur mesure, groupe et utilisateur au moindre privilège
+  \item Tests dans la console et dans CloudShell
+  \item Simulateur de stratégies, refus explicite
+  \item Security Group du serveur web}
+

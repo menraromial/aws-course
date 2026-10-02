@@ -1,0 +1,11 @@
+.schema {
+  margin: 2rem 0 2.2rem;
+  padding: 1.1rem 1rem .8rem;
+  background: var(--fig-paper);
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+}
+.schema svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.schema figcaption { font-size: .88rem; line-height: 1.55; color: var(--c-muted); margin-top: .7rem; }
+.schema figcaption p { display: inline; margin: 0; }
+.schema figcaption strong { color: var(--c-ink); }

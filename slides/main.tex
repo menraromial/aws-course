@@ -1,0 +1,43 @@
+% Diapositives de la partie théorique du cours « Introduction à AWS »
+% Compilation : latexmk -lualatex main.tex
+\documentclass[aspectratio=169,11pt]{beamer}
+\input{preambule}
+
+\begin{document}
+
+% ---- page de titre ------------------------------------------------------
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[Orange] (current page.north west) rectangle ([yshift=-.11cm]current page.north east);
+    \fill[Squid] ([yshift=-2.3cm]current page.west) rectangle ([yshift=2.3cm]current page.east);
+    \node[anchor=west, font=\fontsize{36}{40}\selectfont\bfseries, text=white] at ([xshift=1.2cm,yshift=.55cm]current page.west) {INTRODUCTION À AWS};
+    \node[anchor=west, font=\LARGE, text=Ligne] at ([xshift=1.2cm,yshift=-.55cm]current page.west) {IAM, EC2, S3, SQS et un projet de déploiement};
+    \node[anchor=west, font=\large, text=Gris] at ([xshift=1.2cm,yshift=-3.1cm]current page.west) {Romial Menra};
+  \end{tikzpicture}
+\end{frame}
+
+\sommaire{0}
+
+\begin{frame}{Organisation}
+  \begin{itemize}
+    \setlength{\itemsep}{.6em}
+    \item 5 modules, chacun suivi d'un TP sur la console AWS
+    \item Compte AWS fourni : un utilisateur IAM par étudiant
+    \item Région de travail : \texttt{eu-west-3} (Paris)
+    \item Fil conducteur : une application web publique sur EC2, qui stocke ses fichiers dans S3
+  \end{itemize}
+  \bigskip
+  \begin{itemize}
+    \item Support de cours et énoncés des TP : site du cours
+    \item Documentation de référence :
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com}
+\end{frame}
+
+\input{modules/m1}
+\input{modules/m2}
+\input{modules/m3}
+\input{modules/m4}
+\input{modules/m5}
+
+\end{document}

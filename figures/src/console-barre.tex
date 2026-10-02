@@ -1,0 +1,36 @@
+% Maquette annotée de la barre supérieure de la console AWS
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\usepackage{fontawesome5}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \fill[Console, rounded corners=2pt] (0,0) rectangle (236,-12);
+  % 1 menu services
+  \node[text=IcGlyph, font=\large] (menu) at (7,-6) {\faTh};
+  % 2 recherche
+  \fill[ConsoleField, rounded corners=2pt] (16,-2.5) rectangle (110,-9.5);
+  \node[text=Rule, anchor=west, font=\sffamily\small] (search) at (19,-6) {\faSearch\enspace Rechercher};
+  \node[text=Rule, anchor=east, font=\sffamily\small] at (108,-6) {[Alt+S]};
+  % 3 CloudShell, notifications, aide, réglages
+  \node[draw=IcGlyph, text=IcGlyph, font=\ttfamily\scriptsize\bfseries, inner sep=1pt, rounded corners=1pt] (cs) at (128,-6) {>\_};
+  \node[text=IcGlyph] at (137,-6) {\faBell[regular]};
+  \node[text=IcGlyph] at (145,-6) {\faQuestionCircle[regular]};
+  \node[text=IcGlyph] (gear) at (153,-6) {\faCog};
+  % 4 région
+  \node[text=IcGlyph, font=\sffamily\small, anchor=west] (reg) at (160,-6) {Europe (Paris)\enspace\faCaretDown};
+  % 5 compte
+  \node[text=IcGlyph, font=\sffamily\small, anchor=west] (acc) at (190,-6) {camille @ 1234-5678-9012\enspace\faCaretDown};
+  % page du service, grisée
+  \draw[draw=Line, fill=Soft] (0,-12) rectangle (236,-22);
+  % pastilles et renvois
+  \foreach \n/\x in {1/7, 2/60, 3/128, 4/173, 5/212}{
+    \draw[draw=Compute, line width=.8pt] (\x,-12) -- (\x,-29);
+    \node[pastille] at (\x,-31) {\n};
+  }
+  \node[anchor=north, text width=34mm, align=flush center, font=\sffamily\small] at (7,-35) {\textbf{Services}\\ le catalogue complet, par famille};
+  \node[anchor=north, text width=46mm, align=flush center, font=\sffamily\small] at (60,-35) {\textbf{Recherche}\\ le plus rapide pour ouvrir un service : tapez «~ec2~», «~s3~», «~iam~»};
+  \node[anchor=north, text width=34mm, align=flush center, font=\sffamily\small] at (128,-35) {\textbf{CloudShell}\\ un terminal déjà authentifié};
+  \node[anchor=north, text width=34mm, align=flush center, font=\sffamily\small] at (173,-35) {\textbf{Région}\\ ce que vous voyez dépend d'elle};
+  \node[anchor=north, text width=40mm, align=flush center, font=\sffamily\small] at (214,-35) {\textbf{Compte}\\ votre identité et le numéro du compte};
+\end{tikzpicture}
+\end{document}

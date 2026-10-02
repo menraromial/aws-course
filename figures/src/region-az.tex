@@ -1,0 +1,42 @@
+% Régions et zones de disponibilité, selon les conventions des schémas AWS
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\newcommand{\groupe}[6]{% x1 y1 x2 y2 couleur/icone titre
+  \draw[groupe=#5] (#1,#2) rectangle (#3,#4);
+  \node[anchor=north west, inner sep=0pt] at (#1,#2) {#6};
+}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % AWS Cloud
+  \draw[groupe=Cloud] (0,0) rectangle (250,-90);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[7mm]{g-cloud}};
+  \node[groupetitre=Cloud] at (7,0) {AWS Cloud};
+  % Région Paris
+  \draw[groupe=Region, dash pattern=on 4pt off 2pt] (6,-10) rectangle (178,-84);
+  \node[anchor=north west, inner sep=0pt] at (6,-10) {\ic[7mm]{g-region}};
+  \node[groupetitre=Region] at (13,-10) {Région Europe (Paris) \code{eu-west-3}};
+  % trois AZ
+  \foreach \z/\x in {a/12, b/67, c/122}{
+    \draw[draw=AZ, line width=.8pt, dash pattern=on 4pt off 2pt] (\x,-20) rectangle (\x+50,-66);
+    \node[groupetitre=AZ] at (\x,-20) {Zone de disponibilité \code{eu-west-3\z}};
+    \node at (\x+14,-40) {\svc[11mm]{r-dc}{centre de données}};
+    \node at (\x+36,-40) {\svc[11mm]{r-dc}{centre de données}};
+  }
+  \draw[draw=AZ, line width=1.8pt] (62,-58) -- (67,-58);
+  \draw[draw=AZ, line width=1.8pt] (117,-58) -- (122,-58);
+  \node[remarque, anchor=north west] at (12,-69) {alimentation, refroidissement et réseau propres à chaque zone ;};
+  \node[remarque, anchor=north west] at (12,-74) {liaisons privées redondantes entre zones, latence de l'ordre de la milliseconde};
+  % incident
+  \draw[draw=Security, line width=1.3pt] (158,-39) circle (8.5mm);
+  \node[font=\sffamily\small\bfseries, text=Security, anchor=north west, text width=52mm, align=flush left] at (124,-68) {incident dans une zone :\\ les deux autres continuent};
+  % autre région
+  \draw[groupe=Region, dash pattern=on 4pt off 2pt] (186,-10) rectangle (244,-50);
+  \node[anchor=north west, inner sep=0pt] at (186,-10) {\ic[7mm]{g-region}};
+  \node[groupetitre=Region, text width=44mm] at (193,-10) {Région Europe\\(Francfort) \code{eu-central-1}};
+  \node at (215,-34) {\ic[10mm]{r-dc}\ \ic[10mm]{r-dc}\ \ic[10mm]{r-dc}};
+  \node[remarque, text width=56mm, anchor=north west] at (187,-53) {une autre région, totalement indépendante : rien n'y est copié sans votre décision};
+  % points de présence
+  \node (pop) at (194,-72) {\ic[10mm]{cloudfront}};
+  \node[remarque, anchor=west, text width=46mm] at (201,-72) {points de présence : plusieurs centaines de sites, au plus près des utilisateurs};
+\end{tikzpicture}
+\end{document}

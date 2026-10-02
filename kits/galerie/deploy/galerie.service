@@ -1,0 +1,17 @@
+# Service systemd de la galerie : /etc/systemd/system/galerie.service
+[Unit]
+Description=Galerie (Flask + Gunicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=galerie
+Group=galerie
+WorkingDirectory=/opt/galerie
+EnvironmentFile=/etc/galerie.env
+# Gunicorn n'écoute que sur la machine elle-même : seul Nginx peut le joindre.
+ExecStart=/opt/galerie/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 --access-logfile - app:app
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+% Instances T : utilisation CPU, ligne de base, solde de crédits
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % axes
+  \draw[fleche=Grey] (0,0) -- (170,0) node[right, font=\sffamily\small, text=Grey]{temps};
+  \draw[fleche=Grey] (0,0) -- (0,52) node[above, font=\sffamily\small, text=Grey]{CPU};
+  \foreach \y/\l in {0/0 \%, 5/10 \%, 50/100 \%} \node[left, font=\sffamily\scriptsize, text=Grey] at (0,\y) {\l};
+  % ligne de base 10 %
+  \draw[draw=Compute, line width=1pt, dash pattern=on 4pt off 2pt] (0,5) -- (160,5);
+  % utilisation
+  \fill[VertBg] (0,0) -- (0,2) -- (40,2) -- (40,0) -- cycle;
+  \fill[RougeBg] (40,0) -- (40,45) -- (62,45) -- (62,0) -- cycle;
+  \fill[VertBg] (62,0) -- (62,3) -- (110,3) -- (110,0) -- cycle;
+  \fill[RougeBg] (110,0) -- (110,48) -- (160,48) -- (160,0) -- cycle;
+  \draw[draw=Ink, line width=1.1pt] (0,2) -- (40,2) -- (40,45) -- (62,45) -- (62,3) -- (110,3) -- (110,48) -- (160,48);
+  \node[font=\sffamily\small, text=Storage, align=center] at (20,14) {calme :\\ on accumule\\ des crédits};
+  \node[font=\sffamily\small, text=Security, align=center] at (51,30) {pic :\\ on dépense};
+  \node[font=\sffamily\small, text=Storage, align=center] at (86,30) {on accumule\\ de nouveau};
+  \node[font=\sffamily\small, text=Security, align=center] at (135,30) {pleine charge durable :\\ crédits épuisés, puis\\ \textbf{facturation en plus}\\ (mode \code{unlimited})};
+  % solde
+  \draw[draw=Link, line width=1.1pt] (0,-14) -- (40,-6) -- (62,-18) -- (110,-8) -- (130,-24) -- (160,-24);
+  \node[font=\sffamily\small, text=Link, anchor=west] at (162,-24) {solde de crédits};
+  \draw[draw=Line] (0,-24) -- (160,-24);
+  \node[font=\sffamily\scriptsize, text=Grey, anchor=east] at (0,-24) {0};
+  \node[font=\sffamily\small, text=Compute, anchor=south, align=center] at (86,5.5) {ligne de base\\ (10 \% sur une \code{t3.micro})};
+\end{tikzpicture}
+\end{document}

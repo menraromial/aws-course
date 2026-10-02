@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie</title>
+  <style>
+    :root { --encre: #16191f; --gris: #5f6b7a; --ligne: #d1d5db; --orange: #ec7211; --bleu: #0972d3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; color: var(--encre); background: #f6f7f8; }
+    header { background: #232f3e; color: #fff; padding: 1rem 1.5rem; border-bottom: 3px solid var(--orange); }
+    header h1 { margin: 0; font-size: 1.4rem; }
+    header p { margin: .2rem 0 0; color: #c6ccd5; font-size: .9rem; }
+    main { max-width: 60rem; margin: 0 auto; padding: 1.5rem; }
+    form { background: #fff; border: 1px solid var(--ligne); border-radius: 8px; padding: 1rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
+    button { background: var(--orange); color: #16191f; border: 0; border-radius: 6px; padding: .55rem 1.1rem; font-weight: 600; cursor: pointer; }
+    .message { padding: .8rem 1rem; border-radius: 6px; margin: 1rem 0; }
+    .ok { background: #f2fcf3; border: 1px solid #037f0c; }
+    .erreur { background: #fff5f5; border: 1px solid #d91515; }
+    .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+    .carte { background: #fff; border: 1px solid var(--ligne); border-radius: 8px; overflow: hidden; }
+    .carte img { width: 100%; height: 9rem; object-fit: cover; display: block; background: #eee; }
+    .carte .doc { height: 9rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--gris); background: #f2f3f3; }
+    .carte div.infos { padding: .6rem .8rem; font-size: .85rem; }
+    .carte a { color: var(--bleu); word-break: break-all; }
+    .vide { color: var(--gris); margin-top: 1.5rem; }
+    footer { color: var(--gris); font-size: .8rem; text-align: center; padding: 2rem 1rem; }
+    code { background: #eef0f2; padding: .05rem .3rem; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Galerie</h1>
+    <p>Les fichiers déposés ici sont rangés dans le bucket S3 <code>{{ bucket }}</code>.</p>
+  </header>
+  <main>
+    <form action="{{ url_for('deposer') }}" method="post" enctype="multipart/form-data">
+      <input type="file" name="fichier" required>
+      <button type="submit">Déposer</button>
+    </form>
+
+    {% if depose %}<div class="message ok">Fichier « {{ depose }} » déposé dans S3.</div>{% endif %}
+    {% if erreur %}<div class="message erreur">{{ erreur }}</div>{% endif %}
+
+    {% if fichiers %}
+    <div class="grille">
+      {% for f in fichiers %}
+      <div class="carte">
+        {% if f.image %}<img src="{{ f.lien }}" alt="{{ f.nom }}" loading="lazy">{% else %}<div class="doc">&#128196;</div>{% endif %}
+        <div class="infos">
+          <a href="{{ f.lien }}">{{ f.nom }}</a><br>
+          {{ f.taille }} · {{ f.date.strftime('%d/%m/%Y %H:%M') }} UTC
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% elif not erreur %}
+    <p class="vide">Aucun fichier pour l'instant. Déposez-en un !</p>
+    {% endif %}
+  </main>
+  <footer>
+    Servi par l'instance {{ instance.id }} en zone {{ instance.zone }}.
+    Les liens de téléchargement sont des URL présignées, valables {{ duree }} minutes.
+  </footer>
+</body>
+</html>

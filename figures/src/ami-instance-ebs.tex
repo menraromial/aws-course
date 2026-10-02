@@ -1,0 +1,20 @@
+% Une AMI, des instances, leurs volumes, un instantané
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[12mm]{ami}{0,-30}{r-ami}{\textbf{AMI}\\ Amazon Linux 2023}
+  \draw[draw=Trait, line width=.8pt] (ami.east) -- node[etiq, above]{lancer} (26,-30);
+  \draw[draw=Trait, line width=.8pt] (26,0) -- (26,-60);
+  \foreach \n/\y/\z in {1/0/a, 2/-30/b, 3/-60/c}{
+    \icone[10mm]{i\n}{56,\y}{r-instance}{instance \n\\ \code{eu-west-3\z}}
+    \icone[9mm]{v\n}{100,\y}{r-volume}{volume EBS 8 Gio}
+    \draw[fl] (26,\y) -- (i\n.west);
+    \draw[draw=Vert, line width=1pt] (i\n.east) -- (v\n.west);
+  }
+  \icone[9mm]{snap}{150,-30}{r-snapshot}{instantané\\ (stocké dans S3)}
+  \draw[fl=Vert] (v2.east) -- node[etiq, above]{sauvegarder} (snap.west);
+  \draw[pfl=Orange] (snap-l.south) -- ++(0,-40) -| node[etiq, pos=.25]{nouvelle AMI créée à partir de l'instantané} (ami-l.south);
+  \node[note, anchor=north west, text width=58mm] at (124,-2) {le volume survit à l'arrêt de l'instance ; il est supprimé avec elle à la résiliation, sauf réglage contraire};
+\end{tikzpicture}
+\end{document}

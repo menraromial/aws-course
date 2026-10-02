@@ -1,0 +1,324 @@
+% =====================================================================
+%  Module 4 : Stockage, bases de données et messages
+% =====================================================================
+\section{Stockage, bases de données et messages}
+
+\begin{frame}{Trois types de stockage}
+  \centering
+  \includegraphics[width=.96\textwidth]{stockage-types}
+\end{frame}
+
+\begin{frame}{Amazon S3 : Simple Storage Service}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Stockage objet, accessible par API HTTPS
+    \item \textbf{Objet} : clé + données + métadonnées ; de 0 octet à 50 To
+    \item Envoi en une requête jusqu'à 5 Go, au-delà téléversement en plusieurs parties
+    \item \textbf{Bucket} : conteneur d'objets, créé dans une région
+    \item Nom de bucket unique au monde (3 à 63 caractères, minuscules)
+    \item Cohérence forte en lecture après écriture depuis 2020
+    \item Plus de 500 000 milliards d'objets stockés, plus de 200 millions de requêtes par seconde
+  \end{itemize}
+  \source{AWS, \emph{Amazon S3 FAQs} ; S. Stormacq, « Twenty years of Amazon S3 », AWS News Blog, 2026.}
+\end{frame}
+
+\begin{frame}{Buckets, clés et préfixes}
+  \centering
+  \includegraphics[width=.96\textwidth]{s3-modele}\par\medskip
+  \raggedright
+  \begin{itemize}
+    \item Pas de dossiers : des clés à plat, regroupées par préfixe dans la console
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Classes de stockage S3}
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Classe} & \textbf{Usage} \\ \midrule
+    S3 Standard & données lues fréquemment (classe par défaut) \\
+    S3 Intelligent-Tiering & accès imprévisible, niveaux automatiques \\
+    S3 Standard-IA & lectures rares, accès immédiat \\
+    S3 One Zone-IA & comme Standard-IA, dans une seule AZ \\
+    S3 Glacier Instant Retrieval & archives lues environ une fois par trimestre \\
+    S3 Glacier Flexible Retrieval & archives, récupération en minutes à heures \\
+    S3 Glacier Deep Archive & archives longues, récupération en 12 à 48 h \\
+    S3 Express One Zone & latence très faible, une seule AZ \\ \bottomrule
+  \end{tabularx}
+  \source{\url{https://aws.amazon.com/s3/storage-classes/}}
+\end{frame}
+
+\begin{frame}{Durabilité et disponibilité}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Durabilité conçue pour 99,999999999 \% par an (11 neuf)
+    \item Soit une probabilité de perte de \(10^{-11}\) par objet et par an
+    \item Avec 10 millions d'objets : une perte attendue tous les 10 000 ans environ
+    \item Données copiées sur plusieurs AZ (sauf classes One Zone)
+    \item SLA de disponibilité de S3 Standard : 99,9 \%
+  \end{itemize}
+  \bigskip
+  \attention La durabilité protège contre les pannes matérielles, pas contre une suppression : activer le versionnage
+\end{frame}
+
+\begin{frame}{Fonctionnalités de S3}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item \textbf{Versionnage} : conservation des versions précédentes de chaque objet
+    \item \textbf{Cycle de vie} : changement de classe ou suppression automatique selon l'âge
+    \item \textbf{Réplication} : vers un autre bucket, dans la même région ou une autre
+    \item \textbf{Chiffrement} : SSE-S3 appliqué par défaut depuis janvier 2023, SSE-KMS en option
+    \item \textbf{Notifications d'événements} : vers SQS, SNS, Lambda, EventBridge
+    \item \textbf{Hébergement de site statique}
+    \item \textbf{Object Lock} : écriture unique, lecture multiple (WORM)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Contrôle d'accès à S3}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Stratégies IAM de l'appelant (utilisateur, rôle)
+    \item Stratégie de bucket (basée sur la ressource)
+    \item \textbf{Block Public Access} : activé par défaut sur les nouveaux buckets depuis avril 2023
+    \item ACL désactivées par défaut (\emph{Object Ownership : bucket owner enforced})
+    \item URL présignée : accès temporaire à un objet précis
+  \end{itemize}
+  \bigskip
+  \attention Juin 2017 : bucket public d'un sous-traitant de Verizon, données de 6 à 14 millions de clients exposées
+  \source{AWS, « Amazon S3 now applies two security best practices to all new buckets by default », 2023 ; UpGuard, « Cloud Leak: How A Verizon Partner Exposed Millions of Customer Accounts », 2017.}
+\end{frame}
+
+\begin{frame}{Qui peut lire un objet ?}
+  \centering
+  \includegraphics[width=.95\textwidth]{s3-acces}
+\end{frame}
+
+\begin{frame}[fragile]{Stratégie de bucket}
+  Exemple : refuser toute requête qui n'utilise pas HTTPS
+\begin{lstlisting}[language=json]
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "HTTPSUniquement",
+    "Effect": "Deny",
+    "Principal": "*",
+    "Action": "s3:*",
+    "Resource": ["arn:aws:s3:::galerie-camille",
+                 "arn:aws:s3:::galerie-camille/*"],
+    "Condition": { "Bool": { "aws:SecureTransport": "false" } }
+  }]
+}
+\end{lstlisting}
+  \lien{https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies.html}
+\end{frame}
+
+\begin{frame}{Tarification de S3}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Volume stocké par mois, selon la classe : un peu plus de 0,02 \$/Go-mois en Standard
+    \item Requêtes : \texttt{PUT}, \texttt{COPY}, \texttt{LIST} plus chères que \texttt{GET}
+    \item Transfert sortant vers Internet ; transfert entrant gratuit
+    \item Frais de récupération pour les classes IA et Glacier
+    \item Fonctionnalités optionnelles : réplication, analyse, Transfer Acceleration
+  \end{itemize}
+  \lien{https://aws.amazon.com/s3/pricing/}
+\end{frame}
+
+\begin{frame}{Amazon EBS : Elastic Block Store}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Volume de stockage en bloc, vu comme un disque par l'instance
+    \item Dans une seule AZ, répliqué à l'intérieur de cette AZ
+    \item Attaché à une instance à la fois (sauf Multi-Attach pour \texttt{io1}/\texttt{io2})
+    \item Système de fichiers à créer par l'utilisateur
+    \item Instantanés incrémentaux stockés dans S3, copiables entre régions
+    \item Chiffrement des volumes et des instantanés (KMS)
+  \end{itemize}
+  \bigskip
+  \attention Pas de multi-AZ : un instantané permet de recréer le volume dans une autre AZ
+\end{frame}
+
+\begin{frame}{Types de volumes EBS}
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}p{1.6cm}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{2.6cm}@{}}
+    \toprule
+    \textbf{Type} & \textbf{Support} & \textbf{Usage} & \textbf{Taille max.} \\ \midrule
+    \texttt{gp3} & SSD & usage général, 3 000 à 80 000 IOPS & 64 Tio \\
+    \texttt{gp2} & SSD & génération précédente & 16 Tio \\
+    \texttt{io2} Block Express & SSD & bases critiques, jusqu'à 256 000 IOPS & 64 Tio \\
+    \texttt{st1} & HDD & débit séquentiel (journaux) & 16 Tio \\
+    \texttt{sc1} & HDD & données froides, coût minimal & 16 Tio \\ \bottomrule
+  \end{tabularx}
+  \source{AWS, \emph{Amazon EBS volume types} ; « Amazon EBS increases the maximum size and provisioned performance of gp3 volumes », 2025.}
+\end{frame}
+
+\begin{frame}{Amazon EFS et comparaison}
+  \begin{itemize}
+    \item EFS : système de fichiers NFS managé, élastique, partagé par plusieurs instances, sur plusieurs AZ
+  \end{itemize}
+  \medskip
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{S3} & \textbf{EBS} & \textbf{EFS} \\ \midrule
+    Type & objet & bloc & fichiers (NFS) \\
+    Accès & API HTTPS & une instance & plusieurs instances \\
+    Redondance & plusieurs AZ (selon classe) & une AZ & plusieurs AZ \\
+    Facturation & volume réel + requêtes & volume provisionné & volume réel \\
+    Usage type & fichiers, sauvegardes & disque système, base & dossier partagé \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+% ---- bases de données ------------------------------------------------------
+\begin{frame}{Bases relationnelles et NoSQL}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{Relationnel (SQL)} & \textbf{NoSQL} \\ \midrule
+    Modèle & tables, schéma fixe, jointures & clé-valeur, document, graphe ; schéma souple \\
+    Requêtes & SQL & API propre à chaque moteur \\
+    Mise à l'échelle & surtout verticale & horizontale (partitionnement) \\
+    Garanties & transactions ACID & souvent cohérence à terme, transactions limitées \\
+    Exemples & PostgreSQL, MySQL, Oracle & DynamoDB, MongoDB, Redis, Neo4j \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Bases de données managées sur AWS}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Amazon RDS} & PostgreSQL, MySQL, MariaDB, Oracle, SQL Server, Db2 \\
+    \textbf{Amazon Aurora} & compatible PostgreSQL et MySQL, stockage réparti sur 3 AZ \\
+    \textbf{Amazon DynamoDB} & clé-valeur et document, serverless \\
+    \textbf{Amazon ElastiCache} & cache en mémoire : Valkey, Redis OSS, Memcached \\
+    \textbf{Amazon DocumentDB} & document, compatible MongoDB \\
+    \textbf{Amazon Neptune} & graphe \\
+    \textbf{Amazon OpenSearch Service} & recherche et analyse de journaux \\ \bottomrule
+  \end{tabularx}
+  \lien{https://aws.amazon.com/products/databases/}
+\end{frame}
+
+\begin{frame}{Amazon RDS}
+  \begin{columns}[T]
+    \begin{column}{.48\textwidth}
+      \textbf{Géré par AWS}
+      \begin{itemize}
+        \setlength{\itemsep}{.35em}
+        \item installation et correctifs du moteur
+        \item sauvegardes automatiques (stockées dans S3), restauration à un instant donné
+        \item copie de secours synchrone (Multi-AZ)
+        \item chiffrement, supervision
+      \end{itemize}
+    \end{column}
+    \begin{column}{.48\textwidth}
+      \textbf{Choisi par le client}
+      \begin{itemize}
+        \setlength{\itemsep}{.35em}
+        \item moteur et version
+        \item classe d'instance (\texttt{db.t4g.micro}, \texttt{db.r7g.large}...)
+        \item stockage (gp3, io2)
+        \item Multi-AZ, réplicas en lecture
+        \item réseau, Security Group, utilisateurs
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \bigskip
+  \attention Facturée à l'heure tant qu'elle existe, même sans requête
+\end{frame}
+
+\begin{frame}{Amazon DynamoDB}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item Base clé-valeur et document, entièrement managée, sans serveur à dimensionner
+    \item Latence de quelques millisecondes quelle que soit la taille de la table
+    \item Clé primaire : clé de partition, éventuellement clé de tri
+    \item Élément de 400 Ko au maximum
+    \item Facturation à la requête (\emph{on-demand}) ou capacité réservée
+    \item Index secondaires, transactions, flux de modifications (Streams)
+  \end{itemize}
+  \bigskip
+  \attention Conception guidée par les requêtes à servir : une requête imprévue est difficile à réaliser
+  \lien{https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html}
+\end{frame}
+
+\begin{frame}{S3, RDS ou DynamoDB ?}
+  \begin{columns}[c]
+    \begin{column}{.55\textwidth}
+      \includegraphics[width=\textwidth]{galerie-evoluee}
+    \end{column}
+    \begin{column}{.43\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.5em}
+        \item \textbf{S3} : fichiers (images, documents, sauvegardes)
+        \item \textbf{RDS} : données structurées, jointures, transactions
+        \item \textbf{DynamoDB} : accès par clé à grande échelle, schéma souple
+        \item Critères : volume, fréquence d'accès, type de requêtes, cohérence, coût
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---- messages -----------------------------------------------------------------
+\begin{frame}{Amazon SQS : Simple Queue Service}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item File de messages managée, lancée en 2006
+    \item Découple un \textbf{producteur} et un \textbf{consommateur}
+    \item Absorbe les pics de charge, tolère l'arrêt d'un consommateur
+    \item Opérations : \texttt{SendMessage}, \texttt{ReceiveMessage}, \texttt{DeleteMessage}
+    \item Message jusqu'à 1 Mio (256 Kio avant août 2025)
+    \item Conservation : 4 jours par défaut, de 1 minute à 14 jours
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html}
+\end{frame}
+
+\begin{frame}{Délai de visibilité}
+  \centering
+  \includegraphics[width=.96\textwidth]{sqs-visibilite}\par\medskip
+  \raggedright
+  \begin{itemize}
+    \item Message reçu = invisible pendant le délai (30 s par défaut, jusqu'à 12 h)
+    \item Supprimé seulement par \texttt{DeleteMessage} ; sinon il réapparaît
+    \item Conséquence : traitement idempotent côté consommateur
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Files standard et FIFO}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{Standard} & \textbf{FIFO} \\ \midrule
+    Livraison & au moins une fois & traitement unique \\
+    Ordre & au mieux & strict (par groupe de messages) \\
+    Débit & quasi illimité & 300 messages/s par action, 3 000 par lots ; plus en mode haut débit \\
+    Nom & libre & suffixe \texttt{.fifo} \\ \bottomrule
+  \end{tabularx}
+  \bigskip
+  \begin{itemize}
+    \item File de lettres mortes (DLQ) : messages en échec après N réceptions
+    \item Attente longue (\emph{long polling}) jusqu'à 20 s : moins de requêtes vides
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{SQS, SNS, EventBridge}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Service} & \textbf{Modèle} & \textbf{Usage} \\ \midrule
+    SQS & file : un message, un consommateur & tâches en arrière-plan, lissage de charge \\
+    SNS & publication-abonnement : un message, plusieurs abonnés & notifications, diffusion vers plusieurs files \\
+    EventBridge & bus d'événements avec règles de routage & intégration entre services et applications \\ \bottomrule
+  \end{tabularx}
+  \bigskip
+  \begin{itemize}
+    \item SQS : premier million de requêtes gratuit chaque mois, puis environ 0,40 \$ par million (standard)
+  \end{itemize}
+  \source{AWS, \emph{Amazon SQS pricing}.}
+\end{frame}
+
+\diapotp{4}{Un bucket, un rôle, une file}{%
+  \item Bucket privé, téléversement depuis la console
+  \item URL présignée
+  \item Instance EC2 avec rôle IAM : lecture et écriture dans S3
+  \item File SQS : envoi, réception, délai de visibilité}
+

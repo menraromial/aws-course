@@ -1,0 +1,18 @@
+% Qui peut lire un objet d'un bucket privé
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \draw[cadre=Rouge, line width=1.2pt] (120,8) rectangle (196,-82);
+  \node[titrecadre=Rouge, text width=72mm] at (120,8) {Block Public Access, activé par défaut : aucune règle ne peut rendre le bucket public};
+  \icone[13mm]{bk}{158,-40}{r-bucket}{bucket privé\\ \code{galerie-camille-4821}}
+  \icone[10mm]{anon}{0,-8}{r-user}{internaute anonyme}
+  \icone[10mm]{role}{0,-40}{r-instance}{instance avec \code{role-galerie}}
+  \icone[10mm]{psu}{0,-72}{r-client}{navigateur avec une URL présignée}
+  \draw[fl=Rouge] (anon.east) -- node[etiq, above, pos=.45]{\code{GET} sans signature} (119,-8);
+  \node[font=\sffamily\small\bfseries, text=Rouge, anchor=north] at (80,-11) {403 AccessDenied};
+  \draw[fl=Vert] (role.east) -- node[etiq, above, pos=.45]{requête signée, autorisée par IAM} (bk.west);
+  \draw[fl=Vert] (psu.east) -- node[etiq, above, pos=.4]{signature du rôle dans l'URL, quelques minutes} (158,-72) -- (bk-l.south);
+  \node[note, anchor=north west, text width=196mm] at (0,-88) {une URL présignée porte les droits de celui qui l'a signée, pour un seul objet et une durée limitée};
+\end{tikzpicture}
+\end{document}

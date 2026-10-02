@@ -1,0 +1,28 @@
+% Service de métadonnées : IMDSv1 contre IMDSv2 face à une faille SSRF
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \ox/\titre/\col in {0/{IMDSv1 : une simple requête GET}/Rouge, 124/{IMDSv2 : jeton de session obligatoire}/Vert}{
+    \draw[cadre=\col] (\ox,0) rectangle (\ox+116,-70);
+    \node[titrecadre=\col] at (\ox,0) {\titre};
+  }
+  % v1
+  \icone[9mm]{a1}{14,-26}{r-user}{attaquant}
+  \node[boite, text width=28mm, font=\sffamily\small] (app1) at (54,-26) {application\\ avec une faille SSRF};
+  \node[boite, text width=26mm, font=\sffamily\small] (md1) at (96,-26) {métadonnées\\ \code{169.254.169.254}};
+  \draw[fl=Rouge] (a1.east) -- (app1.west);
+  \draw[fl=Rouge] (app1.east) -- node[etiq, above]{\code{GET}} (md1.west);
+  \draw[fl=Rouge] (md1.south) -- ++(0,-14) -| node[etiq, pos=.25]{identifiants du rôle} (a1-l.south);
+  \node[note, anchor=north west, text width=108mm] at (4,-56) {l'application relaie la requête sans s'en rendre compte : les identifiants partent chez l'attaquant};
+  % v2
+  \icone[9mm]{a2}{138,-26}{r-user}{attaquant}
+  \node[boite, text width=28mm, font=\sffamily\small] (app2) at (178,-26) {application\\ avec une faille SSRF};
+  \node[boite, text width=26mm, font=\sffamily\small] (md2) at (220,-26) {métadonnées\\ \code{169.254.169.254}};
+  \draw[fl=Rouge] (a2.east) -- (app2.west);
+  \draw[draw=Rouge, line width=.8pt] (app2.east) -- node[etiq, above]{\code{GET}} (200,-26);
+  \node[text=Rouge, font=\sffamily\Large\bfseries] at (201.5,-26) {$\times$};
+  \node[anchor=north, font=\sffamily\small, text width=60mm, align=flush center] at (200,-36) {refusé : il faut d'abord un jeton obtenu par \code{PUT}, puis l'envoyer dans un en-tête};
+  \node[note, anchor=north west, text width=108mm] at (128,-56) {une faille SSRF permet rarement d'envoyer un \code{PUT} avec un en-tête choisi : l'attaque échoue};
+\end{tikzpicture}
+\end{document}

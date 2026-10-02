@@ -1,0 +1,38 @@
+% L'architecture du projet final, avec le module qui construit chaque brique
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % cadres
+  \draw[cadre=Ink] (0,0) rectangle (196,-90);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-cloud}};
+  \node[titrecadre=Ink] at (6,0) {AWS Cloud};
+  \draw[pcadre=Sarcelle] (6,-9) rectangle (190,-84);
+  \node[titrecadre=Sarcelle] at (6,-9) {Région \code{eu-west-3}};
+  \draw[cadre=Violet] (12,-18) rectangle (112,-78);
+  \node[titrecadre=Violet] at (12,-18) {VPC par défaut};
+  \draw[cadre=Vert, fill=VertBg] (18,-27) rectangle (106,-72);
+  \node[titrecadre=Vert] at (18,-27) {sous-réseau public};
+  \draw[cadre=Rouge, fill=Paper] (44,-36) rectangle (100,-66);
+  \node[titrecadre=Rouge] at (44,-36) {Security Group};
+  % ressources
+  \icone[11mm]{ec2}{72,-50}{r-instance}{instance EC2\\ Nginx + application}
+  \icone[10mm]{role}{160,-28}{r-role}{rôle IAM}
+  \icone[11mm]{s3}{160,-50}{r-bucket}{bucket S3 privé}
+  \icone[10mm]{web}{-40,-50}{r-users}{internautes}
+  \icone[10mm]{pc}{-40,-76}{r-client}{vous}
+  % flux
+  \draw[fl] (web.east) -- node[etiq, above, pos=.3]{HTTP 80, HTTPS 443} (web.east -| ec2.west);
+  \draw[fl] (pc.east) -- ++(10,0) |- node[etiq, below, pos=.7]{SSH 22, depuis votre adresse} ([yshift=-4.5mm]ec2.west);
+  \draw[fl=Vert] (ec2.east) -- node[etiq, above, pos=.62]{lecture, écriture} (ec2.east -| s3.west);
+  \draw[pfl=Rouge] (role.west) -| (ec2.north);
+  \node[etiq, above] at (133,-28) {endossé par l'instance};
+  % modules
+  \node[num=Ink] at (196,4) {1};
+  \node[num=Rouge] at (100,-36) {2};
+  \node[num=Rouge] at (168,-22) {2};
+  \node[num=Orange] at (82,-44) {3};
+  \node[num=Vert] at (169,-44) {4};
+  \node[num=Bleu] at (-40,-40) {5};
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,31 @@
+% Architecture hautement disponible : au-delà du projet du cours
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{u}{-30,-16}{r-users}{utilisateurs}
+  \icone[9mm]{r53}{-30,-52}{route53}{Route 53 (DNS)}
+  \draw[pfl] (u-l.south) -- node[etiq, right]{nom → adresse} (r53.north);
+  \draw[cadre=Violet] (0,0) rectangle (154,-92);
+  \node[titrecadre=Violet] at (0,0) {VPC, région \code{eu-west-3}};
+  \icone[10mm]{alb}{77,-16}{elb}{Application Load Balancer}
+  \draw[fl] (u.east) -- (alb.west);
+  \foreach \z/\x in {a/6, b/82}{
+    \draw[pcadre=Bleu] (\x,-32) rectangle (\x+66,-88);
+    \node[titrecadre=Bleu] at (\x,-32) {zone \code{eu-west-3\z}};
+    \icone[9mm]{e1\z}{\x+20,-50}{r-instance}{EC2}
+    \icone[9mm]{e2\z}{\x+46,-50}{r-instance}{EC2}
+  }
+  \draw[cadre=Orange, dash pattern=on 3pt off 2pt] (12,-40) rectangle (142,-62);
+  \node[font=\sffamily\small\bfseries, text=Orange, anchor=north east] at (142,-62) {groupe Auto Scaling};
+  \draw[fl] (alb-l.south) -- (77,-36) -| (39,-40);
+  \draw[fl] (77,-36) -| (115,-40);
+  \icone[8mm]{rds1}{39,-76}{r-rdsinst}{RDS principal}
+  \icone[8mm]{rds2}{115,-76}{r-rdsinst}{RDS secours}
+  \draw[pfl=Violet] (rds1.east) -- node[etiq, above]{réplication synchrone} (rds2.west);
+  \icone[10mm]{s3}{184,-40}{s3}{S3}
+  \icone[10mm]{cw}{184,-76}{cloudwatch}{CloudWatch}
+  \draw[fl=Vert] (142,-48) -- node[etiq, above]{fichiers} (s3.west |- 142,-48);
+  \draw[pfl] (142,-56) -- ++(14,0) |- node[etiq, above, pos=.75]{métriques} (cw.west);
+\end{tikzpicture}
+\end{document}

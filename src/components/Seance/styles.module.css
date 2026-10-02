@@ -1,0 +1,7 @@
+.bandeau { display: flex; flex-wrap: wrap; gap: .45rem; margin: -.6rem 0 2rem; }
+.item, .premier {
+  font-size: .8rem; font-weight: 600; letter-spacing: .01em;
+  padding: .18rem .65rem; border-radius: 999px;
+  border: 1px solid var(--c-line); color: var(--c-muted);
+}
+.premier { background: var(--c-squid); border-color: var(--c-squid); color: #fff; }

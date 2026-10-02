@@ -1,0 +1,22 @@
+% Une application, trois services de données
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{u}{0,-30}{r-users}{utilisateur}
+  \icone[11mm]{app}{44,-30}{r-instance}{application (EC2)}
+  \draw[fl] (u.east) -- node[etiq, above]{envoie une photo} (app.west);
+  \draw[draw=Trait, line width=.8pt] (app.east) -- (76,-30);
+  \draw[draw=Trait, line width=.8pt] (76,0) -- (76,-60);
+  \icone[10mm]{s3}{112,0}{s3}{\textbf{S3} : la photo}
+  \icone[10mm]{db}{112,-30}{dynamodb}{\textbf{DynamoDB} ou \textbf{RDS} : titre, auteur, date}
+  \icone[10mm]{q}{112,-60}{sqs}{\textbf{SQS} : « miniature à faire »}
+  \draw[fl=Vert] (76,0) -- node[etiq, above]{1} (s3.west);
+  \draw[fl=Violet] (76,-30) -- node[etiq, above]{2} (db.west);
+  \draw[fl=Rose] (76,-60) -- node[etiq, above]{3} (q.west);
+  \icone[11mm]{w}{176,-60}{r-instance}{travailleur}
+  \draw[fl=Rose] (w.west) -- node[etiq, above]{lit le message} (q.east);
+  \draw[fl=Vert] (w.north) |- node[etiq, pos=.75, above]{lit l'original, écrit la miniature} (s3.east);
+  \node[note, anchor=north west, text width=70mm] at (-6,-50) {l'application répond dès l'étape 3, sans attendre la miniature};
+\end{tikzpicture}
+\end{document}

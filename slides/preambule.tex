@@ -1,0 +1,148 @@
+% =====================================================================
+%  Thème des diapositives « Introduction à AWS »
+%  Support de formation : un module par séance, sommaire rappelé à chaque
+%  module, diapos de TP et de questions, numérotation « module - page ».
+%  Figures : ../static/figures (TikZ + icônes officielles AWS).
+% =====================================================================
+\usepackage{fontspec}
+\setsansfont{Inter}[Scale=0.95]
+\setmonofont{DejaVu Sans Mono}[Scale=0.78]
+\usefonttheme{professionalfonts}
+\usepackage[french]{babel}
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc,arrows.meta,fit}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{listings}
+\usepackage{fontawesome5}
+\graphicspath{{../static/figures/}{../figures/icones/}}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
+% ---- couleurs --------------------------------------------------------
+\definecolor{Squid}{HTML}{232F3E}
+\definecolor{Orange}{HTML}{EC7211}
+\definecolor{Encre}{HTML}{16191F}
+\definecolor{Gris}{HTML}{5F6B7A}
+\definecolor{Ligne}{HTML}{D1D5DB}
+\definecolor{Doux}{HTML}{F2F3F3}
+\definecolor{Lien}{HTML}{0972D3}
+\definecolor{Rouge}{HTML}{D91515}
+\definecolor{Vert}{HTML}{037F0C}
+
+\hypersetup{colorlinks=true, urlcolor=Lien, linkcolor=Squid}
+\setbeamercolor{normal text}{fg=Encre}
+\setbeamercolor{structure}{fg=Squid}
+\setbeamercolor{alerted text}{fg=Orange}
+\setbeamercolor{item}{fg=Squid}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\raisebox{.18em}{\color{Squid}\rule{.36em}{.36em}}}
+\setbeamertemplate{itemize subitem}{\raisebox{.22em}{\color{Gris}\rule{.26em}{.26em}}}
+\setbeamertemplate{enumerate item}{\color{Squid}\bfseries\insertenumlabel.}
+\setlength{\leftmargini}{1.1em}
+\setlength{\leftmarginii}{1.1em}
+\setbeamerfont{itemize/enumerate subbody}{size=\normalsize}
+
+% ---- numérotation « module - page » ------------------------------------
+\newcount\debutmodule \debutmodule=0
+\newcommand{\numdiapo}{%
+  \ifnum\value{section}>0 \thesection\,-\,\the\numexpr\value{framenumber}-\debutmodule\relax
+  \else\insertframenumber\fi}
+
+% ---- titre de diapo : capitales, bandeau orange, module en haut à droite --
+\setbeamertemplate{frametitle}{%
+  \vspace*{.7em}%
+  {\usebeamerfont{frametitle}\Large\bfseries\color{Squid}\MakeUppercase{\insertframetitle}}\par
+  \vspace*{-.1em}}
+\setbeamertemplate{headline}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[Orange] (current page.north west) rectangle ([yshift=-.11cm]current page.north east);
+  \end{tikzpicture}}
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=west, font=\scriptsize, text=Gris] at ([xshift=.6cm,yshift=.35cm]current page.south west) {\textbf{\numdiapo}\quad Introduction à AWS};
+    \ifnum\value{section}>0
+      \node[anchor=east, font=\scriptsize, text=Gris] at ([xshift=-.6cm,yshift=.35cm]current page.south east) {Module \thesection\ · \insertsectionhead};
+    \fi
+  \end{tikzpicture}}
+
+% ---- source et lien vers la documentation ----------------------------------
+\newcommand{\source}[1]{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south west, font=\tiny, text=Gris, text width=13.6cm, align=left, inner sep=0pt]
+      at ([xshift=.6cm,yshift=.72cm]current page.south west) {Source : #1};
+  \end{tikzpicture}}
+\newtcolorbox{encadrelien}{colback=Doux, colframe=Doux, sharp corners, boxrule=0pt,
+  left=6pt, right=6pt, top=3pt, bottom=3pt, fontupper=\small}
+\newcommand{\lien}[1]{\begin{encadrelien}\url{#1}\end{encadrelien}}
+
+% ---- mise en garde en ligne --------------------------------------------------
+\newcommand{\attention}{{\color{Orange}\faExclamationTriangle}\ }
+
+% ---- terminal pour une commande ---------------------------------------------
+\newtcolorbox{terminal}{colback=Squid, colframe=Squid, sharp corners, boxrule=0pt,
+  left=8pt, right=8pt, top=4pt, bottom=4pt, fontupper=\ttfamily\small\color{white}}
+
+% ---- JSON ---------------------------------------------------------------------
+\lstdefinelanguage{json}{morestring=[b]", stringstyle=\color{Lien}, literate={:}{{\color{Gris}:}}1}
+\lstset{basicstyle=\ttfamily\footnotesize, columns=fullflexible, keepspaces=true,
+  backgroundcolor=\color{Doux}, frame=none, xleftmargin=6pt, xrightmargin=6pt,
+  aboveskip=4pt, belowskip=4pt, showstringspaces=false, upquote=true,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1}
+
+% ---- flèche des schémas propres aux diapos ---------------------------------------
+\tikzset{fl/.style={-{Stealth[length=2.4mm]}, line width=1pt, draw=#1}, fl/.default=Encre}
+
+% ---- liste des modules (sommaire) ------------------------------------------------
+\newcommand{\listemodules}{%
+  {Introduction à AWS},
+  {Sécurité et gestion des accès},
+  {Calcul : Amazon EC2},
+  {Stockage, bases de données et messages},
+  {Projet final}}
+\newcommand{\sommaire}[1]{%
+  \begin{frame}{Sommaire}
+    \begin{tikzpicture}[x=1cm,y=1cm]
+      \foreach \titre [count=\n] in \listemodules {
+        \ifnum\n=#1
+          \node[anchor=west, font=\large\bfseries, text=Orange] at (0,-\n*.82) {\n.\enspace\titre};
+          \fill[Orange] (-.35,-\n*.82-.2) rectangle ++(.1,.4);
+        \else
+          \node[anchor=west, font=\large, text=Gris] at (0,-\n*.82) {\n.\enspace\titre};
+        \fi
+      }
+    \end{tikzpicture}
+  \end{frame}}
+
+% ---- page de module (à chaque \section) --------------------------------------------
+\AtBeginSection{%
+  \global\debutmodule=\numexpr\value{framenumber}\relax
+  {\setbeamertemplate{headline}{\begin{tikzpicture}[remember picture, overlay]\fill[Orange] (current page.north west) rectangle ([yshift=-.11cm]current page.north east);\end{tikzpicture}}
+   \begin{frame}[plain]
+     \begin{tikzpicture}[remember picture, overlay]
+       \fill[Orange] (current page.north west) rectangle ([yshift=-.11cm]current page.north east);
+       \node[circle, fill=Squid, text=white, font=\fontsize{30}{30}\selectfont\bfseries, minimum size=2.2cm] at ([yshift=1.1cm]current page.center) {\thesection};
+       \node[font=\fontsize{24}{28}\selectfont\bfseries, text=Squid, text width=13cm, align=center] at ([yshift=-.9cm]current page.center) {\MakeUppercase{\insertsectionhead}};
+     \end{tikzpicture}
+   \end{frame}}
+  \sommaire{\value{section}}}
+
+% ---- diapo de TP -----------------------------------------------------------------
+\newcommand{\diapotp}[3]{% numéro, titre, éléments \item
+  \begin{frame}[plain]
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[Orange] (current page.north west) rectangle ([yshift=-.11cm]current page.north east);
+      \fill[Squid] (current page.north west) rectangle ([xshift=5.2cm]current page.south west);
+      \node[font=\fontsize{40}{40}\selectfont\bfseries, text=white] at ([xshift=2.6cm,yshift=.5cm]current page.west) {TP #1};
+      \node[font=\large, text=Ligne, text width=4.2cm, align=center] at ([xshift=2.6cm,yshift=-.7cm]current page.west) {#2};
+      \node[anchor=west, text width=8.6cm] at ([xshift=6.1cm]current page.west) {%
+        \begin{minipage}{8.6cm}\begin{itemize}\setlength{\itemsep}{.6em}#3\end{itemize}\end{minipage}};
+    \end{tikzpicture}
+  \end{frame}}
+
+% ---- icône de service avec légende -------------------------------------------------------
+\newcommand{\service}[3][1.2cm]{%
+  \begin{tabular}{@{}c@{}}\includegraphics[width=#1]{#2}\\[.15em]\parbox[t]{2.7cm}{\centering\small #3}\end{tabular}}

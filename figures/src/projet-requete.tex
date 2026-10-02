@@ -1,0 +1,28 @@
+% Projet final : ce qui se passe quand on dépose puis télécharge une photo
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \n/\x/\t/\ic in {nav/0/navigateur/r-client, ngx/48/Nginx/r-server, app/96/Flask (boto3)/r-instance, imds/144/métadonnées/r-sts, s3/196/bucket S3/r-bucket}{
+    \node (\n) at (\x,0) {\svcl[10mm]{\ic}{30mm}{\textbf{\t}}};
+    \draw[draw=Line, line width=.8pt, dash pattern=on 4pt off 3pt] (\x,-9) -- (\x,-118);
+  }
+  % dépôt
+  \node[pastille] at (-22,-16) {1};
+  \draw[fleche] (0,-16) -- node[etiq, above]{\code{POST /deposer} + photo} (48,-16);
+  \draw[fleche] (48,-22) -- node[etiq, above]{relais} (96,-22);
+  \draw[fleche=Security] (96,-28) -- node[etiq, above]{identifiants du rôle ?} (144,-28);
+  \draw[fleche=Security, dash pattern=on 3pt off 2pt] (144,-34) -- node[etiq, above]{temporaires, mis en cache} (96,-34);
+  \draw[fleche=Storage] (96,-42) -- node[etiq, above, pos=.6]{\code{PutObject uploads/...}} (196,-42);
+  \draw[fleche=Grey, dash pattern=on 3pt off 2pt] (96,-50) -- node[etiq, above]{\code{302} vers \code{/}} (0,-50);
+  % affichage
+  \node[pastille] at (-22,-64) {2};
+  \draw[fleche] (0,-64) -- node[etiq, above]{\code{GET /}} (96,-64);
+  \draw[fleche=Storage] (96,-70) -- node[etiq, above, pos=.6]{\code{ListObjectsV2}} (196,-70);
+  \node[boite=Ink, text width=40mm, font=\sffamily\scriptsize, anchor=west] at (99,-82) {signe localement une URL par fichier, sans aucun appel réseau};
+  \draw[fleche=Grey, dash pattern=on 3pt off 2pt] (96,-92) -- node[etiq, above]{page avec liens présignés} (0,-92);
+  % téléchargement
+  \node[pastille] at (-22,-108) {3};
+  \draw[fleche=Storage] (0,-108) -- node[etiq, above, pos=.3]{\code{GET} URL présignée : directement chez S3, l'instance n'est pas sollicitée} (196,-108);
+\end{tikzpicture}
+\end{document}

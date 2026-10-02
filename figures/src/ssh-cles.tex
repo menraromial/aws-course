@@ -1,0 +1,26 @@
+% Authentification SSH par paire de clés sur une instance EC2 (séquence)
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node (pc) at (0,0) {\svcl[11mm]{r-client}{50mm}{\textbf{votre ordinateur}}};
+  \node (aws) at (80,0) {\svcl[11mm]{ec2}{50mm}{\textbf{service EC2}}};
+  \node (inst) at (160,0) {\svcl[11mm]{r-instance}{50mm}{\textbf{votre instance}}};
+  \foreach \n in {pc,aws,inst} \draw[draw=Line, line width=.8pt, dash pattern=on 4pt off 3pt] (\n.south) -- ++(0,-96);
+  % 1 création
+  \node[pastille] at (-30,-22) {1};
+  \node[boite=Storage, font=\sffamily\small, text width=36mm] at (80,-22) {génère la paire de clés, garde la \textbf{publique}};
+  \draw[fleche=Security] (62,-22) -- node[etiq, above]{clé privée \code{.pem}, une seule fois} (2,-22);
+  \node[boite=Security, font=\sffamily\small, text width=30mm] at (0,-34) {rangée sur le poste,\\ \code{chmod 400}};
+  % 2 lancement
+  \node[pastille] at (-30,-50) {2};
+  \draw[fleche=Storage] (80,-50) -- node[etiq, above]{au lancement : clé publique} (158,-50);
+  \node[boite=Storage, font=\ttfamily\small, text width=40mm, align=left] at (160,-60) {\textasciitilde/.ssh/authorized\_keys};
+  % 3 connexion
+  \node[pastille] at (-30,-76) {3};
+  \draw[fleche=Compute] (0,-74) -- node[etiq, above, pos=.3]{\code{ssh -i cle.pem ec2-user@IP}} (158,-74);
+  \draw[fleche=Grey] (160,-82) -- node[etiq, above, pos=.7]{un défi à signer} (2,-82);
+  \draw[fleche=Compute] (0,-92) -- node[etiq, above, pos=.3]{la signature, faite avec la clé privée} (158,-92);
+  \node[remarque, anchor=west, text width=40mm] at (166,-88) {vérifiée avec la clé publique : connexion acceptée};
+\end{tikzpicture}
+\end{document}

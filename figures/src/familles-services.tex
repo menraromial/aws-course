@@ -1,0 +1,38 @@
+% Carte des services AWS, organisée en trois étages (fondations en bas)
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+% \categorie{x}{y}{largeur}{titre}{fichier/légende, ...}
+\newcommand{\categorie}[5]{%
+  \draw[categorie] (#1,#2) rectangle ++(#3,-31);
+  \node[cattitre] at (#1+#3/2,#2-4) {#4};
+  \foreach \f/\l [count=\i] in {#5}{\xdef\n{\i}}%
+  \foreach \f/\l [count=\i] in {#5}{%
+    \node[inner sep=0pt, anchor=north] at ({#1+#3*(\i-.5)/\n},#2-8.5) {\svc[10mm]{\f}{\l}};
+  }%
+}
+\newcommand{\etage}[2]{\node[font=\sffamily\large\bfseries] at (121.5,#1) {#2};}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % étage applicatif
+  \etage{2}{Services applicatifs}
+  \categorie{0}{-3}{96}{IA et apprentissage automatique}{bedrock/Amazon Bedrock, sagemaker/Amazon SageMaker AI, rekognition/Amazon Rekognition, translate/Amazon Translate}
+  \categorie{101}{-3}{76}{Applications métier}{workmail/Amazon WorkMail, connect/Amazon Connect, ses/Amazon SES}
+  \categorie{182}{-3}{61}{Postes et front-end}{workspaces/Amazon WorkSpaces, amplify/AWS Amplify}
+  % étage plateforme
+  \etage{-41.5}{Services de plateforme}
+  \categorie{0}{-47}{57}{Sécurité et identité}{iam/\textbf{AWS IAM}, kms/AWS KMS, waf/AWS WAF}
+  \categorie{62}{-47}{57}{Gestion et supervision}{cloudwatch/Amazon CloudWatch, cloudtrail/AWS CloudTrail, cloudformation/AWS CloudFormation}
+  \categorie{124}{-47}{57}{Intégration d'applications}{sqs/\textbf{Amazon SQS}, sns/Amazon SNS, eventbridge/Amazon EventBridge}
+  \categorie{186}{-47}{57}{Analytique}{athena/Amazon Athena, redshift/Amazon Redshift, kinesis/Amazon Kinesis}
+  % étage fondamental
+  \etage{-85}{Services fondamentaux}
+  \categorie{0}{-91}{57}{Calcul}{ec2/\textbf{Amazon EC2}, lambda/AWS Lambda, ecs/Amazon ECS}
+  \categorie{62}{-91}{57}{Stockage}{s3/\textbf{Amazon S3}, ebs/\textbf{Amazon EBS}, glacier/Amazon S3 Glacier}
+  \categorie{124}{-91}{57}{Bases de données}{rds/Amazon RDS, dynamodb/Amazon DynamoDB, elasticache/Amazon ElastiCache}
+  \categorie{186}{-91}{57}{Réseau et diffusion}{vpc/\textbf{Amazon VPC}, cloudfront/Amazon CloudFront, route53/Amazon Route 53}
+  % cadre général
+  \draw[draw=Link, line width=2.2pt, rounded corners=8pt] (-7,16) rectangle (250,-128);
+  \node[fill=white, font=\sffamily\huge, anchor=west, inner xsep=3mm] at (2,16) {Les services AWS};
+  \node[remarque, anchor=north west] at (-7,-130) {en gras : les services que vous utiliserez pendant le cours};
+\end{tikzpicture}
+\end{document}

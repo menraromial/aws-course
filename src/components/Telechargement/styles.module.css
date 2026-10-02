@@ -1,0 +1,7 @@
+.bouton {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .45rem .9rem; border-radius: 6px; font-weight: 600; font-size: .95rem;
+  background: var(--c-orange); color: #16191f; text-decoration: none;
+}
+.bouton:hover { color: #16191f; text-decoration: none; filter: brightness(1.05); }
+.fleche { font-size: 1.1rem; line-height: 1; }

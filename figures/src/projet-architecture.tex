@@ -1,0 +1,29 @@
+% Projet final : l'architecture complète, jusqu'aux processus de l'instance
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{web}{-36,-46}{r-users}{visiteurs \code{http(s)://IP}}
+  \icone[10mm]{moi}{-36,-80}{r-client}{vous \code{ssh}}
+  \draw[cadre=Ink] (0,0) rectangle (224,-100);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-cloud}};
+  \node[titrecadre=Ink] at (6,0) {AWS Cloud, région \code{eu-west-3}};
+  \draw[cadre=Violet] (8,-10) rectangle (150,-94);
+  \node[titrecadre=Violet] at (8,-10) {VPC par défaut, sous-réseau public};
+  \draw[cadre=Rouge] (16,-20) rectangle (144,-88);
+  \node[titrecadre=Rouge] at (16,-20) {\code{sg-web-<prenom>} : 80 et 443 pour tous, 22 pour votre adresse};
+  \draw[cadre=Orange, fill=OrangeBg] (22,-30) rectangle (138,-82);
+  \node[titrecadre=Orange] at (22,-30) {instance \code{galerie-<prenom>}};
+  \node[boite, text width=28mm] (nginx) at (45,-46) {\textbf{Nginx}\\ ports 80 et 443};
+  \node[boite, text width=34mm] (guni) at (112,-46) {\textbf{Gunicorn + Flask}\\ \code{127.0.0.1:8000}\\ utilisateur \code{galerie}};
+  \node[boite, text width=28mm] (sshd) at (45,-71) {\textbf{sshd}\\ port 22};
+  \node[note, text width=34mm, align=flush center] at (112,-70) {service systemd \code{galerie}\\ \code{/etc/galerie.env}};
+  \draw[fl] (nginx) -- node[etiq, above]{relais} (guni);
+  \icone[10mm]{role}{190,-24}{r-role}{\code{role-galerie-<prenom>}\\ List, Get, Put}
+  \icone[11mm]{s3}{190,-60}{r-bucket}{\code{galerie-<prenom>-<suffixe>}}
+  \draw[fl] (web.east) -- (web.east -| nginx.west);
+  \draw[fl=Orange] (moi.east) -- node[etiq, above, pos=.25]{SSH} (moi.east -| sshd.west);
+  \draw[fl=Vert] (guni.east) -- ++(10,0) |- node[etiq, above, pos=.75]{boto3} (s3.west);
+  \draw[pfl=Rouge] (role.west) -- node[etiq, above]{identifiants du rôle (IMDSv2)} (role.west -| 138,0);
+\end{tikzpicture}
+\end{document}

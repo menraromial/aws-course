@@ -1,0 +1,4 @@
+# Versions minimales : pip choisit les plus récentes compatibles avec Python 3.12.
+flask>=3.0,<4
+boto3>=1.34
+gunicorn>=22

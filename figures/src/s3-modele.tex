@@ -1,0 +1,36 @@
+% Bucket, objets, clés et « dossiers »
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\usepackage{fontawesome5}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % contenu réel
+  \draw[draw=Storage, line width=.9pt, rounded corners=4pt] (0,0) rectangle (96,-66);
+  \node[anchor=north west, inner sep=0pt] at (2,-2) {\ic[8mm]{r-bucketempty}};
+  \node[anchor=north west, font=\sffamily\small\bfseries] at (12,-2.5) {\code{galerie-camille-4821}};
+  \node[anchor=north west, font=\sffamily\scriptsize, text=Grey] at (12,-7) {région \code{eu-west-3}};
+  \node[anchor=north west, font=\sffamily\small\bfseries, text=Grey] at (4,-15) {ce que contient vraiment le bucket : une liste plate de clés};
+  \foreach \k/\t [count=\i] in {{index.html}/{2 Ko}, {uploads/2026/chat.jpg}/{340 Ko}, {uploads/2026/plage.jpg}/{1,2 Mo}, {uploads/cv.pdf}/{85 Ko}, {miniatures/chat.jpg}/{12 Ko}}{
+    \node[anchor=west, font=\ttfamily\small] at (6,-17-\i*8) {\k};
+    \node[anchor=east, font=\sffamily\small, text=Grey] at (92,-17-\i*8) {\t};
+  }
+  % vue console
+  \draw[draw=Line, line width=.9pt, rounded corners=4pt] (106,0) rectangle (170,-66);
+  \node[anchor=north west, font=\sffamily\small\bfseries, text=Grey] at (108,-2.5) {ce que la console affiche};
+  \node[anchor=west, font=\sffamily\small] at (110,-14) {\textcolor{Compute}{\faFolder}\enspace miniatures/};
+  \node[anchor=west, font=\sffamily\small] at (110,-22) {\textcolor{Compute}{\faFolder}\enspace uploads/};
+  \node[anchor=west, font=\sffamily\small] at (118,-30) {\textcolor{Compute}{\faFolder}\enspace 2026/};
+  \node[anchor=west, font=\sffamily\small] at (118,-38) {\textcolor{Grey}{\faFile[regular]}\enspace cv.pdf};
+  \node[anchor=west, font=\sffamily\small] at (110,-46) {\textcolor{Grey}{\faFile[regular]}\enspace index.html};
+  \node[remarque, anchor=north west, text width=60mm] at (108,-52) {les « dossiers » ne sont que des préfixes de clés, découpés sur le caractère \code{/}};
+  % anatomie d'un objet
+  \draw[draw=Line, line width=.9pt, rounded corners=4pt] (180,0) rectangle (250,-66);
+  \node[anchor=north west, inner sep=0pt] at (182,-2) {\ic[8mm]{r-document}};
+  \node[anchor=north west, font=\sffamily\small\bfseries] at (192,-4) {un objet};
+  \node[anchor=north west, font=\sffamily\small, text width=64mm, align=flush left] at (183,-14) {%
+    \textbf{clé} : \code{uploads/2026/chat.jpg}\\[1.2mm]
+    \textbf{données} : les octets du fichier, de 0 octet à 50 To\\[1.2mm]
+    \textbf{métadonnées} : \code{Content-Type: image/jpeg}, date, taille, empreinte\\[1.2mm]
+    \textbf{version} : si le versionnage est activé, chaque écriture garde l'ancienne};
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,20 @@
+.hero { background: var(--c-squid); color: #fff; padding: 4.5rem 0 4rem; border-bottom: 3px solid var(--c-orange); }
+.kicker { font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #ff9900; }
+.title { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.08; letter-spacing: -.03em; margin: .8rem 0 1.2rem; color: #fff; }
+.title span { display: block; font-weight: 400; color: #c6ccd5; font-size: .6em; letter-spacing: -.01em; margin-top: .4rem; }
+.lead { font-size: 1.15rem; max-width: 38rem; color: #e9ebed; }
+.actions { margin-top: 2rem; }
+.actions :global(.button--primary) { background: var(--c-orange); border-color: var(--c-orange); color: #16191f; }
+.section { padding: 3.5rem 0 4rem; }
+.h2 { font-size: 1.5rem; margin-bottom: 1.6rem; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.card {
+  display: flex; flex-direction: column; padding: 1.2rem 1.3rem 1rem;
+  border: 1px solid var(--c-line); border-radius: 8px; color: var(--c-ink);
+  background: var(--ifm-background-color); transition: border-color .15s, box-shadow .15s;
+}
+a.card:hover { text-decoration: none; color: var(--c-ink); border-color: var(--c-orange); box-shadow: 0 2px 10px rgba(35, 47, 62, .08); }
+.card h3 { font-size: 1.15rem; margin: .25rem 0 .5rem; }
+.card p { font-size: .95rem; color: var(--c-muted); margin-bottom: .8rem; }
+.cardNum { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--c-orange); }
+.cardFoot { margin-top: auto; padding-top: .6rem; border-top: 1px solid var(--c-line); font-size: .82rem; color: var(--c-muted); }

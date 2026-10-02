@@ -1,0 +1,24 @@
+% TP 4 : bucket privé, instance avec rôle, file SQS
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \draw[cadre=Ink] (0,0) rectangle (160,-88);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-cloud}};
+  \node[titrecadre=Ink] at (6,0) {AWS Cloud, région \code{eu-west-3}};
+  \icone[11mm]{inst}{30,-40}{r-instance}{\code{web-<prenom>}}
+  \icone[9mm]{role}{30,-70}{r-role}{\code{role-galerie-<prenom>}}
+  \draw[pfl=Rouge] (role.north) -- (inst-l.south);
+  \icone[11mm]{s3}{120,-22}{r-bucket}{\code{galerie-<prenom>-<suffixe>}}
+  \icone[10mm]{q}{120,-62}{r-queue}{\code{file-<prenom>}}
+  \draw[fl=Vert] (inst.east) -- ++(18,0) |- node[etiq, above, pos=.75]{\code{aws s3 cp}, \code{ls}} (s3.west);
+  \draw[fl=Rose] (inst.east) ++(18,0) |- node[etiq, below, pos=.75]{\code{send-message}} (q.west);
+  \icone[9mm]{moi}{212,-10}{console}{vous, dans la console}
+  \icone[9mm]{nav}{212,-40}{r-client}{navigateur, URL présignée}
+  \icone[9mm]{anon}{212,-70}{r-user}{anonyme}
+  \draw[fl=Vert] (moi.west) -- ++(-30,0) |- node[etiq, above, pos=.25]{téléversement} ([yshift=2mm]s3.east);
+  \draw[fl=Vert] (nav.west) -- ++(-36,0) |- ([yshift=-2mm]s3.east);
+  \draw[fl=Rouge] (anon.west) -- node[etiq, above]{403} (161,-70);
+  \node[text=Rouge, font=\sffamily\Large\bfseries] at (161,-70) {$\times$};
+\end{tikzpicture}
+\end{document}

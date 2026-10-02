@@ -1,0 +1,21 @@
+% Une instance contre deux instances dans deux zones
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \ox/\titre/\deux/\msg/\col in {0/Une seule instance/0/{zone a en panne : service interrompu}/Security, 92/{Deux instances, deux zones}/1/{zone a en panne : service maintenu par la zone b}/Storage}{
+    \node[font=\sffamily\normalsize\bfseries] at (\ox+38,26) {\titre};
+    \foreach \z/\x in {a/0, b/26, c/52}{
+      \draw[draw=AZ, line width=.8pt, dash pattern=on 3pt off 2pt] (\ox+\x,0) rectangle ++(24,18);
+      \node[font=\sffamily\scriptsize, text=AZ, anchor=north west] at (\ox+\x,18) {zone \z};
+    }
+    \node at (\ox+12,8) {\ic[9mm]{r-instance}};
+    \ifnum\deux=1
+      \node at (\ox+38,8) {\ic[9mm]{r-instance}};
+      \node at (\ox+25,21) {\ic[6mm]{elb}};
+    \fi
+    \draw[draw=Rouge, line width=2pt] (\ox+6,3) -- (\ox+18,13) (\ox+6,13) -- (\ox+18,3);
+    \node[font=\sffamily\small\bfseries, text=\col] at (\ox+38,-5) {\msg};
+  }
+\end{tikzpicture}
+\end{document}

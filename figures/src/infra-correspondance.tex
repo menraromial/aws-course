@@ -1,0 +1,26 @@
+% Infrastructure traditionnelle et équivalents AWS
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\usepackage{fontawesome5}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\sffamily\large\bfseries, text=Grey] at (30,8) {Centre de données classique};
+  \node[font=\sffamily\large\bfseries, text=Compute] at (150,8) {AWS};
+  \foreach \nom/\trad/\icone/\aws [count=\i from 0] in {
+      Sécurité/{pare-feu, annuaire des comptes}/iam/{IAM, Security Groups, NACL},
+      Réseau/{routeurs, commutateurs, VLAN}/vpc/{VPC, sous-réseaux, passerelles},
+      Serveurs/{serveurs physiques, hyperviseurs}/ec2/{EC2},
+      Stockage/{SAN, NAS, partages de fichiers}/s3/{EBS, EFS, S3},
+      {Bases de données}/{SGBD installé sur un serveur}/rds/{RDS, Aurora, DynamoDB}}{
+    \pgfmathsetmacro{\y}{-\i*17}
+    \draw[draw=Line, fill=Soft, rounded corners=3pt] (0,\y+6) rectangle (62,\y-7);
+    \node[anchor=west, font=\sffamily\normalsize, text width=58mm, align=flush left] at (2,\y) {\trad};
+    \node[draw=Line, fill=white, rounded corners=8pt, minimum width=30mm, minimum height=9mm, font=\sffamily\normalsize\bfseries] at (90,\y) {\nom};
+    \draw[draw=Line, fill=white, rounded corners=3pt] (118,\y+6) rectangle (186,\y-7);
+    \node[anchor=west, inner sep=0pt] at (121,\y) {\ic[9mm]{\icone}};
+    \node[anchor=west, font=\sffamily\normalsize, text width=50mm, align=flush left] at (133,\y) {\aws};
+    \draw[draw=Line, line width=1pt] (62,\y) -- (75,\y);
+    \draw[draw=Line, line width=1pt] (105,\y) -- (118,\y);
+  }
+\end{tikzpicture}
+\end{document}

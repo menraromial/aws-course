@@ -1,0 +1,33 @@
+% Cycle de vie d'une instance et ce qui est facturé dans chaque état
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\tikzset{etat/.style={draw=#1, fill=#1Bg, line width=1pt, rounded corners=8pt, minimum width=30mm, minimum height=11mm, font=\sffamily\normalsize\bfseries, text=Ink}, etat/.default=Trait}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[etat=Trait] (pending) at (0,0) {pending};
+  \node[etat=Vert] (running) at (50,0) {running};
+  \node[etat=Trait] (stopping) at (100,0) {stopping};
+  \node[etat=Orange] (stopped) at (150,0) {stopped};
+  \node[etat=Trait] (shutting) at (50,-30) {shutting-down};
+  \node[etat=Rouge] (terminated) at (150,-30) {terminated};
+  \node[circle, fill=Ink, minimum size=3mm, inner sep=0pt] (start) at (-28,0) {};
+  \draw[fleche] (start) -- node[etiq, above]{Launch} (pending);
+  \draw[fleche] (pending) -- (running);
+  \draw[fleche] (running) -- node[etiq, above]{Stop} (stopping);
+  \draw[fleche] (stopping) -- (stopped);
+  \draw[fleche] (stopped.north) to[bend right=22] node[etiq, above]{Start : nouvelle IPv4 publique} (pending.north);
+  \draw[fleche=Security] (running) -- node[etiq, right]{Terminate} (shutting);
+  \draw[fleche=Security] (shutting) -- (terminated);
+  \draw[fleche=Security] (stopped) -- node[etiq, right]{Terminate} (terminated);
+  % tableau de facturation
+  \node[anchor=north west, font=\sffamily\small] at (-30,-46) {%
+    \begin{tabular}{@{}l@{\qquad}c@{\qquad}c@{\qquad}c@{}}
+     & \textbf{running} & \textbf{stopped} & \textbf{terminated}\\[.8mm]
+    \hline\\[-2.8mm]
+    calcul (à la seconde) & \textcolor{Security}{facturé} & \textcolor{Storage}{non} & \textcolor{Storage}{non}\\
+    volume EBS & \textcolor{Security}{facturé} & \textcolor{Security}{facturé} & \textcolor{Storage}{supprimé (par défaut)}\\
+    IPv4 publique & \textcolor{Security}{facturée} & \textcolor{Storage}{libérée} & \textcolor{Storage}{libérée}\\
+    adresse privée & conservée & conservée & libérée\\
+    \end{tabular}};
+\end{tikzpicture}
+\end{document}

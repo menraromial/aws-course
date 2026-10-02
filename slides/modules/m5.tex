@@ -1,0 +1,121 @@
+% =====================================================================
+%  Module 5 : Projet final
+% =====================================================================
+\section{Projet final}
+
+\begin{frame}{Objectif}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Déployer une application web publique sur une instance EC2
+    \item Fonctions : déposer un fichier (10 Mo au plus), lister les fichiers, les télécharger
+    \item Fichiers stockés dans un bucket S3 privé
+    \item Application fournie : Flask + boto3 ; travail demandé : le déploiement
+  \end{itemize}
+  \bigskip
+  \textbf{Exigences}
+  \begin{itemize}
+    \item HTTP (80) et HTTPS (443) ouverts à tous, SSH (22) limité à votre adresse
+    \item Aucune clé d'accès sur l'instance : accès à S3 par un rôle IAM
+    \item Rôle limité au bucket : lister, lire, écrire, pas de suppression
+    \item Redémarrage automatique de l'application (panne, redémarrage de l'instance)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Architecture}
+  \centering
+  \includegraphics[width=\textwidth]{projet-architecture}
+\end{frame}
+
+\begin{frame}{Composants sur l'instance}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Nginx} & serveur frontal sur les ports 80 et 443 : TLS, taille maximale des requêtes, relais vers l'application \\
+    \textbf{Gunicorn} & serveur d'application Python, 2 processus, écoute sur \texttt{127.0.0.1:8000} uniquement \\
+    \textbf{Flask + boto3} & application ; boto3 obtient les identifiants du rôle via IMDSv2 \\
+    \textbf{systemd} & service \texttt{galerie} : démarrage au boot, relance en cas d'arrêt \\
+    \textbf{Utilisateur \texttt{galerie}} & compte système sans droits d'administration \\
+    \textbf{\texttt{/etc/galerie.env}} & configuration : nom du bucket, région ; aucun secret \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Traitement d'une requête}
+  \centering
+  \includegraphics[height=.78\textheight]{projet-requete}
+\end{frame}
+
+\begin{frame}{URL présignées}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item URL signée avec les identifiants de l'application, pour un objet et une durée donnés
+    \item Générée localement, sans appel réseau
+    \item Le navigateur télécharge directement depuis S3 : pas de charge sur l'instance
+    \item Durée de validité limitée par celle des identifiants : quelques heures avec un rôle, 7 jours au maximum avec une clé permanente
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html}
+\end{frame}
+
+\begin{frame}{HTTPS}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Certificat reconnu par les navigateurs : délivré pour un nom de domaine
+    \item Projet : certificat autosigné, connexion chiffrée mais avertissement du navigateur
+    \item En production :
+    \begin{itemize}
+      \item nom de domaine (Route 53 ou autre registraire)
+      \item certificat gratuit AWS Certificate Manager, sur un répartiteur de charge ou CloudFront
+      \item ou certificat Let's Encrypt directement sur Nginx
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Vérifications attendues}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Exigence} & \textbf{Vérification} \\ \midrule
+    Application publique & \texttt{http://IP} et \texttt{https://IP} répondent \\
+    SSH restreint & port 22 fermé depuis CloudShell \\
+    Application non exposée & port 8000 fermé ; \texttt{ss -ltn} montre \texttt{127.0.0.1:8000} \\
+    Bucket privé & URL directe d'un objet : \texttt{AccessDenied} ; URL présignée : accès puis expiration \\
+    Aucune clé & pas de \texttt{\textasciitilde/.aws}, aucune clé dans l'application \\
+    Moindre privilège & \texttt{aws s3 rm} refusé \\
+    Résilience & relance après \texttt{kill -9} et après redémarrage \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Limites et évolutions}
+  \begin{columns}[c]
+    \begin{column}{.57\textwidth}
+      \includegraphics[width=\textwidth]{architecture-cible}
+    \end{column}
+    \begin{column}{.41\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.4em}
+        \item Une instance, une AZ : pas de haute disponibilité
+        \item Adresse IP changeante : nom de domaine, Elastic IP ou répartiteur
+        \item Évolutions : ALB + groupe Auto Scaling multi-AZ, RDS Multi-AZ, alarmes CloudWatch
+        \item Infrastructure décrite en code : CloudFormation, CDK, Terraform
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \lien{https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html}
+\end{frame}
+
+\diapotp{5}{Déployer la galerie}{%
+  \item Archive de l'application dans le bucket
+  \item Instance avec rôle, installation, service systemd
+  \item Nginx en HTTP puis en HTTPS
+  \item Vérifications, puis suppression de toutes les ressources}
+
+
+\begin{frame}{Pour aller plus loin}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Documentation AWS : \url{https://docs.aws.amazon.com}
+    \item AWS Well-Architected Framework : six piliers (excellence opérationnelle, sécurité, fiabilité, performance, coûts, durabilité)
+    \item AWS Skill Builder : formations et laboratoires en ligne
+    \item Certification d'entrée : AWS Certified Cloud Practitioner
+    \item Architectures de référence : AWS Solutions Library, \url{https://aws.amazon.com/solutions/}
+  \end{itemize}
+\end{frame}

@@ -1,0 +1,7 @@
+.chemin {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: .15rem .35rem;
+  font-size: .86em; line-height: 1.5; padding: .05rem .5rem; border-radius: 4px;
+  background: var(--c-console-bg); border: 1px solid var(--c-line); vertical-align: baseline;
+}
+.etape { font-weight: 600; color: var(--c-ink); }
+.sep { color: var(--c-orange); font-weight: 700; }

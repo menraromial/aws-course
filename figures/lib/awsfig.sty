@@ -1,0 +1,86 @@
+% =====================================================================
+%  awsfig.sty : figures du cours « Introduction à AWS »
+%  Cadres à trait fin et fond pâle, flèches fines orthogonales, étiquettes
+%  posées sur le fond, icônes officielles AWS (figures/icones). Toutes les
+%  couleurs viennent de palette.tsv : svgpost.py les transforme en variables
+%  CSS, et les figures suivent le thème clair ou sombre du site.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{awsfig}[2026/10/02 figures du cours AWS]
+\RequirePackage{fontspec}
+\setsansfont{Inter}[Scale=0.95]
+\setmonofont{DejaVu Sans Mono}[Scale=0.85]
+\renewcommand{\familydefault}{\sfdefault}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\graphicspath{{../icones/}}
+\RequirePackage{tikz}
+\usetikzlibrary{positioning,fit,backgrounds,calc,arrows.meta,shapes.misc,decorations.pathreplacing}
+\input{couleurs.tex}
+\color{Ink}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---- anciens noms, conservés comme alias de la palette ----------------
+\colorlet{Grey}{Muted}   \colorlet{Line}{Rule}    \colorlet{Link}{Bleu}
+\colorlet{Compute}{Orange} \colorlet{Storage}{Vert} \colorlet{Database}{Violet}
+\colorlet{Network}{Violet} \colorlet{Security}{Rouge} \colorlet{Integration}{Rose}
+\colorlet{AI}{Sarcelle} \colorlet{Cloud}{Ink} \colorlet{Region}{Sarcelle}
+\colorlet{Subnet}{Vert} \colorlet{AZ}{Bleu} \colorlet{SG}{Rouge}
+\colorlet{ComputeBg}{OrangeBg} \colorlet{StorageBg}{VertBg} \colorlet{SecurityBg}{RougeBg}
+\colorlet{NetworkBg}{VioletBg} \colorlet{DatabaseBg}{VioletBg} \colorlet{IntegrationBg}{RoseBg}
+\colorlet{TraitBg}{Soft} \colorlet{MutedBg}{Soft} \colorlet{InkBg}{Soft}
+
+% ---- icônes ------------------------------------------------------------
+% icône avec légende dessous : \svc[taille]{fichier}{légende}
+\newcommand{\svc}[3][11mm]{%
+  \begin{tabular}{@{}c@{}}\includegraphics[width=#1]{#2}\\[-.3mm]
+  \parbox[t]{20mm}{\centering\fontsize{8.5}{9.5}\selectfont #3}\end{tabular}}
+% même chose avec une largeur de légende choisie
+\newcommand{\svcl}[4][11mm]{%
+  \begin{tabular}{@{}c@{}}\includegraphics[width=#1]{#2}\\[-.3mm]
+  \parbox[t]{#3}{\centering\fontsize{8.5}{9.5}\selectfont #4}\end{tabular}}
+\newcommand{\ic}[2][10mm]{\includegraphics[width=#1]{#2}}
+% icône nommée, légende dessous ; les flèches s'accrochent à l'icône seule :
+%   \icone[taille]{nom}{x,y}{fichier}{légende}
+\newcommand{\icone}[5][10mm]{%
+  \node[inner sep=0pt] (#2) at (#3) {\includegraphics[width=#1]{#4}};
+  \node[anchor=north, inner sep=1mm, font=\fontsize{8.5}{10}\selectfont, align=center, text=Ink] (#2-l) at (#2.south) {#5};}
+\newcommand{\code}[1]{{\ttfamily\small #1}}
+
+\tikzset{
+  every picture/.style={line cap=round, line join=round, font=\sffamily\normalsize, text=Ink},
+  % boîte : trait coloré, fond blanc (ou pâle avec boitec)
+  boite/.style={draw=#1, line width=.8pt, rounded corners=2pt, fill=Paper, align=center, inner sep=2.2mm, text=Ink},
+  boite/.default=Trait,
+  boitec/.style={draw=#1, line width=.8pt, rounded corners=2pt, fill=#1Bg, align=center, inner sep=2.2mm, text=Ink},
+  % cadre de regroupement (compte, région, VPC, instance...)
+  cadre/.style={draw=#1, line width=.8pt, rounded corners=3pt},
+  cadre/.default=Trait,
+  pcadre/.style={cadre=#1, dash pattern=on 4pt off 2.5pt},
+  pcadre/.default=Trait,
+  titrecadre/.style={font=\sffamily\small\bfseries, text=#1, anchor=north west, inner sep=1.5mm},
+  titrecadre/.default=Trait,
+  % flèches fines, de préférence horizontales ou verticales
+  fl/.style={-{Stealth[length=2.3mm,width=1.7mm]}, line width=.8pt, draw=#1},
+  fl/.default=Trait,
+  pfl/.style={fl=#1, dash pattern=on 3pt off 2pt},
+  pfl/.default=Muted,
+  dfl/.style={{Stealth[length=2.3mm,width=1.7mm]}-{Stealth[length=2.3mm,width=1.7mm]}, line width=.8pt, draw=#1},
+  dfl/.default=Trait,
+  % étiquettes
+  etiq/.style={font=\sffamily\small, fill=Paper, inner sep=1.3pt, align=center, text=Ink},
+  etiqc/.style={font=\ttfamily\small, fill=Paper, inner sep=1.3pt, align=center, text=Ink},
+  note/.style={font=\sffamily\small, text=Muted, align=flush left},
+  num/.style={circle, fill=#1, text=Paper, font=\sffamily\small\bfseries, inner sep=0pt, minimum size=5mm},
+  num/.default=Orange,
+  % ---- anciens noms de styles, redéfinis --------------------------------
+  groupe/.style={cadre=#1}, groupe/.default=Trait,
+  groupetitre/.style={titrecadre=#1}, groupetitre/.default=Trait,
+  categorie/.style={draw=Rule, line width=.8pt, rounded corners=5pt, fill=Paper},
+  cattitre/.style={font=\sffamily\normalsize, text=Muted},
+  fleche/.style={fl=#1}, fleche/.default=Trait,
+  pfleche/.style={pfl=#1}, pfleche/.default=Muted,
+  remarque/.style={font=\sffamily\small, text=Muted, align=flush left},
+  pastille/.style={num=#1}, pastille/.default=Orange,
+}
+\endinput

@@ -1,0 +1,39 @@
+% Une stratégie IAM lue ligne à ligne
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\newcommand{\cle}[1]{\textcolor{Bleu}{"#1"}}
+\newcommand{\val}[1]{\textcolor{Vert}{"#1"}}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \fill[Soft, rounded corners=4pt] (-3,4) rectangle (112,-86);
+  \foreach \t [count=\i from 0] in {
+    {\{},
+    {\ \ \cle{Version}: \val{2012-10-17},},
+    {\ \ \cle{Statement}: [},
+    {\ \ \ \ \{},
+    {\ \ \ \ \ \ \cle{Sid}: \val{ListerLeBucket},},
+    {\ \ \ \ \ \ \cle{Effect}: \val{Allow},},
+    {\ \ \ \ \ \ \cle{Action}: \val{s3:ListBucket},},
+    {\ \ \ \ \ \ \cle{Resource}: \val{arn:aws:s3:::galerie-camille}},
+    {\ \ \ \ \},},
+    {\ \ \ \ \{},
+    {\ \ \ \ \ \ \cle{Sid}: \val{LireEtEcrire},},
+    {\ \ \ \ \ \ \cle{Effect}: \val{Allow},},
+    {\ \ \ \ \ \ \cle{Action}: [\val{s3:GetObject}, \val{s3:PutObject}],},
+    {\ \ \ \ \ \ \cle{Resource}: \val{arn:aws:s3:::galerie-camille/*}},
+    {\ \ \ \ \}},
+    {\ \ ]},
+    {\}}}{
+    \node[anchor=west, font=\ttfamily\small, inner sep=0pt] at (0,-\i*5) {\t};
+  }
+  % annotations
+  \newcommand{\annot}[3]{% y ligne, y texte, texte
+    \draw[draw=Compute, line width=.7pt] (113,-#1*5) -- (120,-#1*5) -- (124,#2);
+    \node[anchor=west, text width=74mm, align=flush left, font=\sffamily\small] at (125,#2) {#3};}
+  \annot{1}{-5}{\textbf{Version du langage}, pas de votre fichier : toujours \code{2012-10-17}.}
+  \annot{5}{-20}{\textbf{Effect} : \code{Allow} autorise, \code{Deny} interdit.}
+  \annot{6}{-32}{\textbf{Action} : les appels d'API visés, sous la forme \code{service:Opération}. Le joker \code{*} est accepté (\code{s3:Get*}).}
+  \annot{7}{-46}{\textbf{Resource} : le \textbf{bucket} lui-même. Lister son contenu est une action sur le bucket.}
+  \annot{13}{-66}{\textbf{Resource} : les \textbf{objets} du bucket (\code{/*}). Lire et écrire un fichier sont des actions sur les objets.}
+\end{tikzpicture}
+\end{document}

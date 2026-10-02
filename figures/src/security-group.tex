@@ -1,0 +1,27 @@
+% Un Security Group autour d'une instance : règles entrantes, trafic retour
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{web}{0,0}{r-users}{internautes \code{0.0.0.0/0}}
+  \icone[10mm]{moi}{0,-34}{r-client}{votre poste \code{203.0.113.25/32}}
+  \icone[10mm]{bot}{0,-68}{r-server}{robot de balayage}
+  \draw[cadre=Rouge] (72,10) rectangle (128,-80);
+  \node[titrecadre=Rouge] at (72,10) {\code{sg-web-camille}};
+  \icone[12mm]{inst}{100,-34}{r-instance}{instance EC2}
+  \draw[fl=Vert] (web.east) -- node[etiq, above, pos=.4]{TCP 80, 443 : autorisé} (100,0) -- (inst.north);
+  \draw[fl=Vert] ([yshift=2mm]moi.east) -- node[etiq, above, pos=.4]{TCP 22 : autorisé} ([yshift=2mm]inst.west);
+  \draw[pfl=Vert] ([yshift=-3mm]inst.west) -- node[etiq, below, pos=.6]{réponse : autorisée d'office} ([yshift=-3mm]moi.east);
+  \draw[fl=Rouge] (bot.east) -- node[etiq, above, pos=.4]{TCP 22 : bloqué} (71,-68);
+  \node[text=Rouge, font=\sffamily\Large\bfseries] at (72,-68) {$\times$};
+  \icone[10mm]{net}{170,-34}{r-internet}{dépôts de paquets, API AWS}
+  \draw[fl] (inst.east) -- node[etiq, above]{sortant : tout autorisé} (net.west);
+  \node[anchor=north west, font=\sffamily\small, align=left] at (140,-52) {%
+    \begin{tabular}{@{}lll@{}}
+    \multicolumn{3}{@{}l}{\textbf{Règles entrantes}}\\[.6mm]
+    HTTP & TCP 80 & \code{0.0.0.0/0}\\
+    HTTPS & TCP 443 & \code{0.0.0.0/0}\\
+    SSH & TCP 22 & \code{203.0.113.25/32}\\
+    \end{tabular}};
+\end{tikzpicture}
+\end{document}

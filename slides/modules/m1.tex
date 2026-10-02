@@ -1,0 +1,262 @@
+% =====================================================================
+%  Module 1 : Introduction à AWS
+% =====================================================================
+\section{Introduction à AWS}
+
+\begin{frame}{Amazon Web Services}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Filiale cloud d'Amazon, lancée en 2006
+    \item Infrastructure et services informatiques à la demande, accessibles par API
+    \item Premier fournisseur mondial de cloud : 28 \% du marché (T2 2026)
+    \item Chiffre d'affaires 2025 : 128,7 milliards de dollars (+20 \% sur un an)
+  \end{itemize}
+  \bigskip
+  \textbf{Principes fondateurs}
+  \begin{itemize}
+    \item API d'abord : tout se pilote par programme
+    \item Libre-service : ressources disponibles en quelques minutes, sans intervention humaine
+    \item Paiement à l'usage : à la seconde, au gigaoctet, à la requête
+  \end{itemize}
+  \source{Amazon, \emph{Fourth Quarter 2025 Results} ; Synergy Research Group, Q2 2026.}
+\end{frame}
+
+\begin{frame}{Quelques dates}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{@{}l l@{}}
+    \textbf{2002} & premiers services web d'Amazon pour les développeurs \\
+    \textbf{2006} & S3 (mars), SQS (juillet), EC2 (août) : les trois services d'origine \\
+    \textbf{2009} & VPC et RDS \\
+    \textbf{2012} & DynamoDB \\
+    \textbf{2014} & Lambda (fonctions serverless) \\
+    \textbf{2017} & ouverture de la région de Paris (\texttt{eu-west-3}) \\
+    \textbf{2026} & 39 régions, 123 zones de disponibilité, plus de 1 200 types d'instances EC2 \\
+  \end{tabular}
+  \source{AWS News Blog, « Twenty years of Amazon S3 », « Happy 20th Birthday, Amazon EC2 », « Amazon SQS turns 20 », 2026.}
+\end{frame}
+
+\begin{frame}{Parts de marché du cloud (T2 2026)}
+  \begin{columns}[c]
+    \begin{column}{.55\textwidth}
+      \begin{tikzpicture}[x=1cm,y=1cm]
+        \foreach \nom/\part/\coul [count=\i from 0] in {AWS/28/Orange, Microsoft Azure/20/Lien, Google Cloud/15/Vert, Autres/37/Ligne}{
+          \node[anchor=east, font=\small] at (0,-\i*.9) {\nom};
+          \fill[\coul] (.15,-\i*.9-.28) rectangle ++(\part*.1,.56);
+          \node[anchor=west, font=\small\bfseries] at (\part*.1+.25,-\i*.9) {\part\ \%};
+        }
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{.42\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.5em}
+        \item Marché mondial de l'infrastructure cloud : 143,4 Md\$ sur le trimestre
+        \item Croissance d'environ 43 \% sur un an
+        \item Les trois premiers : 63 \% du marché
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \source{Synergy Research Group, « Cloud Market Share Trends », Q2 2026.}
+\end{frame}
+
+\begin{frame}{Modèles de service}
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{Le client gère} & \textbf{Exemples AWS} \\ \midrule
+    \textbf{IaaS} & système d'exploitation, logiciels, données, accès & EC2, EBS, VPC \\
+    \textbf{PaaS} & code, données, accès & RDS, Lambda, Elastic Beanstalk \\
+    \textbf{SaaS} & données, accès & Amazon WorkMail, Amazon Connect \\ \bottomrule
+  \end{tabularx}
+  \bigskip
+  \begin{itemize}
+    \item Plus le service est géré, moins il y a d'administration, et moins de contrôle
+    \item Les données et les droits d'accès restent toujours à la charge du client
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Modèle de responsabilité partagée}
+  \begin{columns}[c]
+    \begin{column}{.6\textwidth}
+      \includegraphics[width=\textwidth]{responsabilite}
+    \end{column}
+    \begin{column}{.38\textwidth}
+      \begin{itemize}
+        \setlength{\itemsep}{.6em}
+        \item AWS : sécurité \textbf{du} cloud (bâtiments, matériel, réseau, virtualisation)
+        \item Client : sécurité \textbf{dans} le cloud (configuration, mises à jour, données, IAM)
+        \item La frontière dépend du service
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \lien{https://aws.amazon.com/compliance/shared-responsibility-model/}
+\end{frame}
+
+\begin{frame}{Catalogue de services}
+  \centering
+  \includegraphics[height=.74\textheight]{familles-services}
+  \source{AWS, \emph{Overview of Amazon Web Services} : plus de 200 services.}
+\end{frame}
+
+\begin{frame}{Infrastructure classique et équivalents AWS}
+  \centering
+  \includegraphics[width=.92\textwidth]{infra-correspondance}
+\end{frame}
+
+\begin{frame}{Infrastructure mondiale : régions}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Région : zone géographique regroupant plusieurs zones de disponibilité
+    \item 39 régions en 2026, d'autres annoncées
+    \item Régions indépendantes : une panne reste en principe confinée à sa région
+    \item Les données restent dans la région choisie, sauf réplication explicite
+    \item Chaque région a un code : \texttt{eu-west-3} (Paris), \texttt{eu-central-1} (Francfort), \texttt{us-east-1} (Virginie du Nord)
+    \item Certaines régions récentes doivent être activées (\emph{opt-in}) : \texttt{af-south-1}, \texttt{eu-south-1}...
+  \end{itemize}
+  \lien{https://aws.amazon.com/about-aws/global-infrastructure/regions_az/}
+\end{frame}
+
+\begin{frame}{Régions, zones de disponibilité, points de présence}
+  \centering
+  \includegraphics[width=\textwidth]{region-az}
+\end{frame}
+
+\begin{frame}{Zones de disponibilité (AZ)}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Un ou plusieurs centres de données à l'intérieur d'une région
+    \item Alimentation, refroidissement et réseau propres
+    \item Distantes les unes des autres, mais à moins de 100 km : latence de l'ordre de la milliseconde
+    \item Paris : 3 AZ, \texttt{eu-west-3a}, \texttt{eu-west-3b}, \texttt{eu-west-3c}
+    \item Points de présence : plusieurs centaines de sites pour CloudFront et Route 53
+  \end{itemize}
+  \bigskip
+  \attention Un sous-réseau, un volume EBS et une instance EC2 vivent dans \textbf{une seule} AZ
+\end{frame}
+
+\begin{frame}{Haute disponibilité}
+  \centering
+  \includegraphics[width=.9\textwidth]{haute-dispo}\par\bigskip
+  \raggedright
+  \begin{itemize}
+    \item Haute disponibilité = ressources réparties sur au moins deux AZ
+    \item Pour EC2 : plusieurs instances derrière un répartiteur de charge (ELB)
+    \item Pour une base RDS : déploiement Multi-AZ (copie de secours synchrone)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Services et régions}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Tous les services ne sont pas disponibles dans toutes les régions
+    \item Les nouveautés arrivent souvent d'abord en \texttt{us-east-1}
+    \item Les prix varient d'une région à l'autre
+    \item Services \textbf{régionaux} : EC2, EBS, VPC, RDS, SQS... (la console affiche une région)
+    \item Services \textbf{globaux} : IAM, Route 53, CloudFront (la console affiche « Global »)
+    \item S3 : liste des buckets globale, mais chaque bucket appartient à une région
+  \end{itemize}
+  \bigskip
+  \attention Une ressource créée dans une autre région n'apparaît pas dans la console
+  \lien{https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/}
+\end{frame}
+
+\begin{frame}{Choisir une région}
+  \begin{enumerate}
+    \setlength{\itemsep}{.6em}
+    \item \textbf{Réglementation} : localisation des données (RGPD, données de santé, secteur public)
+    \item \textbf{Latence} : proximité des utilisateurs, à mesurer
+    \item \textbf{Services disponibles} dans la région
+    \item \textbf{Prix}
+  \end{enumerate}
+  \bigskip
+  Pour ce cours : \texttt{eu-west-3} (Paris), ouverte en décembre 2017, 3 AZ
+\end{frame}
+
+\begin{frame}{Idée reçue n°1 : « le cloud n'est pas fiable »}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Engagements de service (SLA) publiés pour chaque service
+    \begin{itemize}
+      \item EC2 : 99,99 \% par mois pour un déploiement sur plusieurs AZ, 99,5 \% pour une instance seule
+      \item S3 Standard : 99,9 \% de disponibilité, durabilité conçue pour 99,999999999 \% (11 neuf)
+    \end{itemize}
+    \item Données S3 copiées dans plusieurs AZ
+  \end{itemize}
+  \bigskip
+  \attention Les pannes existent :
+  \begin{itemize}
+    \item 28/02/2017 : S3 indisponible plus de 4 h en \texttt{us-east-1} (erreur de commande)
+    \item 19-20/10/2025 : panne de DynamoDB d'environ 14 h en \texttt{us-east-1}, avec effet en cascade sur EC2, Lambda, STS...
+  \end{itemize}
+  \source{AWS, \emph{Amazon Compute SLA}, \emph{Amazon S3 SLA} ; AWS, résumés des incidents du 28/02/2017 et du 19-20/10/2025.}
+\end{frame}
+
+\begin{frame}{Idée reçue n°2 : « je perds le contrôle de mes données »}
+  \begin{itemize}
+    \setlength{\itemsep}{.6em}
+    \item Le client reste propriétaire de ses données
+    \item Il choisit la région où elles sont stockées
+    \item Chiffrement au repos et en transit, avec des clés gérées par AWS ou par le client (KMS)
+    \item Récupération des données à tout moment (API, transfert, AWS Snowball)
+    \item Journal de tous les appels d'API du compte (CloudTrail)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Tarification}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Paiement à l'usage, facture mensuelle
+    \item Chaque service a ses propres unités : heure ou seconde, Go-mois, requêtes, Go transférés
+    \item Coût difficile à prévoir sans estimation préalable
+    \item Pas d'arrêt automatique en cas de dépassement : un budget AWS envoie une alerte, il ne coupe rien
+    \item Comptes créés depuis le 15/07/2025 : jusqu'à 200 \$ de crédits, plan gratuit de 6 mois
+    \item Transfert entrant gratuit, transfert sortant vers Internet facturé
+  \end{itemize}
+  \lien{https://calculator.aws}
+\end{frame}
+
+\begin{frame}{Ce qui coûte, même sans être utilisé}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{3.8cm}@{}}
+    \toprule
+    \textbf{Ressource} & \textbf{Unité facturée} & \textbf{Facturée à l'arrêt ?} \\ \midrule
+    Instance EC2 démarrée & seconde (minimum 60 s) & \textcolor{Rouge}{oui} \\
+    Instance EC2 arrêtée & aucune pour le calcul & \textcolor{Rouge}{disque EBS facturé} \\
+    Volume EBS & Go provisionné par mois & \textcolor{Rouge}{oui} \\
+    Adresse IPv4 publique & heure (0,005 \$) depuis 02/2024 & \textcolor{Rouge}{oui} \\
+    NAT Gateway & heure + Go traité & \textcolor{Rouge}{oui} \\
+    Objet S3 & Go-mois + requêtes & selon le volume \\ \bottomrule
+  \end{tabularx}
+  \source{AWS, pages de tarification ; AWS News Blog, « New – AWS Public IPv4 Address Charge », 2023.}
+\end{frame}
+
+\begin{frame}{Accès à AWS}
+  \centering
+  \includegraphics[height=.56\textheight]{appel-api}\par\medskip
+  \raggedright
+  \begin{itemize}
+    \item Console web : découverte, diagnostic
+    \item CLI (\texttt{aws}) et SDK (\texttt{boto3}...) : scripts et applications
+    \item Infrastructure as Code : CloudFormation, CDK, Terraform, Pulumi
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{AWS CLI et CloudShell}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item CloudShell : terminal intégré à la console, déjà authentifié, CLI installée
+    \item Toute action passe par un appel d'API signé, contrôlé par IAM
+    \item Même appel, que l'on passe par la console, la CLI ou un SDK
+  \end{itemize}
+  \begin{terminal}
+aws sts get-caller-identity\\
+aws ec2 describe-availability-zones --region eu-west-3 --output table
+  \end{terminal}
+  \lien{https://docs.aws.amazon.com/cli/latest/reference/}
+\end{frame}
+
+\diapotp{1}{Prise en main de la console}{%
+  \item Connexion avec l'utilisateur IAM fourni
+  \item Région par défaut : \texttt{eu-west-3}
+  \item Premières commandes dans CloudShell
+  \item Lecture des prix des types d'instances}
+
