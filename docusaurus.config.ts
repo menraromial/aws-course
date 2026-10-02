@@ -44,7 +44,6 @@ const config: Config = {
       items: [
         {type: 'docSidebar', sidebarId: 'cours', position: 'left', label: 'Le cours'},
         {to: '/cours/module-5/projet', label: 'Projet final', position: 'left'},
-        {to: '/cours/guide-enseignant', label: "Guide de l'enseignant", position: 'right'},
       ],
     },
     footer: {
@@ -59,7 +58,6 @@ const config: Config = {
             {label: 'Module 3 : Amazon EC2', to: '/cours/module-3/cours'},
             {label: 'Module 4 : stockage et messages', to: '/cours/module-4/cours'},
             {label: 'Module 5 : projet final', to: '/cours/module-5/projet'},
-            {label: "Guide de l'enseignant", to: '/cours/guide-enseignant'},
           ],
         },
       ],

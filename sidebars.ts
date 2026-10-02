@@ -33,7 +33,6 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: ['module-5/projet', 'module-5/tp'],
     },
-    'guide-enseignant',
   ],
 };
 
