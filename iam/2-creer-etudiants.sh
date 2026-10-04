@@ -42,4 +42,5 @@ done
 echo
 echo "$CREES compte(s) créé(s). Adresse de connexion : $CONNEXION"
 echo "Identifiants : $(pwd)/$SORTIE"
-echo "Téléchargez-le (Actions › Download file), puis effacez-le de CloudShell : rm $(pwd)/$SORTIE"
+echo "Pour le télécharger : Actions › Download file (en haut à droite de CloudShell),"
+echo "chemin $(pwd)/$SORTIE. Effacez-le ensuite : rm $(pwd)/$SORTIE"
