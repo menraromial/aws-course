@@ -11,7 +11,7 @@ import Chemin from '@site/src/components/Chemin';
 <Seance items={['Module 2', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, tel qu'il figure dans l'e-mail qui vous a transmis vos identifiants. C'est en général votre prénom en minuscules et sans accent, parfois un autre de vos prénoms ou votre prénom suivi d'un chiffre. Exemple : `cle-<prenom>` devient `cle-camille`, ou `cle-camille2`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
 :::
 
 Un stagiaire arrive dans l'équipe. Sa mission : faire l'inventaire des machines virtuelles et des pare-feu du compte. Il ne doit rien pouvoir créer, rien modifier, rien supprimer, et il n'a aucune raison de voir les fichiers stockés dans S3. Vous allez lui préparer un accès qui corresponde exactement à cette mission, puis vérifier, en vous mettant à sa place, qu'il ne peut rien faire de plus.

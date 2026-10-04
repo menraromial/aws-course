@@ -11,7 +11,7 @@ import Telechargement from '@site/src/components/Telechargement';
 <Seance items={['Module 5', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, tel qu'il figure dans l'e-mail qui vous a transmis vos identifiants. C'est en général votre prénom en minuscules et sans accent, parfois un autre de vos prénoms ou votre prénom suivi d'un chiffre. Exemple : `cle-<prenom>` devient `cle-camille`, ou `cle-camille2`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
 :::
 
 Ce pas-à-pas vous mène d'une instance vide à la galerie en ligne, puis vous fait vérifier, point par point, que le déploiement tient les promesses du [cahier des charges](projet.md#le-cahier-des-charges). Toutes les commandes ont été rejouées sur Amazon Linux 2023 ; si l'une d'elles ne donne pas le résultat annoncé, arrêtez-vous et comprenez pourquoi avant de continuer.

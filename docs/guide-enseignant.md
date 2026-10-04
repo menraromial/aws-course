@@ -14,322 +14,60 @@ Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la p
 
 ## Avant le premier module
 
-### Créer les comptes des étudiants
+### Préparer le compte et créer les comptes des étudiants
 
-Les comptes sont des **utilisateurs IAM** (pas IAM Identity Center) dont le nom est tiré du prénom de l'étudiant : `camille`, `jeanpaul`, `camille2`. Ce nom est la valeur de `<prenom>` dans tous les énoncés, qui le rappellent en tête de chaque TP, et les stratégies s'appuient dessus par la variable `${aws:username}`. La chaîne complète part d'un formulaire Google et arrive dans IAM sans recopie à la main :
+Les comptes sont des **utilisateurs IAM** (pas IAM Identity Center) nommés `student1`, `student2`… On peut donc les créer avant de connaître la liste des étudiants, et en distribuer un à chacun le jour du premier cours. Ce nom est la valeur de `<prenom>` dans tous les énoncés, qui le rappellent en tête de chaque TP : le bucket de `student12` s'appelle `galerie-student12-4821`, sa paire de clés `cle-student12`. Les stratégies s'appuient dessus par la variable `${aws:username}`. Notez à qui vous attribuez chaque numéro.
 
-1. les étudiants remplissent un formulaire, dont les réponses arrivent dans une feuille Google Sheets ;
-2. un script Apps Script attaché à la feuille ajoute à chaque ligne un nom d'utilisateur et un mot de passe ;
-3. vous téléchargez la feuille en CSV et la donnez au script `creer-etudiants.sh`, qui crée les comptes dans AWS ;
-4. un clic sur **Envoyer les identifiants** envoie à chaque étudiant son nom d'utilisateur et son mot de passe.
+Tout se trouve dans le dossier [`iam/`](https://github.com/menraromial/aws-course/tree/main/iam) du dépôt, et trois scripts font tout le travail, à lancer dans CloudShell avec un compte administrateur :
 
-Tout se trouve dans le dossier [`iam/`](https://github.com/menraromial/aws-course/tree/main/iam) du dépôt :
+| Script | Ce qu'il fait |
+|---|---|
+| `1-preparer-compte.sh` | crée (ou met à jour) les trois stratégies, le groupe `etudiants`, règle les crédits CPU des `t3` en mode standard, déploie la fonction « une instance par étudiant », et affiche le quota de vCPU |
+| `2-creer-etudiants.sh` | crée les comptes `studentN` et enregistre leurs identifiants dans `etudiants.csv` |
+| `3-tout-supprimer.sh` | à la fin du cours, supprime tout ce que les deux premiers ont créé, et ce que les étudiants ont créé dans IAM |
+
+Les trois stratégies, dans le même dossier :
 
 | Fichier | Rôle |
 |---|---|
 | `aws-cours-etudiant.json` | droits de l'étudiant, et limite de permissions de son propre utilisateur |
 | `aws-cours-limite-stagiaire.json` | limite que l'étudiant doit poser sur l'utilisateur créé au TP 2 |
 | `aws-cours-limite-role.json` | limite que l'étudiant doit poser sur le rôle créé au TP 4 |
-| `formulaire/identifiants.gs` | script Apps Script de la feuille des réponses |
-| `creer-etudiants.sh` | crée les comptes à partir du CSV de la feuille |
-| `une-instance-par-etudiant/` | fonction qui arrête la seconde instance d'un étudiant (voir plus bas) |
 
-#### 1. Le formulaire
+**Avant le cours**, dans CloudShell :
 
-Dans Google Forms, créez un formulaire avec trois questions obligatoires, de type *Réponse courte* :
-
-- **Nom** ;
-- **Prénoms**, avec pour description « Tous vos prénoms, séparés par des espaces » ;
-- **Adresse e-mail**, avec la validation *Texte › Adresse e-mail*. Vous pouvez aussi activer <Chemin>Paramètres › Réponses › Collecter les adresses e-mail</Chemin>, qui ajoute la colonne d'elle-même.
-
-Dans l'onglet **Réponses**, cliquez sur **Associer à Sheets** pour créer la feuille. Les intitulés comptent un peu : le script cherche, sur la première ligne, une colonne qui commence par « Nom », une qui contient « Prénom » et une qui contient « mail ».
-
-#### 2. Le script de la feuille
-
-Dans la feuille, ouvrez <Chemin>Extensions › Apps Script</Chemin>, remplacez le contenu du fichier `Code.gs` par celui de `identifiants.gs` (reproduit ci-dessous), puis remplacez `URL_CONNEXION` par l'adresse de connexion de votre compte AWS (affichée sur le tableau de bord d'IAM, ou par le script `creer-etudiants.sh`). Enregistrez et rechargez la feuille : un menu **Comptes AWS** apparaît. Au premier usage, Google demande d'autoriser le script à modifier la feuille et à envoyer des e-mails en votre nom ; comme le script n'est pas publié, il affiche un avertissement « Google n'a pas validé cette application », que l'on passe par <Chemin>Paramètres avancés › Accéder au projet</Chemin>.
-
-Le menu propose trois commandes :
-
-- **Générer les identifiants** ajoute, si elles n'existent pas, les colonnes `username`, `password` et `envoye_le`, et remplit les deux premières pour chaque ligne qui n'en a pas encore ;
-- **Envoyer les identifiants** commence par générer ce qui manque, demande confirmation, puis envoie un e-mail à chaque étudiant dont la colonne `envoye_le` est vide, et y inscrit la date d'envoi ;
-- **Renvoyer à la sélection** renvoie l'e-mail aux lignes sélectionnées, pour un étudiant qui l'a perdu.
-
-Pour avoir un vrai bouton dans la feuille, insérez un dessin (<Chemin>Insertion › Dessin</Chemin>), puis, dans son menu à trois points, <Chemin>Attribuer un script</Chemin> et saisissez `envoyerIdentifiants`.
-
-Les règles de génération, appliquées dans l'ordre des réponses :
-
-- le **nom d'utilisateur** est le premier des prénoms de l'étudiant qui n'est pas encore pris, en minuscules, sans accent ni tiret ; si tous ses prénoms sont pris, c'est le premier suivi du plus petit numéro libre ;
-- le **mot de passe** est ce prénom, avec une majuscule, suivi de `@2026`, complété par des `!` s'il fait moins des 8 caractères qu'exige AWS.
-
-| Prénoms saisis | Nom d'utilisateur | Mot de passe |
-|---|---|---|
-| Camille | `camille` | `Camille@2026` |
-| Jean-Paul Marie | `jeanpaul` | `Jeanpaul@2026` |
-| Camille Hélène | `helene` | `Helene@2026` |
-| Camille | `camille2` | `Camille@2026` |
-| Bo | `bo` | `Bo@2026!` |
-
-Un nom d'utilisateur ne contient que des minuscules et des chiffres. Ce n'est pas qu'une question d'esthétique : il entre dans des noms de buckets, qui refusent majuscules et accents, et dans les motifs des stratégies, où un tiret créerait des confusions (`galerie-jean-*` couvrirait les buckets d'un `jean-paul`).
-
-:::danger[Un mot de passe que tout le monde peut deviner]
-Avec la règle `<Prenom>@2026`, n'importe quel étudiant connaît le mot de passe de ses camarades : il suffit de connaître leur prénom. AWS impose de le changer à la première connexion, mais celui qui se connecte le premier le choisit à la place de l'intéressé et s'empare de son compte. Deux parades, à combiner :
-
-- passez `SUFFIXE_ALEATOIRE` à `true` en tête du script : le mot de passe devient `Camille@2026-4821`, toujours facile à recopier, mais impossible à deviner ;
-- envoyez les identifiants juste avant la séance, en demandant à chacun de se connecter et de changer son mot de passe sur-le-champ.
-:::
-
-Le nombre d'e-mails est limité par Google : une centaine de destinataires par jour avec un compte Gmail personnel, bien davantage avec un compte Google Workspace. Le script s'arrête quand le quota est épuisé ; relancez **Envoyer les identifiants** le lendemain, il reprend où il s'était arrêté.
-
-<details>
-<summary>Le script <code>identifiants.gs</code></summary>
-
-```javascript title="identifiants.gs"
-/**
- * Comptes AWS du cours, à partir des réponses au formulaire d'inscription.
- *
- * À coller dans Extensions › Apps Script de la feuille liée au formulaire.
- * Ajoute un menu « Comptes AWS » :
- *  - Générer les identifiants : remplit les colonnes username et password
- *    des lignes qui n'en ont pas encore ;
- *  - Envoyer les identifiants : génère ce qui manque, puis envoie un e-mail
- *    à chaque étudiant qui ne l'a pas encore reçu (colonne envoye_le) ;
- *  - Renvoyer à la sélection : renvoie l'e-mail aux lignes sélectionnées.
- *
- * Le nom d'utilisateur est l'un des prénoms de l'étudiant, en minuscules,
- * sans accent ni tiret : le premier qui n'est pas déjà pris. Si tous ses
- * prénoms sont pris, le premier suivi d'un numéro (jean2, jean3...).
- * Les lignes sont traitées dans l'ordre des réponses.
- */
-
-const ANNEE = '2026';
-const URL_CONNEXION = 'https://<compte>.signin.aws.amazon.com/console'; // à remplacer
-const URL_COURS = 'https://menraromial.com/aws-course/';
-// true : ajoute quatre chiffres au hasard au mot de passe (Camille@2026-4821).
-// Fortement conseillé, voir le guide de l'enseignant.
-const SUFFIXE_ALEATOIRE = false;
-const ENTETES = {username: 'username', password: 'password', envoi: 'envoye_le'};
-
-function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Comptes AWS')
-    .addItem('Générer les identifiants', 'genererIdentifiants')
-    .addItem('Envoyer les identifiants', 'envoyerIdentifiants')
-    .addItem('Renvoyer à la sélection', 'renvoyerSelection')
-    .addToUi();
-}
-
-/* ---------- fonctions pures (sans dépendance à Google) ---------- */
-
-function normaliser_(texte) {
-  return String(texte)
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
-/** Liste des prénoms normalisés d'une réponse ("Jean-Paul  Marie" → ["jeanpaul", "marie"]). */
-function prenoms_(texte) {
-  return String(texte).split(/[\s,;/]+/).map(normaliser_).filter(Boolean);
-}
-
-/** Premier prénom libre, sinon le premier prénom suivi du plus petit numéro libre. */
-function choisirUsername_(prenoms, pris) {
-  const libre = prenoms.find(p => !pris.has(p));
-  if (libre) return libre;
-  let i = 2;
-  while (pris.has(prenoms[0] + i)) i++;
-  return prenoms[0] + i;
-}
-
-/** <Prenom>@2026 à partir du prénom retenu (sans le numéro éventuel). */
-function motDePasse_(username) {
-  const prenom = username.replace(/[0-9]+$/, '');
-  let mdp = prenom.charAt(0).toUpperCase() + prenom.slice(1) + '@' + ANNEE;
-  if (SUFFIXE_ALEATOIRE) mdp += '-' + Math.floor(1000 + Math.random() * 9000);
-  while (mdp.length < 8) mdp += '!'; // longueur minimale exigée par AWS
-  return mdp;
-}
-
-/* ---------- accès à la feuille ---------- */
-
-function feuille_() {
-  return SpreadsheetApp.getActive().getSheets()[0]; // la feuille des réponses
-}
-
-/** Numéros (à partir de 1) des colonnes utiles ; crée les colonnes de sortie si besoin. */
-function colonnes_(sh) {
-  const entetes = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(h => String(h).trim());
-  const trouver = re => entetes.findIndex(h => re.test(h)) + 1;
-  const c = {nom: trouver(/^nom\b/i), prenoms: trouver(/pr[ée]nom/i), mail: trouver(/mail/i)};
-  if (!c.nom || !c.prenoms || !c.mail) {
-    throw new Error('Colonnes « Nom », « Prénoms » et « adresse e-mail » introuvables en ligne 1.');
-  }
-  for (const cle of Object.keys(ENTETES)) {
-    let i = entetes.indexOf(ENTETES[cle]) + 1;
-    if (!i) {
-      entetes.push(ENTETES[cle]);
-      i = entetes.length;
-      sh.getRange(1, i).setValue(ENTETES[cle]).setFontWeight('bold');
-    }
-    c[cle] = i;
-  }
-  return c;
-}
-
-function lignes_(sh) {
-  const n = sh.getLastRow() - 1;
-  return n < 1 ? [] : sh.getRange(2, 1, n, sh.getLastColumn()).getValues();
-}
-
-/* ---------- menu ---------- */
-
-function genererIdentifiants() {
-  const sh = feuille_();
-  const c = colonnes_(sh);
-  const lignes = lignes_(sh);
-  const pris = new Set(lignes.map(l => String(l[c.username - 1]).trim().toLowerCase()).filter(Boolean));
-  let crees = 0;
-  const sansPrenom = [];
-  lignes.forEach((l, k) => {
-    const ligne = k + 2;
-    let username = String(l[c.username - 1]).trim();
-    if (!username) {
-      const prenoms = prenoms_(l[c.prenoms - 1]);
-      if (!prenoms.length) { sansPrenom.push(ligne); return; }
-      username = choisirUsername_(prenoms, pris);
-      pris.add(username);
-      sh.getRange(ligne, c.username).setValue(username);
-      crees++;
-    }
-    if (!String(l[c.password - 1]).trim()) {
-      sh.getRange(ligne, c.password).setNumberFormat('@').setValue(motDePasse_(username));
-    }
-  });
-  SpreadsheetApp.flush();
-  let message = crees + ' identifiant(s) généré(s).';
-  if (sansPrenom.length) message += ' Lignes sans prénom : ' + sansPrenom.join(', ') + '.';
-  SpreadsheetApp.getActive().toast(message, 'Comptes AWS', 8);
-  return crees;
-}
-
-function envoyerIdentifiants() {
-  genererIdentifiants();
-  const ui = SpreadsheetApp.getUi();
-  const sh = feuille_();
-  const c = colonnes_(sh);
-  const lignes = lignes_(sh);
-  const aEnvoyer = [];
-  lignes.forEach((l, k) => { if (!l[c.envoi - 1] && l[c.username - 1]) aEnvoyer.push(k); });
-  if (!aEnvoyer.length) { ui.alert('Tous les étudiants ont déjà reçu leurs identifiants.'); return; }
-  if (ui.alert('Envoyer les identifiants à ' + aEnvoyer.length + ' étudiant(s) ?', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
-  const bilan = envoyerLignes_(sh, c, lignes, aEnvoyer);
-  ui.alert(bilan);
-}
-
-function renvoyerSelection() {
-  genererIdentifiants();
-  const ui = SpreadsheetApp.getUi();
-  const sh = feuille_();
-  const c = colonnes_(sh);
-  const lignes = lignes_(sh);
-  const plage = sh.getActiveRange();
-  const indices = [];
-  for (let r = plage.getRow(); r < plage.getRow() + plage.getNumRows(); r++) {
-    if (r >= 2 && r - 2 < lignes.length) indices.push(r - 2);
-  }
-  if (!indices.length) { ui.alert('Sélectionnez une ou plusieurs lignes d\'étudiants.'); return; }
-  if (ui.alert('Renvoyer les identifiants à ' + indices.length + ' étudiant(s) ?', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
-  ui.alert(envoyerLignes_(sh, c, lignes, indices));
-}
-
-function envoyerLignes_(sh, c, lignes, indices) {
-  let envoyes = 0;
-  const erreurs = [];
-  for (const k of indices) {
-    if (MailApp.getRemainingDailyQuota() < 1) {
-      erreurs.push('quota d\'envoi du jour épuisé : relancez demain pour les suivants');
-      break;
-    }
-    const l = lignes[k];
-    const mail = String(l[c.mail - 1]).trim();
-    if (!mail) { erreurs.push('ligne ' + (k + 2) + ' sans adresse e-mail'); continue; }
-    try {
-      MailApp.sendEmail({to: mail, subject: 'Cours AWS : vos identifiants', body: corpsDuMail_(l, c)});
-      sh.getRange(k + 2, c.envoi).setValue(new Date());
-      envoyes++;
-    } catch (e) {
-      erreurs.push('ligne ' + (k + 2) + ' : ' + e.message);
-    }
-  }
-  return envoyes + ' e-mail(s) envoyé(s).' + (erreurs.length ? '\n' + erreurs.join('\n') : '');
-}
-
-function corpsDuMail_(l, c) {
-  const prenom = String(l[c.prenoms - 1]).trim().split(/\s+/)[0];
-  const username = String(l[c.username - 1]).trim();
-  return [
-    'Bonjour ' + prenom + ',',
-    '',
-    'Voici vos identifiants pour le compte AWS du cours.',
-    '',
-    'Adresse de connexion : ' + URL_CONNEXION,
-    'Nom d\'utilisateur : ' + username,
-    'Mot de passe provisoire : ' + String(l[c.password - 1]).trim(),
-    '',
-    'À la première connexion, AWS vous demandera de choisir votre propre mot de passe.',
-    'Faites-le dès réception de ce message.',
-    '',
-    'Dans les énoncés des TP, remplacez <prenom> par votre nom d\'utilisateur : ' + username + '.',
-    '',
-    'Le cours : ' + URL_COURS,
-  ].join('\n');
-}
-
-if (typeof module !== 'undefined') {
-  module.exports = {normaliser_, prenoms_, choisirUsername_, motDePasse_};
-}
+```bash title="CloudShell (administrateur)"
+git clone https://github.com/menraromial/aws-course.git
+aws-course/iam/1-preparer-compte.sh
+aws-course/iam/2-creer-etudiants.sh 100
 ```
 
-</details>
+Le premier script est relançable : après une modification des stratégies dans le dépôt, un `git pull` suivi d'un nouveau lancement les met à jour. Le second crée `student1` à `student100`, chacun avec un mot de passe tiré au hasard (de la forme `Cours-4821-a3f9`), à changer à la première connexion, l'ajout au groupe `etudiants` et la limite de permissions `aws-cours-etudiant`. Il ajoute une ligne par compte à `etudiants.csv` : nom d'utilisateur, mot de passe et adresse de connexion du compte. Les comptes existants sont laissés tels quels ; `2-creer-etudiants.sh 120 101` ajoute `student101` à `student120`.
 
-#### 3. Créer les comptes dans AWS
-
-Avec un compte administrateur :
-
-1. <Chemin>IAM › Policies › Create policy</Chemin>, mode JSON : créez les trois stratégies en collant le contenu des trois fichiers JSON, sous les noms `aws-cours-etudiant`, `aws-cours-limite-stagiaire` et `aws-cours-limite-role`. Les noms comptent : la première exige les deux autres sous ces noms exacts.
-2. Dans la feuille, lancez **Générer les identifiants**, puis téléchargez-la : <Chemin>Fichier › Télécharger › Valeurs séparées par des virgules (.csv)</Chemin>.
-3. Dans CloudShell, déposez ce fichier (<Chemin>Actions › Upload file</Chemin>), récupérez le dépôt et lancez le script :
-
-    ```bash title="CloudShell (administrateur)"
-    git clone https://github.com/menraromial/aws-course.git
-    aws-course/iam/creer-etudiants.sh ~/reponses.csv
-    rm ~/reponses.csv
-    ```
-
-    Remplacez `reponses.csv` par le nom du fichier téléchargé. Le script crée le groupe `etudiants` (avec la stratégie `aws-cours-etudiant`), puis, pour chaque ligne, l'utilisateur avec le mot de passe de la colonne `password`, à changer à la première connexion, l'ajout au groupe et la limite de permissions `aws-cours-etudiant`. Il ignore les autres colonnes et signale les lignes qu'il n'a pas traitées : nom d'utilisateur invalide, ou déjà présent dans le compte, par exemple un administrateur qui porterait le même prénom qu'un étudiant. Dans ce cas, changez le nom de cet étudiant dans la feuille avant d'envoyer les identifiants. Le script est relançable : pour des inscriptions tardives, régénérez, retéléchargez et relancez, seuls les nouveaux comptes sont créés.
-
-4. Seulement alors, lancez **Envoyer les identifiants** depuis la feuille.
-
-Sans formulaire, `creer-etudiants.sh 100` crée des comptes `student1` à `student100` avec des mots de passe tirés au hasard, écrits dans `etudiants.csv` ; il faut alors indiquer aux étudiants que leur `<prenom>` est leur numéro de compte.
+**Récupérer les identifiants.** Dans CloudShell, <Chemin>Actions › Download file</Chemin>, chemin `etudiants.csv`, puis effacez le fichier de CloudShell (`rm etudiants.csv`) : il contient tous les mots de passe. Le fichier s'ouvre dans un tableur ; imprimez-le et découpez une bande par étudiant, ou recopiez chaque ligne dans un message individuel. Pour un étudiant qui a perdu son mot de passe : <Chemin>IAM › Users › studentN › Security credentials › Manage console access</Chemin>, puis un nouveau mot de passe à changer à la connexion.
 
 La limite de permissions posée sur chaque étudiant n'est pas une précaution de trop. Au TP 2, chaque étudiant peut ajouter n'importe quel utilisateur à son groupe `stagiaires-<prenom>`, y compris lui-même, et ce groupe porte une stratégie qu'il a écrite. Avec sa propre stratégie comme limite, il ne peut jamais obtenir plus que ce qu'elle accorde.
+
+**À la fin du cours** :
+
+```bash title="CloudShell (administrateur)"
+aws-course/iam/3-tout-supprimer.sh                     # comptes et IAM seulement
+aws-course/iam/3-tout-supprimer.sh --avec-ressources   # et les ressources des étudiants
+```
+
+Le script dresse d'abord l'inventaire de ce qu'il va supprimer et demande de taper `SUPPRIMER` pour continuer. Il supprime la fonction « une instance par étudiant » (règle, fonction, rôle, journaux), les utilisateurs `studentN`, le groupe `etudiants`, les ressources IAM créées par les étudiants pendant les TP (`stagiaire-studentN`, `stagiaires-studentN`, `role-galerie-studentN`, `lecture-ec2-studentN`, `galerie-s3-studentN`) et les trois stratégies `aws-cours-*`. Avec `--avec-ressources`, il résilie aussi les instances dont le tag `Proprietaire` est un `studentN`, puis supprime les buckets `galerie-studentN-*`, les files `file-studentN`, les paires de clés `cle-studentN` et les Security Groups `pare-feu-web-studentN`, tous à Paris. Il ne touche qu'aux noms qui suivent exactement ces modèles : vos propres utilisateurs, buckets ou instances ne risquent rien. Les groupes `launch-wizard-...` créés par l'assistant de lancement ne portent pas de nom d'étudiant ; supprimez-les à la main s'il en reste.
 
 ### Une seule instance en marche par étudiant
 
 Aucune stratégie IAM ne sait compter : elle peut limiter le type d'instance, pas leur nombre. La limite d'une instance en marche par étudiant est donc assurée par une petite fonction Lambda, déclenchée par EventBridge chaque fois qu'une instance passe à l'état `running`. Elle regroupe les instances en marche par valeur du tag `Proprietaire`, garde celle qui tourne depuis le plus longtemps et **arrête** les autres, en leur ajoutant un tag `ArreteeAutomatiquement`. Elle arrête au lieu de résilier : un étudiant ne perd jamais son disque. Le tag `Proprietaire` est obligatoire au lancement et les étudiants ne peuvent plus le modifier ensuite : ils ne peuvent pas échapper au comptage.
 
-Pour la déployer, toujours dans CloudShell :
-
-```bash title="CloudShell (administrateur)"
-cd ~/aws-course/iam/une-instance-par-etudiant
-./deployer.sh
-```
-
-Le script crée le rôle d'exécution `une-instance-par-etudiant` (lecture des instances, arrêt et tags des instances de `eu-west-3`), la fonction et la règle EventBridge du même nom. Ses décisions apparaissent dans <Chemin>CloudWatch › Log groups › /aws/lambda/une-instance-par-etudiant</Chemin>. Son coût est nul en pratique : quelques centaines d'appels par séance. La logique a été testée avec un faux EC2 (`pytest test_lambda.py`, avec `moto`) ; faites tout de même un essai avec un compte étudiant avant le premier TP 3, en lançant deux instances à la suite.
+Le script `1-preparer-compte.sh` la déploie (en appelant `une-instance-par-etudiant/deployer.sh`) : il crée le rôle d'exécution `une-instance-par-etudiant` (lecture des instances, arrêt et tags des instances de `eu-west-3`), la fonction et la règle EventBridge du même nom. Ses décisions apparaissent dans <Chemin>CloudWatch › Log groups › /aws/lambda/une-instance-par-etudiant</Chemin>. Son coût est nul en pratique : quelques centaines d'appels par séance. La logique a été testée avec un faux EC2 (`pytest test_lambda.py`, avec `moto`) ; faites tout de même un essai avec un compte étudiant avant le premier TP 3, en lançant deux instances à la suite.
 
 Les étudiants n'ont aucun droit sur Lambda ni sur EventBridge : ils ne peuvent ni voir ni désactiver la fonction.
 
 ### Le quota d'instances du compte
 
-Indépendamment des stratégies, AWS limite le nombre de processeurs virtuels en marche dans chaque région. Le quota qui compte ici est *Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances*, exprimé en vCPU. Une `t3.micro` en compte 2 : cent étudiants avec une instance chacun demandent **200 vCPU**. Sur un compte récent, ce quota est souvent bien plus bas. Vérifiez-le avant le premier TP 3 :
+Indépendamment des stratégies, AWS limite le nombre de processeurs virtuels en marche dans chaque région. Le quota qui compte ici est *Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances*, exprimé en vCPU. Une `t3.micro` en compte 2 : cent étudiants avec une instance chacun demandent **200 vCPU**. Sur un compte récent, ce quota est souvent bien plus bas. Le script `1-preparer-compte.sh` l'affiche à la fin ; pour le relire :
 
 ```bash title="CloudShell (administrateur)"
 aws service-quotas get-service-quota --region eu-west-3 --service-code ec2 \
@@ -352,12 +90,7 @@ S'il est inférieur au nombre d'étudiants multiplié par deux, demandez une aug
 À Paris, une `t3.micro` coûte environ 0,012 $ par heure, plus 0,005 $ par heure pour son adresse IPv4 publique. Les cinq TP représentent une dizaine d'heures d'instance par étudiant, soit **moins de 0,20 $ par étudiant**, une vingtaine de dollars pour cent étudiants. Le vrai risque est l'instance oubliée : environ **12 $ par mois** chacune. Dix instances oubliées pendant un mois suffisent à épuiser un crédit de 120 $ ; avec cent étudiants et une instance chacun, une semaine d'oubli collectif coûte déjà environ 280 $. Trois précautions :
 
 1. **Une alerte de budget.** <Chemin>Billing and Cost Management › Budgets › Create budget</Chemin>, budget de coûts mensuel de 120 $, avec des alertes par e-mail à 25 %, 50 % et 80 %. Dans les options avancées, décochez les **crédits** dans les types de charges : sinon le budget voit des coûts nuls tant que le crédit les absorbe. Une action de budget peut aussi attacher automatiquement une stratégie de refus au groupe `etudiants` quand un seuil est atteint.
-2. **Les crédits CPU en mode standard par défaut.** Les `t3` sont en mode *unlimited* par défaut et aucune condition IAM ne permet d'imposer le mode standard au lancement. Basculez le réglage par défaut du compte, une fois pour toutes :
-
-    ```bash title="CloudShell (administrateur)"
-    aws ec2 modify-default-credit-specification --region eu-west-3 --instance-family t3 --cpu-credits standard
-    ```
-
+2. **Les crédits CPU en mode standard par défaut.** Les `t3` sont en mode *unlimited* par défaut et aucune condition IAM ne permet d'imposer le mode standard au lancement. Le script `1-preparer-compte.sh` bascule donc le réglage par défaut du compte à Paris : une instance en surcharge ralentit au lieu de coûter plus cher.
 3. **Une vérification après chaque séance**, qui liste les instances encore présentes et leur propriétaire :
 
     ```bash title="CloudShell (administrateur)"

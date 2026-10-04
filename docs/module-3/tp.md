@@ -12,7 +12,7 @@ import Chemin from '@site/src/components/Chemin';
 <Seance items={['Module 3', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, tel qu'il figure dans l'e-mail qui vous a transmis vos identifiants. C'est en général votre prénom en minuscules et sans accent, parfois un autre de vos prénoms ou votre prénom suivi d'un chiffre. Exemple : `cle-<prenom>` devient `cle-camille`, ou `cle-camille2`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
 :::
 
 Vous allez lancer votre première instance, vous y connecter, y installer un serveur web et l'ouvrir dans votre navigateur. Puis vous la détruirez, et vous en relancerez une identique sans taper une seule commande dessus.

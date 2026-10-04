@@ -3,6 +3,7 @@
 # eu-west-3 : rôle d'exécution, fonction Lambda, règle EventBridge.
 # À lancer dans CloudShell avec un compte administrateur, depuis ce dossier.
 # Relançable : les éléments déjà présents sont mis à jour.
+export AWS_PAGER=""
 set -euo pipefail
 
 REGION=eu-west-3
