@@ -172,14 +172,26 @@ Rechargez la page dans votre navigateur.
 
 ## 6. Vérifier le pare-feu depuis l'extérieur
 
-CloudShell tourne sur une machine d'AWS, avec une adresse IP qui n'est pas la vôtre. C'est l'endroit idéal pour vérifier ce que voit « le reste d'Internet ». Ouvrez CloudShell et essayez :
+CloudShell tourne sur une machine d'AWS, avec une adresse IP qui n'est pas la vôtre. C'est l'endroit idéal pour vérifier ce que voit « le reste d'Internet ». Ouvrez CloudShell (l'icône dans la barre de la console, pas le terminal de votre ordinateur) et commencez par vérifier son adresse :
+
+```bash title="CloudShell"
+curl -s https://checkip.amazonaws.com
+```
+
+Comparez avec l'adresse que vous avez autorisée dans la règle SSH : elles doivent être différentes. Testez ensuite les deux ports :
 
 ```bash title="CloudShell"
 curl -s http://<IP-publique> | head -5
 timeout 10 bash -c "</dev/tcp/<IP-publique>/22" && echo "port 22 ouvert" || echo "port 22 fermé"
 ```
 
-La page web s'affiche, puisque le port 80 est ouvert à tous. Le port 22, lui, ne répond pas : la règle SSH n'autorise que votre adresse, et le Security Group ignore silencieusement tout le reste.
+La page web s'affiche, puisque le port 80 est ouvert à tous. Le port 22, lui, ne répond pas : la règle SSH n'autorise que votre adresse, et le Security Group ignore silencieusement tout le reste. La seconde commande attend donc dix secondes avant d'afficher `port 22 fermé`.
+
+Lancez maintenant la même commande `timeout` dans le terminal de votre ordinateur : elle affiche `port 22 ouvert`, et c'est normal, puisque votre adresse est celle que la règle autorise. Le même port est ouvert ou fermé selon l'endroit d'où l'on frappe.
+
+:::warning
+Si CloudShell affiche `port 22 ouvert`, votre instance est ouverte en SSH au monde entier. Ouvrez l'instance, onglet **Security** : il ne doit y avoir qu'un seul groupe, `pare-feu-web-<prenom>`, dont la règle SSH a pour source votre adresse suivie de `/32`. Deux erreurs fréquentes : une règle SSH en `0.0.0.0/0`, ou un groupe `launch-wizard-...` créé par l'assistant parce que **Create security group** était resté coché à l'étape 2. Ce groupe ouvre le port 22 à tous par défaut. Dans ce cas, <Chemin>Actions › Security › Change security groups</Chemin>, retirez-le et gardez seulement le vôtre.
+:::
 
 ## 7. Arrêter et redémarrer
 
