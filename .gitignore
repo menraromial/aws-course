@@ -45,5 +45,5 @@ slides/*.toc
 slides/*.out
 slides/*.vrb
 
-# Identifiants générés par iam/creer-etudiants.sh
-etudiants.csv
+# Identifiants des étudiants (CSV de la feuille, etudiants.csv) : jamais dans le dépôt
+*.csv

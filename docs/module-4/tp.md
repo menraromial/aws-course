@@ -12,7 +12,7 @@ import Chemin from '@site/src/components/Chemin';
 <Seance items={['Module 4', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, tel qu'il figure dans l'e-mail qui vous a transmis vos identifiants. C'est en général votre prénom en minuscules et sans accent, parfois un autre de vos prénoms ou votre prénom suivi d'un chiffre. Exemple : `cle-<prenom>` devient `cle-camille`, ou `cle-camille2`.
 :::
 
 Ce TP assemble les trois modules précédents. Vous allez créer un bucket privé, y déposer un fichier, le partager sans ouvrir le bucket, puis donner à une instance EC2 le droit d'y lire et d'y écrire, sans lui confier la moindre clé. Vous finirez par une file SQS, pour voir de vos yeux le délai de visibilité.
