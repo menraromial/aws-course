@@ -54,6 +54,8 @@ Lancez l'instance, attendez `2/2 checks passed`, notez son adresse IPv4 publique
 ssh -i ~/.ssh/cle-<prenom>.pem ec2-user@<IP-publique>
 ```
 
+Si SSH répond `Too many authentication failures`, ajoutez `-o IdentitiesOnly=yes`, comme au TP 3.
+
 Vérifiez tout de suite que l'instance a bien endossé le rôle et qu'elle voit l'archive :
 
 ```bash title="Sur l'instance"

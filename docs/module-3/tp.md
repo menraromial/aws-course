@@ -69,6 +69,15 @@ ssh -i ~/.ssh/cle-<prenom>.pem ec2-user@<IP-publique>
 
 À la première connexion, SSH affiche l'empreinte de la clé du serveur et demande confirmation : répondez `yes`. Vous devez arriver sur une invite de la forme `[ec2-user@ip-172-31-... ~]$`.
 
+Deux messages peuvent apparaître avant l'invite.
+
+- **`WARNING: connection is not using a post-quantum key exchange algorithm`** : les versions récentes d'OpenSSH (10.1 et suivantes) signalent ainsi que le serveur ne propose pas d'échange de clés résistant aux futurs ordinateurs quantiques. C'est le cas du serveur SSH d'Amazon Linux 2023. La connexion est bel et bien chiffrée ; vous pouvez ignorer cet avertissement pour le TP.
+- **`Received disconnect ... Too many authentication failures`** : si votre ordinateur contient déjà plusieurs clés SSH, l'agent SSH les propose toutes au serveur avant celle que vous avez indiquée avec `-i`, et le serveur coupe au bout de six essais. Demandez à SSH de n'utiliser que la clé indiquée :
+
+    ```bash title="Votre terminal"
+    ssh -o IdentitiesOnly=yes -i ~/.ssh/cle-<prenom>.pem ec2-user@<IP-publique>
+    ```
+
 Faites connaissance avec la machine :
 
 ```bash title="Sur l'instance"
@@ -194,6 +203,8 @@ Gardez la paire de clés `cle-<prenom>` et le Security Group `pare-feu-web-<pren
 La connexion SSH reste bloquée puis se termine par `Connection timed out` : c'est presque toujours le Security Group. Votre adresse a peut-être changé depuis la création de la règle ; comparez avec [checkip.amazonaws.com](https://checkip.amazonaws.com/) et corrigez la source de la règle SSH. Certains réseaux d'établissement bloquent aussi les connexions SSH sortantes ; le partage de connexion de votre téléphone permet de le vérifier (pensez alors à mettre à jour la règle).
 
 SSH répond `Permission denied (publickey)` : le Security Group laisse passer, mais la clé ne convient pas. Vérifiez que vous utilisez bien `cle-<prenom>.pem`, l'utilisateur `ec2-user` et non `root`, et que l'instance a été lancée avec cette paire de clés.
+
+SSH répond `Too many authentication failures` : votre agent SSH a proposé d'autres clés avant la bonne. Ajoutez `-o IdentitiesOnly=yes` à la commande (voir l'étape 3).
 
 SSH répond `UNPROTECTED PRIVATE KEY FILE` : les permissions du fichier `.pem` sont trop ouvertes. Reprenez le `chmod 400` ou la commande `icacls` de l'étape 1.
 
