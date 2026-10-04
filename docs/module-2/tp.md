@@ -10,11 +10,15 @@ import Chemin from '@site/src/components/Chemin';
 
 <Seance items={['Module 2', 'Travaux pratiques']} />
 
+:::note[Votre nom dans les énoncés]
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+:::
+
 Un stagiaire arrive dans l'équipe. Sa mission : faire l'inventaire des machines virtuelles et des pare-feu du compte. Il ne doit rien pouvoir créer, rien modifier, rien supprimer, et il n'a aucune raison de voir les fichiers stockés dans S3. Vous allez lui préparer un accès qui corresponde exactement à cette mission, puis vérifier, en vous mettant à sa place, qu'il ne peut rien faire de plus.
 
 Dans la seconde partie, vous préparerez le Security Group qui protégera votre serveur web au module 3.
 
-Le compte du cours est partagé : tout ce que vous créez porte votre prénom, pour que chacun retrouve ses ressources et ne touche pas à celles des autres. IAM et les Security Groups sont gratuits ; ce TP ne coûte rien.
+Le compte du cours est partagé : tout ce que vous créez porte votre nom d'utilisateur, pour que chacun retrouve ses ressources et ne touche pas à celles des autres. IAM et les Security Groups sont gratuits ; ce TP ne coûte rien.
 
 ## 1. Écrire la stratégie du stagiaire
 

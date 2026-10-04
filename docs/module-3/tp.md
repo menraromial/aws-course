@@ -11,6 +11,10 @@ import Chemin from '@site/src/components/Chemin';
 
 <Seance items={['Module 3', 'Travaux pratiques']} />
 
+:::note[Votre nom dans les énoncés]
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+:::
+
 Vous allez lancer votre première instance, vous y connecter, y installer un serveur web et l'ouvrir dans votre navigateur. Puis vous la détruirez, et vous en relancerez une identique sans taper une seule commande dessus.
 
 <Schema svg={tp3Architecture} num="TP3" alt="Votre navigateur atteint en HTTP 80, et votre terminal en SSH 22 depuis votre adresse, la passerelle Internet du VPC par défaut (172.31.0.0/16) en région eu-west-3. Dans la zone eu-west-3a, le sous-réseau public contient l'instance web-<prenom> qui fait tourner Nginx, protégée par le Security Group pare-feu-web-<prenom> et munie d'un volume EBS de 8 Gio.">
@@ -56,6 +60,10 @@ Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et remplissez l'a
     - **Credit specification** : choisissez **Standard**. En cas de charge anormale, l'instance ralentira au lieu de coûter plus cher.
     - **Metadata version** : vérifiez qu'il est indiqué **V2 only (token required)**.
 8. Dans le résumé à droite, relisez tout, puis cliquez sur **Launch instance**.
+
+:::info[Une seule instance en marche à la fois]
+Sur le compte du cours, chaque étudiant n'a droit qu'à **une instance en marche**. Si vous en démarrez une seconde, elle est arrêtée automatiquement moins d'une minute après son démarrage, et elle reçoit un tag `ArreteeAutomatiquement`. C'est toujours la plus récente qui est arrêtée, celle qui tournait déjà continue. Avant de lancer une nouvelle instance, résiliez donc celle dont vous n'avez plus besoin.
+:::
 
 Revenez à la liste des instances. La vôtre passe de `Pending` à `Running` en quelques dizaines de secondes. Attendez que la colonne **Status check** affiche `2/2 checks passed` : cela signifie que la machine virtuelle et son système d'exploitation répondent.
 
@@ -249,6 +257,8 @@ SSH répond `Permission denied (publickey)` : le Security Group laisse passer, m
 SSH répond `Too many authentication failures` : votre agent SSH a proposé d'autres clés avant la bonne. Ajoutez `-o IdentitiesOnly=yes` à la commande (voir l'étape 3).
 
 SSH répond `UNPROTECTED PRIVATE KEY FILE` : les permissions du fichier `.pem` sont trop ouvertes. Reprenez le `chmod 400` ou la commande `icacls` de l'étape 1.
+
+Votre instance s'arrête toute seule une minute après son démarrage, avec un tag `ArreteeAutomatiquement` : une autre de vos instances était déjà en marche. Résiliez celle dont vous n'avez plus besoin, puis redémarrez la bonne.
 
 Le navigateur tourne sans fin sur `http://<IP>` : vérifiez l'adresse (elle change à chaque redémarrage), la règle HTTP du Security Group, et que Nginx tourne (`systemctl status nginx`).
 

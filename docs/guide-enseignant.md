@@ -16,35 +16,71 @@ Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la p
 
 ### Créer les comptes des étudiants
 
-Trois stratégies, dans le dossier [`iam/`](https://github.com/menraromial/aws-course/tree/main/iam) du dépôt, couvrent les cinq TP et rien d'autre. Elles supposent des **utilisateurs IAM** (pas IAM Identity Center) dont le nom est le prénom de l'étudiant, en minuscules et sans accent : c'est la valeur de `<prenom>` dans tous les énoncés, et les stratégies s'en servent par la variable `${aws:username}`.
+Les comptes sont des **utilisateurs IAM** (pas IAM Identity Center) nommés `student1`, `student2`… jusqu'à `student100`. Ce nom est la valeur de `<prenom>` dans tous les énoncés, qui le rappellent en tête de chaque TP : le bucket de `student12` s'appelle `galerie-student12-4821`, sa paire de clés `cle-student12`. Les stratégies s'appuient dessus par la variable `${aws:username}`. Notez à qui vous attribuez chaque numéro.
 
-| Stratégie | Rôle |
+Tout se trouve dans le dossier [`iam/`](https://github.com/menraromial/aws-course/tree/main/iam) du dépôt :
+
+| Fichier | Rôle |
 |---|---|
-| `aws-cours-etudiant` | droits de l'étudiant, et limite de permissions de son propre utilisateur |
-| `aws-cours-limite-stagiaire` | limite que l'étudiant doit poser sur l'utilisateur créé au TP 2 |
-| `aws-cours-limite-role` | limite que l'étudiant doit poser sur le rôle créé au TP 4 |
+| `aws-cours-etudiant.json` | droits de l'étudiant, et limite de permissions de son propre utilisateur |
+| `aws-cours-limite-stagiaire.json` | limite que l'étudiant doit poser sur l'utilisateur créé au TP 2 |
+| `aws-cours-limite-role.json` | limite que l'étudiant doit poser sur le rôle créé au TP 4 |
+| `creer-etudiants.sh` | crée les comptes `student1` à `studentN` |
+| `une-instance-par-etudiant/` | fonction qui arrête la seconde instance d'un étudiant (voir plus bas) |
 
-Les noms comptent : la première stratégie exige ces noms exacts pour les deux autres. Dans la console, avec un compte administrateur :
+Avec un compte administrateur :
 
-1. <Chemin>IAM › Policies › Create policy</Chemin>, mode JSON : créez les trois stratégies en collant le contenu des trois fichiers, sous les noms ci-dessus.
-2. <Chemin>IAM › User groups › Create group</Chemin> : groupe `etudiants`, auquel vous attachez `aws-cours-etudiant`.
-3. Pour chaque étudiant, <Chemin>IAM › Users › Create user</Chemin> : nom = prénom, accès à la console avec mot de passe provisoire à changer, ajout au groupe `etudiants`, et **limite de permissions** `aws-cours-etudiant`.
-4. Sur le tableau de bord d'IAM, notez l'adresse de connexion du compte (de la forme `https://<compte>.signin.aws.amazon.com/console`) : c'est celle que vous remettez aux étudiants.
+1. <Chemin>IAM › Policies › Create policy</Chemin>, mode JSON : créez les trois stratégies en collant le contenu des trois fichiers JSON, sous les noms `aws-cours-etudiant`, `aws-cours-limite-stagiaire` et `aws-cours-limite-role`. Les noms comptent : la première exige les deux autres sous ces noms exacts.
+2. Ouvrez CloudShell, récupérez le dépôt et lancez le script, avec le nombre de comptes voulu :
 
-La limite de permissions de l'étape 3 n'est pas une précaution de trop. Au TP 2, chaque étudiant peut ajouter n'importe quel utilisateur à son groupe `stagiaires-<prenom>`, y compris lui-même, et ce groupe porte une stratégie qu'il a écrite. Avec sa propre stratégie comme limite, il ne peut jamais obtenir plus que ce qu'elle accorde.
+    ```bash title="CloudShell (administrateur)"
+    git clone https://github.com/menraromial/aws-course.git
+    cd aws-course/iam
+    ./creer-etudiants.sh 100
+    ```
+
+    Le script crée le groupe `etudiants` (avec la stratégie `aws-cours-etudiant`), puis chaque utilisateur avec un mot de passe provisoire à changer à la première connexion, l'ajout au groupe et la limite de permissions `aws-cours-etudiant`. Il affiche l'adresse de connexion du compte et écrit les identifiants dans `etudiants.csv`, que vous téléchargez avec <Chemin>Actions › Download file</Chemin> avant de l'effacer de CloudShell. Il est relançable : les comptes existants ne sont pas touchés, et `./creer-etudiants.sh 120` ajoute seulement les vingt suivants.
+
+La limite de permissions posée sur chaque étudiant n'est pas une précaution de trop. Au TP 2, chaque étudiant peut ajouter n'importe quel utilisateur à son groupe `stagiaires-<prenom>`, y compris lui-même, et ce groupe porte une stratégie qu'il a écrite. Avec sa propre stratégie comme limite, il ne peut jamais obtenir plus que ce qu'elle accorde.
+
+### Une seule instance en marche par étudiant
+
+Aucune stratégie IAM ne sait compter : elle peut limiter le type d'instance, pas leur nombre. La limite d'une instance en marche par étudiant est donc assurée par une petite fonction Lambda, déclenchée par EventBridge chaque fois qu'une instance passe à l'état `running`. Elle regroupe les instances en marche par valeur du tag `Proprietaire`, garde celle qui tourne depuis le plus longtemps et **arrête** les autres, en leur ajoutant un tag `ArreteeAutomatiquement`. Elle arrête au lieu de résilier : un étudiant ne perd jamais son disque. Le tag `Proprietaire` est obligatoire au lancement et les étudiants ne peuvent plus le modifier ensuite : ils ne peuvent pas échapper au comptage.
+
+Pour la déployer, toujours dans CloudShell :
+
+```bash title="CloudShell (administrateur)"
+cd ~/aws-course/iam/une-instance-par-etudiant
+./deployer.sh
+```
+
+Le script crée le rôle d'exécution `une-instance-par-etudiant` (lecture des instances, arrêt et tags des instances de `eu-west-3`), la fonction et la règle EventBridge du même nom. Ses décisions apparaissent dans <Chemin>CloudWatch › Log groups › /aws/lambda/une-instance-par-etudiant</Chemin>. Son coût est nul en pratique : quelques centaines d'appels par séance. La logique a été testée avec un faux EC2 (`pytest test_lambda.py`, avec `moto`) ; faites tout de même un essai avec un compte étudiant avant le premier TP 3, en lançant deux instances à la suite.
+
+Les étudiants n'ont aucun droit sur Lambda ni sur EventBridge : ils ne peuvent ni voir ni désactiver la fonction.
+
+### Le quota d'instances du compte
+
+Indépendamment des stratégies, AWS limite le nombre de processeurs virtuels en marche dans chaque région. Le quota qui compte ici est *Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances*, exprimé en vCPU. Une `t3.micro` en compte 2 : cent étudiants avec une instance chacun demandent **200 vCPU**. Sur un compte récent, ce quota est souvent bien plus bas. Vérifiez-le avant le premier TP 3 :
+
+```bash title="CloudShell (administrateur)"
+aws service-quotas get-service-quota --region eu-west-3 --service-code ec2 \
+  --quota-code L-1216C47A --query Quota.Value
+```
+
+S'il est inférieur au nombre d'étudiants multiplié par deux, demandez une augmentation dans <Chemin>Service Quotas › Amazon EC2</Chemin>, quelques jours à l'avance : la demande est examinée par AWS. Ce quota sert aussi de plafond global : même en cas de problème, le compte ne pourra pas faire tourner plus de vCPU que lui.
 
 ### Ce que les stratégies autorisent et interdisent
 
 - **Lecture** partout : EC2, IAM, CloudWatch, prix, tableau de bord de santé, CloudShell. Elle ne coûte rien et sert au TP 1 (zones de la Virginie du Nord, vue globale d'EC2) et au simulateur de stratégies.
-- **EC2 à Paris uniquement** : instances `t3.micro` ou `t2.micro`, AMI publiées par Amazon, matériel partagé (pas d'instance dédiée), disques `gp3` ou `gp2` de 16 Gio au plus, tag `Proprietaire` égal au nom d'utilisateur obligatoire au lancement. Un étudiant ne peut arrêter, redémarrer, résilier ou modifier que les instances qui portent son nom. Les Security Groups et les paires de clés sont modifiables par tous, ce qui ne coûte rien.
+- **EC2 à Paris uniquement** : instances `t3.micro` ou `t2.micro`, AMI publiées par Amazon, matériel partagé (pas d'instance dédiée), disques `gp3` ou `gp2` de 16 Gio au plus, tag `Proprietaire` égal au nom d'utilisateur obligatoire au lancement. Un étudiant ne peut arrêter, redémarrer, résilier ou modifier que les instances qui portent son nom, et ne peut pas changer ce tag. Une seule instance en marche à la fois (voir plus haut). Les Security Groups et les paires de clés sont modifiables par tous, ce qui ne coûte rien.
 - **IAM** : seulement les ressources des TP, à son nom (`lecture-ec2-<prenom>`, `galerie-s3-<prenom>`, `stagiaires-<prenom>`, `stagiaire-<prenom>`, `role-galerie-<prenom>`). L'utilisateur stagiaire et le rôle ne peuvent être créés qu'avec leur limite, qui les plafonne respectivement à `ec2:Describe*` et CloudShell, et à S3 sur les buckets `galerie-*` et SQS sur les files `file-*`. Aucune limite ne peut être retirée, aucune stratégie `aws-cours-*` modifiée. Pas de clé d'accès : CloudShell suffit.
 - **S3** : tout, mais seulement sur les buckets `galerie-<prenom>-*`, créés à Paris. Stratégies de bucket, ACL, réplication et accélération de transfert sont interdites : un bucket ne peut pas devenir public, et donc pas servir de point de téléchargement payant pour le monde entier.
-- **SQS** : tout, sur les files `file-<prenom>*`.
+- **SQS** : tout, sur sa file `file-<prenom>`.
 - Tout le reste (RDS, NAT Gateway, adresses Elastic IP, Lambda, répartiteurs de charge, autres régions…) est refusé par défaut, puisque rien ne l'autorise.
 
 ### Ce qui coûte, et comment s'en protéger
 
-À Paris, une `t3.micro` coûte environ 0,012 $ par heure, plus 0,005 $ par heure pour son adresse IPv4 publique. Les cinq TP représentent une dizaine d'heures d'instance par étudiant, soit **moins de 0,20 $ par étudiant**. Le vrai risque est l'instance oubliée : environ **12 $ par mois** chacune. Dix instances oubliées pendant un mois suffisent à épuiser un crédit de 120 $. Trois précautions :
+À Paris, une `t3.micro` coûte environ 0,012 $ par heure, plus 0,005 $ par heure pour son adresse IPv4 publique. Les cinq TP représentent une dizaine d'heures d'instance par étudiant, soit **moins de 0,20 $ par étudiant**, une vingtaine de dollars pour cent étudiants. Le vrai risque est l'instance oubliée : environ **12 $ par mois** chacune. Dix instances oubliées pendant un mois suffisent à épuiser un crédit de 120 $ ; avec cent étudiants et une instance chacun, une semaine d'oubli collectif coûte déjà environ 280 $. Trois précautions :
 
 1. **Une alerte de budget.** <Chemin>Billing and Cost Management › Budgets › Create budget</Chemin>, budget de coûts mensuel de 120 $, avec des alertes par e-mail à 25 %, 50 % et 80 %. Dans les options avancées, décochez les **crédits** dans les types de charges : sinon le budget voit des coûts nuls tant que le crédit les absorbe. Une action de budget peut aussi attacher automatiquement une stratégie de refus au groupe `etudiants` quand un seuil est atteint.
 2. **Les crédits CPU en mode standard par défaut.** Les `t3` sont en mode *unlimited* par défaut et aucune condition IAM ne permet d'imposer le mode standard au lancement. Basculez le réglage par défaut du compte, une fois pour toutes :

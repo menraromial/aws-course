@@ -11,6 +11,10 @@ import Chemin from '@site/src/components/Chemin';
 
 <Seance items={['Module 4', 'Travaux pratiques']} />
 
+:::note[Votre nom dans les énoncés]
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+:::
+
 Ce TP assemble les trois modules précédents. Vous allez créer un bucket privé, y déposer un fichier, le partager sans ouvrir le bucket, puis donner à une instance EC2 le droit d'y lire et d'y écrire, sans lui confier la moindre clé. Vous finirez par une file SQS, pour voir de vos yeux le délai de visibilité.
 
 <Schema svg={tp4Architecture} num="TP4" alt="Dans la région eu-west-3, l'instance web-<prenom>, qui endosse le rôle role-galerie-<prenom>, lit et écrit dans le bucket galerie-<prenom>-<suffixe> (aws s3 cp, ls) et envoie des messages dans la file file-<prenom>. Depuis l'extérieur, vous téléversez des fichiers depuis la console, un navigateur accède au bucket avec une URL présignée, et un anonyme reçoit une erreur 403.">
@@ -47,7 +51,7 @@ Vous venez de partager un fichier précis, pour une durée précise, sans rendre
 
 ## 4. Une instance qui n'a le droit de rien
 
-Lancez une instance comme au TP 3 : nom `web-<prenom>`, tag `Proprietaire`, Amazon Linux 2023, `t3.micro`, paire de clés `cle-<prenom>`, Security Group `pare-feu-web-<prenom>`, crédits *Standard*. Pas de user data cette fois, et surtout, dans **Advanced details**, laissez le champ **IAM instance profile** vide.
+Vérifiez d'abord qu'aucune instance du TP 3 ne tourne encore à votre nom : vous n'avez droit qu'à une instance en marche. Lancez ensuite une instance comme au TP 3 : nom `web-<prenom>`, tag `Proprietaire`, Amazon Linux 2023, `t3.micro`, paire de clés `cle-<prenom>`, Security Group `pare-feu-web-<prenom>`, crédits *Standard*. Pas de user data cette fois, et surtout, dans **Advanced details**, laissez le champ **IAM instance profile** vide.
 
 Connectez-vous en SSH, puis demandez à AWS qui vous êtes :
 

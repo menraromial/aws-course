@@ -44,3 +44,6 @@ slides/*.snm
 slides/*.toc
 slides/*.out
 slides/*.vrb
+
+# Identifiants générés par iam/creer-etudiants.sh
+etudiants.csv

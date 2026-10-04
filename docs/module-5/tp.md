@@ -10,6 +10,10 @@ import Telechargement from '@site/src/components/Telechargement';
 
 <Seance items={['Module 5', 'Travaux pratiques']} />
 
+:::note[Votre nom dans les énoncés]
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+:::
+
 Ce pas-à-pas vous mène d'une instance vide à la galerie en ligne, puis vous fait vérifier, point par point, que le déploiement tient les promesses du [cahier des charges](projet.md#le-cahier-des-charges). Toutes les commandes ont été rejouées sur Amazon Linux 2023 ; si l'une d'elles ne donne pas le résultat annoncé, arrêtez-vous et comprenez pourquoi avant de continuer.
 
 ## 1. Rassembler les pièces
@@ -48,7 +52,7 @@ Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et reprenez les r
   - **Credit specification** : *Standard*.
   - **Metadata version** : *V2 only (token required)*.
 
-Lancez l'instance, attendez `2/2 checks passed`, notez son adresse IPv4 publique, puis connectez-vous en SSH.
+Si l'instance du TP 4 tourne encore, résiliez-la d'abord : vous n'avez droit qu'à une instance en marche. Lancez l'instance, attendez `2/2 checks passed`, notez son adresse IPv4 publique, puis connectez-vous en SSH.
 
 ```bash title="Votre terminal"
 ssh -i ~/.ssh/cle-<prenom>.pem ec2-user@<IP-publique>

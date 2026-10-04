@@ -163,7 +163,7 @@ Le point le plus important à retenir est que certaines ressources coûtent mêm
 | NAT Gateway | heure, plus gigaoctet traité | oui |
 | Objet S3 | gigaoctet par mois, plus requêtes | selon le volume stocké |
 
-D'où trois règles que l'on applique pendant tout le cours : travailler toujours dans la région de Paris, mettre son prénom dans le nom de chaque ressource pour la retrouver, et supprimer à la fin de chaque TP ce que l'on a créé.
+D'où trois règles que l'on applique pendant tout le cours : travailler toujours dans la région de Paris, mettre son nom d'utilisateur dans le nom de chaque ressource pour la retrouver, et supprimer à la fin de chaque TP ce que l'on a créé.
 
 ## L'accès à AWS
 
