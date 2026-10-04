@@ -48,7 +48,9 @@ Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et remplissez l'a
 2. **Application and OS Images** : dans *Quick Start*, choisissez **Amazon Linux**, puis l'AMI **Amazon Linux 2023** en architecture **64-bit (x86)**. Notez son identifiant `ami-...`.
 3. **Instance type** : `t3.micro`.
 4. **Key pair** : `cle-<prenom>`.
-5. **Network settings** : cliquez sur **Edit**. Laissez le VPC par défaut et le sous-réseau proposé, vérifiez que **Auto-assign public IP** est sur *Enable*, puis choisissez **Select existing security group** et sélectionnez `pare-feu-web-<prenom>`.
+5. **Network settings** : cliquez sur **Edit**. Laissez le VPC par défaut. Dans **Subnet**, choisissez le sous-réseau dont la zone est `eu-west-3a`. Vérifiez que **Auto-assign public IP** est sur *Enable*, puis choisissez **Select existing security group** et sélectionnez `pare-feu-web-<prenom>`.
+
+    La liste **Subnet** propose trois sous-réseaux : le VPC par défaut en contient un par zone de disponibilité de Paris (`eu-west-3a`, `eu-west-3b` et `eu-west-3c`). Ils sont tous les trois publics et équivalents pour ce TP, et la `t3.micro` est disponible dans chacun. Choisir un sous-réseau revient à choisir la zone où l'instance va tourner, et son volume EBS sera créé dans la même zone. Nous prenons tous `eu-west-3a` pour que vos résultats correspondent au schéma ; si vous laissez *No preference*, AWS choisit une zone à votre place.
 6. **Configure storage** : laissez le volume proposé, 8 Gio en `gp3`.
 7. **Advanced details** : dépliez la rubrique. Vous y trouverez deux réglages dont on a parlé en cours.
     - **Credit specification** : choisissez **Standard**. En cas de charge anormale, l'instance ralentira au lieu de coûter plus cher.
