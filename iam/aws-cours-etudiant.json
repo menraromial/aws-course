@@ -1,0 +1,282 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LectureEtOutils",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "ec2:Get*",
+        "iam:Get*",
+        "iam:List*",
+        "iam:Simulate*",
+        "s3:ListAllMyBuckets",
+        "s3:GetBucketLocation",
+        "s3:GetAccountPublicAccessBlock",
+        "sqs:ListQueues",
+        "cloudwatch:Describe*",
+        "cloudwatch:Get*",
+        "cloudwatch:List*",
+        "health:Describe*",
+        "pricing:*",
+        "cloudshell:*",
+        "kms:ListAliases",
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "MonMotDePasse",
+      "Effect": "Allow",
+      "Action": "iam:ChangePassword",
+      "Resource": "arn:aws:iam::*:user/${aws:username}"
+    },
+    {
+      "Sid": "EC2AParis",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:CreateSecurityGroup",
+        "ec2:DeleteSecurityGroup",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:ModifySecurityGroupRules",
+        "ec2:UpdateSecurityGroupRuleDescriptions*",
+        "ec2:CreateKeyPair",
+        "ec2:ImportKeyPair",
+        "ec2:DeleteKeyPair"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {"aws:RequestedRegion": "eu-west-3"}
+      }
+    },
+    {
+      "Sid": "TagsALaCreation",
+      "Effect": "Allow",
+      "Action": "ec2:CreateTags",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-west-3",
+          "ec2:CreateAction": ["RunInstances", "CreateSecurityGroup", "CreateKeyPair", "ImportKeyPair"]
+        }
+      }
+    },
+    {
+      "Sid": "MesInstances",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:StartInstances",
+        "ec2:StopInstances",
+        "ec2:RebootInstances",
+        "ec2:TerminateInstances",
+        "ec2:ModifyInstanceMetadataOptions",
+        "ec2:AssociateIamInstanceProfile",
+        "ec2:ReplaceIamInstanceProfileAssociation",
+        "ec2:DisassociateIamInstanceProfile",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {"aws:RequestedRegion": "eu-west-3"},
+        "StringEqualsIgnoreCase": {"aws:ResourceTag/Proprietaire": "${aws:username}"}
+      }
+    },
+    {
+      "Sid": "InstancesT3MicroOuT2Micro",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEquals": {"ec2:InstanceType": ["t3.micro", "t2.micro"]}
+      }
+    },
+    {
+      "Sid": "PasDeMaterielDedie",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEqualsIfExists": {"ec2:Tenancy": "default"}
+      }
+    },
+    {
+      "Sid": "TagProprietaireObligatoire",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEqualsIgnoreCase": {"aws:RequestTag/Proprietaire": "${aws:username}"}
+      }
+    },
+    {
+      "Sid": "ImagesAmazonSeulement",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*::image/*",
+      "Condition": {
+        "StringNotEquals": {"ec2:Owner": "amazon"}
+      }
+    },
+    {
+      "Sid": "Disques16GioAuPlus",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:volume/*",
+      "Condition": {
+        "NumericGreaterThan": {"ec2:VolumeSize": "16"}
+      }
+    },
+    {
+      "Sid": "DisquesGp3OuGp2",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:volume/*",
+      "Condition": {
+        "StringNotEqualsIfExists": {"ec2:VolumeType": ["gp3", "gp2"]}
+      }
+    },
+    {
+      "Sid": "MesStrategies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreatePolicy",
+        "iam:DeletePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:TagPolicy",
+        "iam:UntagPolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:policy/lecture-ec2-${aws:username}",
+        "arn:aws:iam::*:policy/galerie-s3-${aws:username}"
+      ]
+    },
+    {
+      "Sid": "MonGroupeDeStagiaires",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateGroup",
+        "iam:DeleteGroup",
+        "iam:AddUserToGroup",
+        "iam:RemoveUserFromGroup",
+        "iam:AttachGroupPolicy",
+        "iam:DetachGroupPolicy",
+        "iam:PutGroupPolicy",
+        "iam:DeleteGroupPolicy"
+      ],
+      "Resource": "arn:aws:iam::*:group/stagiaires-${aws:username}"
+    },
+    {
+      "Sid": "StagiaireAvecSaLimite",
+      "Effect": "Allow",
+      "Action": ["iam:CreateUser", "iam:PutUserPermissionsBoundary"],
+      "Resource": "arn:aws:iam::*:user/stagiaire-${aws:username}",
+      "Condition": {
+        "ArnLike": {"iam:PermissionsBoundary": "arn:aws:iam::*:policy/aws-cours-limite-stagiaire"}
+      }
+    },
+    {
+      "Sid": "GererLeStagiaire",
+      "Effect": "Allow",
+      "Action": [
+        "iam:DeleteUser",
+        "iam:CreateLoginProfile",
+        "iam:UpdateLoginProfile",
+        "iam:DeleteLoginProfile",
+        "iam:TagUser",
+        "iam:UntagUser"
+      ],
+      "Resource": "arn:aws:iam::*:user/stagiaire-${aws:username}"
+    },
+    {
+      "Sid": "RoleAvecSaLimite",
+      "Effect": "Allow",
+      "Action": ["iam:CreateRole", "iam:PutRolePermissionsBoundary"],
+      "Resource": "arn:aws:iam::*:role/role-galerie-${aws:username}",
+      "Condition": {
+        "ArnLike": {"iam:PermissionsBoundary": "arn:aws:iam::*:policy/aws-cours-limite-role"}
+      }
+    },
+    {
+      "Sid": "GererLeRole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:DeleteRole",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:PassRole",
+        "iam:CreateInstanceProfile",
+        "iam:DeleteInstanceProfile",
+        "iam:AddRoleToInstanceProfile",
+        "iam:RemoveRoleFromInstanceProfile",
+        "iam:TagInstanceProfile"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:role/role-galerie-${aws:username}",
+        "arn:aws:iam::*:instance-profile/role-galerie-${aws:username}"
+      ]
+    },
+    {
+      "Sid": "ProtegerLesLimites",
+      "Effect": "Deny",
+      "Action": [
+        "iam:DeleteUserPermissionsBoundary",
+        "iam:DeleteRolePermissionsBoundary",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:DeletePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:user/*",
+        "arn:aws:iam::*:role/*",
+        "arn:aws:iam::*:policy/aws-cours-*"
+      ]
+    },
+    {
+      "Sid": "MesBuckets",
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::galerie-${aws:username}-*",
+        "arn:aws:s3:::galerie-${aws:username}-*/*"
+      ]
+    },
+    {
+      "Sid": "BucketsAParis",
+      "Effect": "Deny",
+      "Action": "s3:CreateBucket",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {"s3:LocationConstraint": "eu-west-3"}
+      }
+    },
+    {
+      "Sid": "BucketsPrivesSansOptionPayante",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutBucketPolicy",
+        "s3:PutBucketAcl",
+        "s3:PutObjectAcl",
+        "s3:PutReplicationConfiguration",
+        "s3:PutAccelerateConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "MaFile",
+      "Effect": "Allow",
+      "Action": "sqs:*",
+      "Resource": "arn:aws:sqs:eu-west-3:*:file-${aws:username}*"
+    }
+  ]
+}

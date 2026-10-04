@@ -42,4 +42,4 @@ Le titre de chaque bloc de commandes indique où le taper : **CloudShell**, **Vo
 
 Les chemins dans la console sont écrits comme ceci : <Chemin>EC2 › Instances › Launch instances</Chemin>. Ils reprennent les libellés anglais, langue par défaut de la console et de la documentation. AWS modifie régulièrement l'interface ; si un bouton a changé de place, la barre de recherche (<kbd>Alt</kbd>+<kbd>S</kbd>) retrouve n'importe quel service par son nom.
 
-Dans les noms de ressources, remplacez `<prenom>` par votre prénom, en minuscules et sans accent.
+Dans les noms de ressources, remplacez `<prenom>` par votre nom d'utilisateur AWS, celui qui vous a été remis pour vous connecter : votre prénom, en minuscules et sans accent. Ce n'est pas qu'une convention : les droits de votre compte ne vous autorisent à créer et à modifier que des ressources qui portent ce nom.

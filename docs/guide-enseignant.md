@@ -8,15 +8,63 @@ description: "Points à dessiner au tableau, questions à poser, corrigés et pa
   <meta name="robots" content="noindex, nofollow" />
 </head>
 
+import Chemin from '@site/src/components/Chemin';
+
 Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la peine de dessiner au tableau, les questions qui font réagir une salle, les corrigés et les pannes que l'on rencontre le plus souvent en TP. Elle suit l'ordre des modules.
 
 ## Avant le premier module
 
-Chaque étudiant doit disposer d'un accès au compte AWS du cours : adresse de connexion, nom d'utilisateur, mot de passe provisoire. Deux points à régler en amont.
+### Créer les comptes des étudiants
 
-Les droits accordés conditionnent les TP. Le TP 1 ne demande que la lecture sur EC2 (`ec2:Describe*`) et l'accès à CloudShell. Les TP suivants demanderont de créer des instances, des Security Groups, des buckets et un rôle IAM ; il faut que les stratégies des étudiants le permettent, idéalement limitées à la région `eu-west-3` et à quelques types d'instances.
+Trois stratégies, dans le dossier [`iam/`](https://github.com/menraromial/aws-course/tree/main/iam) du dépôt, couvrent les cinq TP et rien d'autre. Elles supposent des **utilisateurs IAM** (pas IAM Identity Center) dont le nom est le prénom de l'étudiant, en minuscules et sans accent : c'est la valeur de `<prenom>` dans tous les énoncés, et les stratégies s'en servent par la variable `${aws:username}`.
 
-Si les étudiants se connectent par IAM Identity Center plutôt qu'avec des utilisateurs IAM, adaptez le TP 1 : la page de connexion est un portail d'accès, et `aws sts get-caller-identity` renvoie un ARN de la forme `arn:aws:sts::<compte>:assumed-role/<ensemble-de-permissions>/<utilisateur>` au lieu de `arn:aws:iam::<compte>:user/<utilisateur>`. C'est d'ailleurs un bon sujet de discussion pour le module 2.
+| Stratégie | Rôle |
+|---|---|
+| `aws-cours-etudiant` | droits de l'étudiant, et limite de permissions de son propre utilisateur |
+| `aws-cours-limite-stagiaire` | limite que l'étudiant doit poser sur l'utilisateur créé au TP 2 |
+| `aws-cours-limite-role` | limite que l'étudiant doit poser sur le rôle créé au TP 4 |
+
+Les noms comptent : la première stratégie exige ces noms exacts pour les deux autres. Dans la console, avec un compte administrateur :
+
+1. <Chemin>IAM › Policies › Create policy</Chemin>, mode JSON : créez les trois stratégies en collant le contenu des trois fichiers, sous les noms ci-dessus.
+2. <Chemin>IAM › User groups › Create group</Chemin> : groupe `etudiants`, auquel vous attachez `aws-cours-etudiant`.
+3. Pour chaque étudiant, <Chemin>IAM › Users › Create user</Chemin> : nom = prénom, accès à la console avec mot de passe provisoire à changer, ajout au groupe `etudiants`, et **limite de permissions** `aws-cours-etudiant`.
+4. Sur le tableau de bord d'IAM, notez l'adresse de connexion du compte (de la forme `https://<compte>.signin.aws.amazon.com/console`) : c'est celle que vous remettez aux étudiants.
+
+La limite de permissions de l'étape 3 n'est pas une précaution de trop. Au TP 2, chaque étudiant peut ajouter n'importe quel utilisateur à son groupe `stagiaires-<prenom>`, y compris lui-même, et ce groupe porte une stratégie qu'il a écrite. Avec sa propre stratégie comme limite, il ne peut jamais obtenir plus que ce qu'elle accorde.
+
+### Ce que les stratégies autorisent et interdisent
+
+- **Lecture** partout : EC2, IAM, CloudWatch, prix, tableau de bord de santé, CloudShell. Elle ne coûte rien et sert au TP 1 (zones de la Virginie du Nord, vue globale d'EC2) et au simulateur de stratégies.
+- **EC2 à Paris uniquement** : instances `t3.micro` ou `t2.micro`, AMI publiées par Amazon, matériel partagé (pas d'instance dédiée), disques `gp3` ou `gp2` de 16 Gio au plus, tag `Proprietaire` égal au nom d'utilisateur obligatoire au lancement. Un étudiant ne peut arrêter, redémarrer, résilier ou modifier que les instances qui portent son nom. Les Security Groups et les paires de clés sont modifiables par tous, ce qui ne coûte rien.
+- **IAM** : seulement les ressources des TP, à son nom (`lecture-ec2-<prenom>`, `galerie-s3-<prenom>`, `stagiaires-<prenom>`, `stagiaire-<prenom>`, `role-galerie-<prenom>`). L'utilisateur stagiaire et le rôle ne peuvent être créés qu'avec leur limite, qui les plafonne respectivement à `ec2:Describe*` et CloudShell, et à S3 sur les buckets `galerie-*` et SQS sur les files `file-*`. Aucune limite ne peut être retirée, aucune stratégie `aws-cours-*` modifiée. Pas de clé d'accès : CloudShell suffit.
+- **S3** : tout, mais seulement sur les buckets `galerie-<prenom>-*`, créés à Paris. Stratégies de bucket, ACL, réplication et accélération de transfert sont interdites : un bucket ne peut pas devenir public, et donc pas servir de point de téléchargement payant pour le monde entier.
+- **SQS** : tout, sur les files `file-<prenom>*`.
+- Tout le reste (RDS, NAT Gateway, adresses Elastic IP, Lambda, répartiteurs de charge, autres régions…) est refusé par défaut, puisque rien ne l'autorise.
+
+### Ce qui coûte, et comment s'en protéger
+
+À Paris, une `t3.micro` coûte environ 0,012 $ par heure, plus 0,005 $ par heure pour son adresse IPv4 publique. Les cinq TP représentent une dizaine d'heures d'instance par étudiant, soit **moins de 0,20 $ par étudiant**. Le vrai risque est l'instance oubliée : environ **12 $ par mois** chacune. Dix instances oubliées pendant un mois suffisent à épuiser un crédit de 120 $. Trois précautions :
+
+1. **Une alerte de budget.** <Chemin>Billing and Cost Management › Budgets › Create budget</Chemin>, budget de coûts mensuel de 120 $, avec des alertes par e-mail à 25 %, 50 % et 80 %. Dans les options avancées, décochez les **crédits** dans les types de charges : sinon le budget voit des coûts nuls tant que le crédit les absorbe. Une action de budget peut aussi attacher automatiquement une stratégie de refus au groupe `etudiants` quand un seuil est atteint.
+2. **Les crédits CPU en mode standard par défaut.** Les `t3` sont en mode *unlimited* par défaut et aucune condition IAM ne permet d'imposer le mode standard au lancement. Basculez le réglage par défaut du compte, une fois pour toutes :
+
+    ```bash title="CloudShell (administrateur)"
+    aws ec2 modify-default-credit-specification --region eu-west-3 --instance-family t3 --cpu-credits standard
+    ```
+
+3. **Une vérification après chaque séance**, qui liste les instances encore présentes et leur propriétaire :
+
+    ```bash title="CloudShell (administrateur)"
+    aws ec2 describe-instances --region eu-west-3 \
+      --filters Name=instance-state-name,Values=pending,running,stopping,stopped \
+      --query "Reservations[].Instances[].[InstanceId,State.Name,Tags[?Key=='Proprietaire']|[0].Value,LaunchTime]" \
+      --output table
+    ```
+
+    Une instance arrêtée ne coûte plus que son disque, quelques centimes par mois ; une instance en marche coûte. Les buckets et les files vides ne coûtent rien.
+
+Si les étudiants se connectent par IAM Identity Center plutôt qu'avec des utilisateurs IAM, les stratégies ci-dessus ne s'appliquent pas telles quelles (la variable `${aws:username}` n'existe pas pour une session Identity Center), et le TP 1 change : la page de connexion est un portail d'accès, et `aws sts get-caller-identity` renvoie un ARN de la forme `arn:aws:sts::<compte>:assumed-role/<ensemble-de-permissions>/<utilisateur>` au lieu de `arn:aws:iam::<compte>:user/<utilisateur>`.
 
 ## Module 1 : Introduction à AWS
 
@@ -58,9 +106,7 @@ La commande `echo $AWS_REGION` affiche `eu-west-3` : CloudShell fixe cette varia
 
 ### Les droits que demande le TP
 
-Le TP 2 fait créer aux étudiants une stratégie, un groupe et un utilisateur IAM, puis un Security Group. Il leur faut donc au minimum `iam:CreatePolicy`, `iam:CreateGroup`, `iam:CreateUser`, `iam:CreateLoginProfile`, `iam:AddUserToGroup`, `iam:AttachGroupPolicy`, `iam:PutGroupPolicy`, les actions de suppression correspondantes, ainsi que `ec2:CreateSecurityGroup`, `ec2:AuthorizeSecurityGroupIngress` et `ec2:CreateTags`.
-
-Attention au piège : dans un compte partagé, un étudiant qui peut créer des utilisateurs et leur attacher n'importe quelle stratégie peut se fabriquer un administrateur. Trois parades, de la plus simple à la plus fine : un compte par étudiant (via AWS Organizations) ; une condition `iam:PolicyARN` qui limite les stratégies attachables à une liste connue (`AWSCloudShellFullAccess`, `AmazonEC2ReadOnlyAccess` et les stratégies du client préfixées) ; ou une **limite de permissions** (*permissions boundary*) imposée à tout utilisateur créé par un étudiant, via la condition `iam:PermissionsBoundary`. C'est d'ailleurs un bon exemple à montrer aux étudiants les plus avancés.
+Ils sont couverts par `aws-cours-etudiant` (voir [Avant le premier module](#avant-le-premier-module)). Le piège classique d'un compte partagé, un étudiant qui crée un utilisateur, lui attache une stratégie `"Action": "*"` et se connecte sous ce nom, est fermé par la limite `aws-cours-limite-stagiaire`, que la création de l'utilisateur exige. C'est un bon exemple à montrer aux étudiants les plus avancés : ils se heurtent eux-mêmes à une limite de permissions avant d'en poser une.
 
 ### Au tableau
 
@@ -157,9 +203,7 @@ Pour l'authentification SSH, un dessin à trois colonnes (vous, EC2, l'instance)
 
 ### Les droits que demande le TP
 
-S3 : `s3:CreateBucket`, `s3:PutBucketTagging`, `s3:ListBucket`, `s3:GetObject`, `s3:PutObject` sur les buckets préfixés `galerie-`, et `s3:ListAllMyBuckets` pour la console. IAM : `iam:CreatePolicy`, `iam:CreatePolicyVersion`, `iam:CreateRole`, `iam:AttachRolePolicy`, et surtout `iam:PassRole`, sans lequel un étudiant ne peut pas associer un rôle à une instance. SQS : `sqs:CreateQueue`, `sqs:TagQueue`, `sqs:DeleteQueue`, et les actions d'envoi et de réception. EC2 : `ec2:AssociateIamInstanceProfile`.
-
-Le piège d'escalade vu au module 2 se retrouve ici sous une autre forme : un étudiant qui peut créer un rôle, lui attacher n'importe quelle stratégie et le passer à une instance peut obtenir, via cette instance, des droits qu'il n'a pas lui-même. Limitez `iam:PassRole` et `iam:AttachRolePolicy` aux rôles et stratégies préfixés par le prénom, ou imposez une limite de permissions aux rôles créés.
+Ils sont couverts par `aws-cours-etudiant`. Le piège d'escalade du module 2 se retrouve ici sous une autre forme : un étudiant qui peut créer un rôle, lui attacher n'importe quelle stratégie et le passer à une instance obtiendrait, via cette instance, des droits qu'il n'a pas lui-même. La création du rôle exige donc la limite `aws-cours-limite-role`, et `iam:PassRole` n'est accordé que sur `role-galerie-<prenom>`. Seule faiblesse assumée : cette limite vaut pour tous les buckets `galerie-*`, si bien qu'un étudiant qui le voudrait vraiment pourrait, depuis son instance, lire le bucket d'un voisin en écrivant sa stratégie en conséquence.
 
 ### Au tableau
 

@@ -49,8 +49,11 @@ Pourquoi `"Resource": "*"` ? Parce que la plupart des actions `Describe` d'EC2 n
 3. Créez le groupe.
 4. Ouvrez <Chemin>IAM › Users › Create user</Chemin>. Nommez l'utilisateur `stagiaire-<prenom>` et cochez **Provide user access to the AWS Management Console**. Si la console vous propose IAM Identity Center, choisissez **I want to create an IAM user**.
 5. Choisissez un mot de passe personnalisé et notez-le. Décochez l'obligation de le changer à la première connexion, puisque c'est vous qui allez l'utiliser.
-6. À l'étape des permissions, choisissez **Add user to group** et cochez `stagiaires-<prenom>`. Terminez la création.
-7. Sur la page de confirmation, notez l'**adresse de connexion à la console** affichée pour cet utilisateur.
+6. À l'étape des permissions, choisissez **Add user to group** et cochez `stagiaires-<prenom>`.
+7. Toujours sur cette page, dépliez **Set permissions boundary**, choisissez d'utiliser une limite de permissions et sélectionnez `aws-cours-limite-stagiaire`. Terminez la création.
+
+    Une **limite de permissions** (*permissions boundary*) fixe le maximum de ce qu'un utilisateur pourra jamais faire, quelles que soient les stratégies qu'on lui attache par la suite : ses droits réels sont l'intersection de ses stratégies et de sa limite. Le compte du cours vous oblige à en poser une, préparée par votre enseignant, sur tout utilisateur que vous créez. Sans elle, n'importe quel étudiant pourrait écrire une stratégie `"Action": "*"`, l'attacher à son stagiaire, se connecter sous ce nom et devenir administrateur du compte. Si vous oubliez cette étape, la création de l'utilisateur est refusée.
+8. Sur la page de confirmation, notez l'**adresse de connexion à la console** affichée pour cet utilisateur.
 
 ## 3. Se mettre à la place du stagiaire
 
@@ -137,7 +140,7 @@ Commencez par regarder quelle adresse IP Internet voit pour votre ordinateur : o
     | SSH | My IP | `Administration depuis mon poste` |
 
 4. Laissez la règle sortante par défaut, qui autorise tout : votre instance devra télécharger des paquets et joindre S3.
-5. Ajoutez un tag `Proprietaire` avec votre prénom comme valeur, puis créez le groupe.
+5. Ajoutez un tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS, puis créez le groupe.
 
 Ouvrez le groupe créé et vérifiez l'onglet **Inbound rules** : trois règles, dont une SSH dont la source se termine par `/32`.
 

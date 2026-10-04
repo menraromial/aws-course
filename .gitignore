@@ -32,6 +32,7 @@ figures/icones-aws-source/
 # Documents tiers (référence de travail, non redistribuables)
 Zenika-training-aws-beginners-Slides.pdf
 setup-amazon-ec2-s3-cloudfront-or-other-aws-services.png
+trainee-policy.json
 
 # Fichiers intermédiaires LaTeX des diapositives (seul main.pdf est gardé)
 slides/*.aux

@@ -24,7 +24,7 @@ Vous aurez besoin de la paire de clés `cle-<prenom>`, du Security Group `pare-f
 1. Ouvrez <Chemin>S3 › Buckets › Create bucket</Chemin>. Vérifiez que la région affichée est **Europe (Paris) eu-west-3**.
 2. Nom : `galerie-<prenom>-<suffixe>`, où `<suffixe>` est un nombre de quatre chiffres tiré au hasard. Le nom doit être en minuscules, sans espace ni accent. Si la console répond qu'il existe déjà, changez de suffixe : quelqu'un, quelque part dans le monde, l'a déjà pris.
 3. Parcourez les autres réglages sans les modifier, en les reconnaissant au passage. **Object Ownership** est sur *ACLs disabled*. **Block all public access** est coché. **Default encryption** indique un chiffrement côté serveur par des clés gérées par S3. C'est exactement ce que dit le cours : un bucket neuf est privé et chiffré.
-4. Ajoutez un tag `Proprietaire` avec votre prénom, puis cliquez sur **Create bucket**.
+4. Ajoutez un tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS, puis cliquez sur **Create bucket**.
 
 ## 2. Déposer un fichier et essayer de le lire
 
@@ -89,7 +89,7 @@ Nommez-la `galerie-s3-<prenom>` et créez-la. Vous reconnaissez la stratégie é
 **Le rôle.** Ouvrez <Chemin>IAM › Roles › Create role</Chemin>.
 
 1. **Trusted entity type** : *AWS service*. **Use case** : *EC2*. Cliquez sur **Next**.
-2. Cherchez et cochez `galerie-s3-<prenom>`. Cliquez sur **Next**.
+2. Cherchez et cochez `galerie-s3-<prenom>`. Plus bas sur la même page, dépliez **Set permissions boundary**, choisissez d'utiliser une limite de permissions et sélectionnez `aws-cours-limite-role`, comme pour le stagiaire du TP 2. Cette limite plafonne le rôle à la lecture et à l'écriture dans des buckets `galerie-...` et à l'usage de files `file-...` : quoi que contienne un jour sa stratégie, une instance qui endosse ce rôle ne pourra rien faire d'autre. Sans elle, la création du rôle est refusée. Cliquez sur **Next**.
 3. Nommez le rôle `role-galerie-<prenom>`. Avant de valider, regardez le bloc **Trust policy** affiché par la console : c'est la stratégie de confiance du cours, qui autorise `ec2.amazonaws.com` à endosser le rôle. Créez le rôle.
 
 **L'association.** Dans la liste des instances, sélectionnez `web-<prenom>`, puis <Chemin>Actions › Security › Modify IAM role</Chemin>. Choisissez `role-galerie-<prenom>` et cliquez sur **Update IAM role**. Il n'est pas nécessaire de redémarrer l'instance.

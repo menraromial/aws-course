@@ -44,7 +44,7 @@ icacls .\cle-<prenom>.pem /inheritance:r /grant:r "$($env:USERNAME):(R)"
 
 Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et remplissez l'assistant de haut en bas.
 
-1. **Name and tags** : nommez l'instance `web-<prenom>`. Cliquez sur **Add additional tags** et ajoutez le tag `Proprietaire` avec votre prénom.
+1. **Name and tags** : nommez l'instance `web-<prenom>`. Cliquez sur **Add additional tags** et ajoutez le tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS. Ce tag est obligatoire sur le compte du cours : sans lui, le lancement est refusé, et c'est grâce à lui que vous seul pouvez arrêter ou résilier votre instance.
 2. **Application and OS Images** : dans *Quick Start*, choisissez **Amazon Linux**, puis l'AMI **Amazon Linux 2023** en architecture **64-bit (x86)**. Notez son identifiant `ami-...`.
 3. **Instance type** : `t3.micro`.
 4. **Key pair** : `cle-<prenom>`.
@@ -190,7 +190,7 @@ La page web s'affiche, puisque le port 80 est ouvert à tous. Le port 22, lui, n
 Lancez maintenant la même commande `timeout` dans le terminal de votre ordinateur : elle affiche `port 22 ouvert`, et c'est normal, puisque votre adresse est celle que la règle autorise. Le même port est ouvert ou fermé selon l'endroit d'où l'on frappe.
 
 :::warning
-Si CloudShell affiche `port 22 ouvert`, votre instance est ouverte en SSH au monde entier. Ouvrez l'instance, onglet **Security** : il ne doit y avoir qu'un seul groupe, `pare-feu-web-<prenom>`, dont la règle SSH a pour source votre adresse suivie de `/32`. Deux erreurs fréquentes : une règle SSH en `0.0.0.0/0`, ou un groupe `launch-wizard-...` créé par l'assistant parce que **Create security group** était resté coché à l'étape 2. Ce groupe ouvre le port 22 à tous par défaut. Dans ce cas, <Chemin>Actions › Security › Change security groups</Chemin>, retirez-le et gardez seulement le vôtre.
+Si CloudShell affiche `port 22 ouvert`, votre instance est ouverte en SSH au monde entier. Ouvrez l'instance, onglet **Security** : il ne doit y avoir qu'un seul groupe, `pare-feu-web-<prenom>`, dont la règle SSH a pour source votre adresse suivie de `/32`. Deux erreurs fréquentes : une règle SSH en `0.0.0.0/0`, ou un groupe `launch-wizard-...` créé par l'assistant parce que **Create security group** était resté coché à l'étape 2. Ce groupe ouvre le port 22 à tous par défaut. Dans ce cas, le plus simple est de résilier l'instance et d'en relancer une en choisissant bien **Select existing security group**. Vous pouvez aussi ouvrir le groupe `launch-wizard-...` et supprimer sa règle SSH ouverte à `0.0.0.0/0`.
 :::
 
 ## 7. Arrêter et redémarrer
