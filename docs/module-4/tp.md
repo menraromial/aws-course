@@ -17,7 +17,7 @@ Ce TP assemble les trois modules précédents. Vous allez créer un bucket priv�
   Ce que vous allez construire. Le bucket, le rôle et sa stratégie resserviront tels quels au projet final.
 </Schema>
 
-Vous aurez besoin de la paire de clés `cle-<prenom>`, du Security Group `sg-web-<prenom>` et du numéro du compte (12 chiffres, visible dans le menu du compte). Préparez aussi une petite image sur votre ordinateur, une photo quelconque de quelques centaines de kilo-octets.
+Vous aurez besoin de la paire de clés `cle-<prenom>`, du Security Group `pare-feu-web-<prenom>` et du numéro du compte (12 chiffres, visible dans le menu du compte). Préparez aussi une petite image sur votre ordinateur, une photo quelconque de quelques centaines de kilo-octets.
 
 ## 1. Créer le bucket
 
@@ -47,7 +47,7 @@ Vous venez de partager un fichier précis, pour une durée précise, sans rendre
 
 ## 4. Une instance qui n'a le droit de rien
 
-Lancez une instance comme au TP 3 : nom `web-<prenom>`, tag `Proprietaire`, Amazon Linux 2023, `t3.micro`, paire de clés `cle-<prenom>`, Security Group `sg-web-<prenom>`, crédits *Standard*. Pas de user data cette fois, et surtout, dans **Advanced details**, laissez le champ **IAM instance profile** vide.
+Lancez une instance comme au TP 3 : nom `web-<prenom>`, tag `Proprietaire`, Amazon Linux 2023, `t3.micro`, paire de clés `cle-<prenom>`, Security Group `pare-feu-web-<prenom>`, crédits *Standard*. Pas de user data cette fois, et surtout, dans **Advanced details**, laissez le champ **IAM instance profile** vide.
 
 Connectez-vous en SSH, puis demandez à AWS qui vous êtes :
 

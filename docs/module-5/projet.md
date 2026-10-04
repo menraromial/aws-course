@@ -35,7 +35,7 @@ L'application s'appelle **la galerie**. C'est une page web où l'on dépose des 
 
 ## L'architecture
 
-<Schema svg={projetArchitecture} num="5.1" alt="Des visiteurs atteignent en HTTP ou HTTPS, et vous en SSH, la passerelle Internet du VPC par défaut. Dans le sous-réseau public, le Security Group sg-web-<prenom> autorise 80 et 443 pour tous et 22 pour votre adresse. Dans l'instance galerie-<prenom>, Nginx écoute sur les ports 80 et 443 (HTTPS autosigné) et relaie les requêtes à Gunicorn et Flask, qui écoutent sur 127.0.0.1:8000 sous l'utilisateur galerie, lancés par le service systemd galerie avec la configuration /etc/galerie.env. L'instance endosse le rôle role-galerie-<prenom> (List, Get, Put) et l'application parle au bucket privé galerie-<prenom>-<suffixe> (préfixes uploads/ et deploy/) avec boto3.">
+<Schema svg={projetArchitecture} num="5.1" alt="Des visiteurs atteignent en HTTP ou HTTPS, et vous en SSH, la passerelle Internet du VPC par défaut. Dans le sous-réseau public, le Security Group pare-feu-web-<prenom> autorise 80 et 443 pour tous et 22 pour votre adresse. Dans l'instance galerie-<prenom>, Nginx écoute sur les ports 80 et 443 (HTTPS autosigné) et relaie les requêtes à Gunicorn et Flask, qui écoutent sur 127.0.0.1:8000 sous l'utilisateur galerie, lancés par le service systemd galerie avec la configuration /etc/galerie.env. L'instance endosse le rôle role-galerie-<prenom> (List, Get, Put) et l'application parle au bucket privé galerie-<prenom>-<suffixe> (préfixes uploads/ et deploy/) avec boto3.">
   L'architecture du projet, jusqu'aux processus qui tournent dans l'instance.
 </Schema>
 

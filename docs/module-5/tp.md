@@ -21,7 +21,7 @@ Vous avez besoin de ce que vous avez construit aux modules précédents. Vérifi
 | Le bucket `galerie-<prenom>-<suffixe>` | <Chemin>S3 › Buckets</Chemin> | région Paris, *Block all public access* activé |
 | La stratégie `galerie-s3-<prenom>` | <Chemin>IAM › Policies</Chemin> | exactement deux déclarations : `s3:ListBucket` sur le bucket, `s3:GetObject` et `s3:PutObject` sur `<bucket>/*` |
 | Le rôle `role-galerie-<prenom>` | <Chemin>IAM › Roles</Chemin> | entité de confiance `ec2.amazonaws.com`, stratégie `galerie-s3-<prenom>` attachée |
-| Le Security Group `sg-web-<prenom>` | <Chemin>EC2 › Security Groups</Chemin> | HTTP et HTTPS depuis `0.0.0.0/0`, SSH depuis votre adresse actuelle en `/32` |
+| Le Security Group `pare-feu-web-<prenom>` | <Chemin>EC2 › Security Groups</Chemin> | HTTP et HTTPS depuis `0.0.0.0/0`, SSH depuis votre adresse actuelle en `/32` |
 | La paire de clés `cle-<prenom>` | <Chemin>EC2 › Key Pairs</Chemin> et votre dossier `~/.ssh` | le fichier `.pem` est bien sur votre ordinateur |
 
 Si une pièce manque, reprenez l'étape correspondante : TP 2, étape 6 pour le Security Group ; TP 3, étape 1 pour la clé ; TP 4, étapes 1 et 5 pour le bucket, la stratégie et le rôle. Si la stratégie contient encore la déclaration `UtiliserLaFile` du TP 4, retirez-la : le rôle ne doit avoir que les droits dont l'application a besoin.
@@ -42,7 +42,7 @@ Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et reprenez les r
 
 - **Name** : `galerie-<prenom>`, et le tag `Proprietaire`.
 - **AMI** : Amazon Linux 2023, 64-bit (x86). **Type** : `t3.micro`. **Key pair** : `cle-<prenom>`.
-- **Network settings** : VPC par défaut, adresse publique activée, Security Group existant `sg-web-<prenom>`.
+- **Network settings** : VPC par défaut, adresse publique activée, Security Group existant `pare-feu-web-<prenom>`.
 - **Advanced details** :
   - **IAM instance profile** : `role-galerie-<prenom>`. C'est la différence avec le TP 3, et c'est elle qui permettra à l'application de parler à S3.
   - **Credit specification** : *Standard*.
@@ -174,7 +174,7 @@ C'est la fin du cours : tout ce que vous avez créé doit disparaître. Dans l'o
 1. **L'instance** `galerie-<prenom>` : <Chemin>Instance state › Terminate (delete) instance</Chemin>. Attendez l'état `Terminated`.
 2. **Le bucket** : dans <Chemin>S3 › Buckets</Chemin>, sélectionnez-le, cliquez sur **Empty** et confirmez, puis sur **Delete**. Un bucket doit être vide pour être supprimé.
 3. **Le rôle** `role-galerie-<prenom>`, puis **la stratégie** `galerie-s3-<prenom>`, dans IAM.
-4. **Le Security Group** `sg-web-<prenom>`. Il ne peut être supprimé qu'une fois l'instance résiliée.
+4. **Le Security Group** `pare-feu-web-<prenom>`. Il ne peut être supprimé qu'une fois l'instance résiliée.
 5. **La paire de clés** `cle-<prenom>` dans <Chemin>EC2 › Key Pairs</Chemin>, et le fichier `.pem` sur votre ordinateur.
 
 Vérifiez enfin, dans <Chemin>EC2 › Global View</Chemin>, qu'aucune instance ne tourne encore à votre nom dans aucune région.

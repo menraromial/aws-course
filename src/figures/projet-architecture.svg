@@ -255,39 +255,42 @@
 <path d="M 2.03 -2.48 L 1.45 -2.48 L 1.45 -3.43 L 2.03 -3.43 C 2.30 -3.43 2.50 -3.48 2.65 -3.59 C 2.81 -3.70 2.89 -3.86 2.89 -4.06 C 2.89 -4.25 2.81 -4.41 2.65 -4.53 C 2.50 -4.64 2.30 -4.70 2.03 -4.70 C 1.82 -4.70 1.59 -4.67 1.35 -4.62 C 1.12 -4.57 0.88 -4.5 0.62 -4.40 L 0.62 -5.40 C 0.88 -5.47 1.13 -5.53 1.37 -5.57 C 1.62 -5.61 1.86 -5.64 2.09 -5.64 C 2.67 -5.64 3.12 -5.50 3.45 -5.25 C 3.78 -5 3.95 -4.64 3.95 -4.20 C 3.95 -3.86 3.85 -3.59 3.67 -3.39 C 3.48 -3.17 3.21 -3.04 2.85 -2.98 C 3.25 -2.91 3.55 -2.75 3.76 -2.5 C 3.97 -2.25 4.07 -1.94 4.07 -1.54 C 4.07 -1.00 3.90 -0.59 3.56 -0.31 C 3.21 -0.03 2.71 0.10 2.06 0.10 C 1.78 0.10 1.50 0.08 1.23 0.03 C 0.96 -0.00 0.70 -0.07 0.46 -0.17 L 0.46 -1.18 C 0.69 -1.07 0.94 -0.98 1.21 -0.92 C 1.48 -0.85 1.76 -0.82 2.06 -0.82 C 2.36 -0.82 2.59 -0.89 2.76 -1.03 C 2.94 -1.16 3.03 -1.35 3.03 -1.59 C 3.03 -1.87 2.94 -2.09 2.76 -2.25 C 2.59 -2.40 2.35 -2.48 2.03 -2.48 Z M 2.03 -2.48 "/>
 </g>
 <g id="projet-architecture-glyph-3-7">
-<path d="M 2.98 -2.14 C 2.98 -2.51 2.91 -2.81 2.76 -3.03 C 2.62 -3.25 2.44 -3.37 2.20 -3.37 C 1.98 -3.37 1.80 -3.25 1.65 -3.03 C 1.51 -2.81 1.45 -2.51 1.45 -2.14 C 1.45 -1.76 1.51 -1.46 1.65 -1.23 C 1.80 -1.01 1.98 -0.90 2.20 -0.90 C 2.44 -0.90 2.62 -1.01 2.76 -1.23 C 2.91 -1.46 2.98 -1.76 2.98 -2.14 Z M 4.06 -0.31 C 4.06 0.35 3.91 0.83 3.60 1.12 C 3.30 1.42 2.82 1.57 2.15 1.57 C 1.92 1.57 1.69 1.55 1.46 1.51 C 1.25 1.48 1.02 1.43 0.79 1.37 L 0.79 0.37 C 1.00 0.48 1.21 0.57 1.42 0.62 C 1.64 0.67 1.85 0.70 2.07 0.70 C 2.39 0.70 2.61 0.62 2.76 0.48 C 2.91 0.33 2.98 0.11 2.98 -0.18 L 2.98 -0.64 C 2.86 -0.44 2.72 -0.28 2.54 -0.18 C 2.37 -0.09 2.16 -0.04 1.90 -0.04 C 1.43 -0.04 1.06 -0.23 0.78 -0.60 C 0.5 -0.98 0.35 -1.48 0.35 -2.12 C 0.35 -2.78 0.5 -3.30 0.78 -3.68 C 1.06 -4.07 1.43 -4.26 1.90 -4.26 C 2.14 -4.26 2.35 -4.20 2.53 -4.09 C 2.71 -3.97 2.86 -3.82 2.98 -3.62 L 2.98 -4.15 L 4.06 -4.15 Z M 4.06 -0.31 "/>
-</g>
-<g id="projet-architecture-glyph-3-8">
-<path d="M 3.15 -2.06 C 3.15 -2.46 3.08 -2.78 2.95 -3 C 2.81 -3.22 2.63 -3.34 2.40 -3.34 C 2.16 -3.34 1.97 -3.22 1.84 -3 C 1.70 -2.78 1.64 -2.46 1.64 -2.06 C 1.64 -1.66 1.70 -1.35 1.84 -1.12 C 1.97 -0.89 2.16 -0.78 2.40 -0.78 C 2.63 -0.78 2.81 -0.89 2.95 -1.12 C 3.08 -1.35 3.15 -1.66 3.15 -2.06 Z M 1.64 -3.56 C 1.77 -3.78 1.92 -3.96 2.10 -4.07 C 2.28 -4.19 2.48 -4.25 2.70 -4.25 C 3.19 -4.25 3.56 -4.06 3.82 -3.68 C 4.09 -3.31 4.23 -2.77 4.23 -2.07 C 4.23 -1.37 4.10 -0.83 3.84 -0.45 C 3.58 -0.07 3.21 0.10 2.73 0.10 C 2.48 0.10 2.26 0.05 2.07 -0.06 C 1.89 -0.18 1.75 -0.36 1.64 -0.60 L 1.64 0 L 0.56 0 L 0.56 -5.76 L 1.64 -5.76 Z M 1.64 -3.56 "/>
-</g>
-<g id="projet-architecture-glyph-3-9">
-<path d="M 4.25 -3.43 L 1.29 -2.37 L 4.25 -1.32 L 4.25 -0.40 L 0.32 -1.93 L 0.32 -2.81 L 4.25 -4.35 Z M 4.25 -3.43 "/>
-</g>
-<g id="projet-architecture-glyph-3-10">
 <path d="M 1.64 -0.57 L 1.64 1.57 L 0.56 1.57 L 0.56 -4.15 L 1.64 -4.15 L 1.64 -3.53 C 1.75 -3.76 1.89 -3.94 2.07 -4.06 C 2.26 -4.18 2.48 -4.25 2.73 -4.25 C 3.21 -4.25 3.58 -4.05 3.84 -3.67 C 4.10 -3.29 4.23 -2.76 4.23 -2.07 C 4.23 -1.36 4.09 -0.82 3.82 -0.45 C 3.56 -0.07 3.19 0.10 2.70 0.10 C 2.48 0.10 2.28 0.05 2.10 -0.06 C 1.92 -0.17 1.77 -0.34 1.64 -0.57 Z M 3.15 -2.07 C 3.15 -2.48 3.08 -2.79 2.95 -3.01 C 2.81 -3.24 2.63 -3.35 2.40 -3.35 C 2.16 -3.35 1.97 -3.24 1.84 -3.01 C 1.70 -2.79 1.64 -2.48 1.64 -2.07 C 1.64 -1.67 1.70 -1.36 1.84 -1.14 C 1.97 -0.91 2.16 -0.79 2.40 -0.79 C 2.63 -0.79 2.81 -0.91 2.95 -1.14 C 3.08 -1.36 3.15 -1.67 3.15 -2.07 Z M 3.15 -2.07 "/>
 </g>
-<g id="projet-architecture-glyph-3-11">
-<path d="M 4.26 -3 C 4.14 -3.11 4.00 -3.19 3.84 -3.25 C 3.68 -3.30 3.51 -3.32 3.32 -3.32 C 3.09 -3.32 2.89 -3.28 2.71 -3.20 C 2.55 -3.12 2.42 -3.01 2.32 -2.85 C 2.26 -2.76 2.22 -2.64 2.20 -2.51 C 2.17 -2.39 2.17 -2.18 2.17 -1.90 L 2.17 0 L 1.07 0 L 1.07 -4.15 L 2.17 -4.15 L 2.17 -3.5 C 2.27 -3.73 2.43 -3.92 2.65 -4.04 C 2.87 -4.17 3.12 -4.25 3.42 -4.25 C 3.57 -4.25 3.72 -4.22 3.85 -4.18 C 4.00 -4.15 4.14 -4.10 4.26 -4.04 Z M 4.26 -3 "/>
-</g>
-<g id="projet-architecture-glyph-3-12">
-<path d="M 3.96 -2.70 L 3.96 0 L 2.89 0 L 2.89 -2.53 C 2.89 -2.83 2.84 -3.04 2.76 -3.17 C 2.67 -3.30 2.53 -3.37 2.34 -3.37 C 2.14 -3.37 1.98 -3.28 1.87 -3.10 C 1.76 -2.92 1.71 -2.68 1.71 -2.37 L 1.71 0 L 0.64 0 L 0.64 -4.15 L 1.71 -4.15 L 1.71 -3.53 C 1.78 -3.75 1.92 -3.93 2.10 -4.06 C 2.29 -4.18 2.51 -4.25 2.78 -4.25 C 3.17 -4.25 3.47 -4.11 3.67 -3.85 C 3.86 -3.59 3.96 -3.21 3.96 -2.70 Z M 3.96 -2.70 "/>
-</g>
-<g id="projet-architecture-glyph-3-13">
-<path d="M 2.28 -3.37 C 2.01 -3.37 1.81 -3.25 1.67 -3.03 C 1.52 -2.80 1.45 -2.48 1.45 -2.07 C 1.45 -1.66 1.52 -1.33 1.67 -1.10 C 1.81 -0.89 2.01 -0.78 2.28 -0.78 C 2.53 -0.78 2.74 -0.89 2.89 -1.10 C 3.04 -1.33 3.12 -1.66 3.12 -2.07 C 3.12 -2.48 3.04 -2.80 2.89 -3.03 C 2.74 -3.25 2.53 -3.37 2.28 -3.37 Z M 0.35 -2.07 C 0.35 -2.74 0.53 -3.26 0.87 -3.65 C 1.22 -4.05 1.69 -4.25 2.28 -4.25 C 2.87 -4.25 3.34 -4.05 3.68 -3.65 C 4.03 -3.26 4.20 -2.74 4.20 -2.07 C 4.20 -1.39 4.03 -0.86 3.68 -0.46 C 3.34 -0.08 2.87 0.10 2.28 0.10 C 1.69 0.10 1.22 -0.08 0.87 -0.46 C 0.53 -0.86 0.35 -1.39 0.35 -2.07 Z M 0.35 -2.07 "/>
-</g>
-<g id="projet-architecture-glyph-3-14">
-<path d="M 2.56 -3.73 C 2.64 -3.91 2.75 -4.03 2.87 -4.12 C 3 -4.20 3.14 -4.25 3.32 -4.25 C 3.69 -4.25 3.94 -4.12 4.07 -3.87 C 4.21 -3.63 4.28 -3.12 4.28 -2.34 L 4.28 0 L 3.39 0 L 3.39 -2.67 C 3.39 -2.97 3.36 -3.17 3.31 -3.28 C 3.26 -3.38 3.18 -3.43 3.06 -3.43 C 2.93 -3.43 2.84 -3.38 2.79 -3.28 C 2.75 -3.17 2.73 -2.97 2.73 -2.67 L 2.73 0 L 1.85 0 L 1.85 -2.67 C 1.85 -2.97 1.83 -3.17 1.78 -3.28 C 1.72 -3.38 1.64 -3.43 1.51 -3.43 C 1.39 -3.43 1.30 -3.38 1.25 -3.28 C 1.20 -3.17 1.18 -2.97 1.18 -2.67 L 1.18 0 L 0.29 0 L 0.29 -4.15 L 1.09 -4.15 L 1.09 -3.71 C 1.15 -3.88 1.25 -4.01 1.39 -4.10 C 1.52 -4.20 1.67 -4.25 1.84 -4.25 C 2.00 -4.25 2.16 -4.19 2.29 -4.09 C 2.44 -4 2.53 -3.87 2.56 -3.73 Z M 2.56 -3.73 "/>
-</g>
-<g id="projet-architecture-glyph-3-15">
-<path d="M 0.32 -3.43 L 0.32 -4.35 L 4.25 -2.81 L 4.25 -1.93 L 0.32 -0.40 L 0.32 -1.32 L 3.28 -2.37 Z M 0.32 -3.43 "/>
-</g>
-<g id="projet-architecture-glyph-3-16">
+<g id="projet-architecture-glyph-3-8">
 <path d="M 2.59 -1.95 C 2.18 -1.95 1.89 -1.89 1.73 -1.79 C 1.57 -1.69 1.5 -1.51 1.5 -1.26 C 1.5 -1.07 1.55 -0.92 1.67 -0.81 C 1.78 -0.69 1.93 -0.64 2.12 -0.64 C 2.41 -0.64 2.64 -0.75 2.79 -0.96 C 2.95 -1.18 3.03 -1.48 3.03 -1.87 L 3.03 -1.95 Z M 4.10 -2.37 L 4.10 0 L 3.03 0 L 3.03 -0.46 C 2.89 -0.28 2.72 -0.13 2.51 -0.03 C 2.31 0.06 2.09 0.10 1.84 0.10 C 1.37 0.10 1.00 -0.01 0.73 -0.26 C 0.47 -0.51 0.34 -0.86 0.34 -1.31 C 0.34 -1.80 0.5 -2.16 0.81 -2.39 C 1.13 -2.61 1.62 -2.73 2.28 -2.73 L 3.03 -2.73 L 3.03 -2.92 C 3.03 -3.08 2.96 -3.21 2.82 -3.31 C 2.70 -3.40 2.51 -3.45 2.28 -3.45 C 2.01 -3.45 1.76 -3.41 1.51 -3.34 C 1.27 -3.28 1.02 -3.17 0.76 -3.03 L 0.76 -3.96 C 1.00 -4.06 1.24 -4.12 1.48 -4.17 C 1.73 -4.22 2 -4.25 2.28 -4.25 C 2.94 -4.25 3.41 -4.11 3.68 -3.84 C 3.96 -3.57 4.10 -3.08 4.10 -2.37 Z M 4.10 -2.37 "/>
 </g>
+<g id="projet-architecture-glyph-3-9">
+<path d="M 4.26 -3 C 4.14 -3.11 4.00 -3.19 3.84 -3.25 C 3.68 -3.30 3.51 -3.32 3.32 -3.32 C 3.09 -3.32 2.89 -3.28 2.71 -3.20 C 2.55 -3.12 2.42 -3.01 2.32 -2.85 C 2.26 -2.76 2.22 -2.64 2.20 -2.51 C 2.17 -2.39 2.17 -2.18 2.17 -1.90 L 2.17 0 L 1.07 0 L 1.07 -4.15 L 2.17 -4.15 L 2.17 -3.5 C 2.27 -3.73 2.43 -3.92 2.65 -4.04 C 2.87 -4.17 3.12 -4.25 3.42 -4.25 C 3.57 -4.25 3.72 -4.22 3.85 -4.18 C 4.00 -4.15 4.14 -4.10 4.26 -4.04 Z M 4.26 -3 "/>
+</g>
+<g id="projet-architecture-glyph-3-10">
+<path d="M 2.73 -4.51 L 2.73 -4.15 L 4.01 -4.15 L 4.01 -3.31 L 2.73 -3.31 L 2.73 0 L 1.65 0 L 1.65 -3.31 L 0.64 -3.31 L 0.64 -4.15 L 1.65 -4.15 L 1.65 -4.43 C 1.65 -4.93 1.75 -5.28 1.96 -5.46 C 2.17 -5.66 2.56 -5.76 3.12 -5.76 L 4.01 -5.76 L 4.01 -4.93 L 3.17 -4.93 C 3.00 -4.93 2.89 -4.90 2.82 -4.84 C 2.77 -4.78 2.74 -4.67 2.73 -4.51 Z M 2.73 -4.51 "/>
+</g>
+<g id="projet-architecture-glyph-3-11">
+<path d="M 3.15 -2.06 C 3.15 -2.46 3.08 -2.78 2.95 -3 C 2.81 -3.22 2.63 -3.34 2.40 -3.34 C 2.16 -3.34 1.97 -3.22 1.84 -3 C 1.70 -2.78 1.64 -2.46 1.64 -2.06 C 1.64 -1.66 1.70 -1.35 1.84 -1.12 C 1.97 -0.89 2.16 -0.78 2.40 -0.78 C 2.63 -0.78 2.81 -0.89 2.95 -1.12 C 3.08 -1.35 3.15 -1.66 3.15 -2.06 Z M 1.64 -3.56 C 1.77 -3.78 1.92 -3.96 2.10 -4.07 C 2.28 -4.19 2.48 -4.25 2.70 -4.25 C 3.19 -4.25 3.56 -4.06 3.82 -3.68 C 4.09 -3.31 4.23 -2.77 4.23 -2.07 C 4.23 -1.37 4.10 -0.83 3.84 -0.45 C 3.58 -0.07 3.21 0.10 2.73 0.10 C 2.48 0.10 2.26 0.05 2.07 -0.06 C 1.89 -0.18 1.75 -0.36 1.64 -0.60 L 1.64 0 L 0.56 0 L 0.56 -5.76 L 1.64 -5.76 Z M 1.64 -3.56 "/>
+</g>
+<g id="projet-architecture-glyph-3-12">
+<path d="M 4.25 -3.43 L 1.29 -2.37 L 4.25 -1.32 L 4.25 -0.40 L 0.32 -1.93 L 0.32 -2.81 L 4.25 -4.35 Z M 4.25 -3.43 "/>
+</g>
+<g id="projet-architecture-glyph-3-13">
+<path d="M 3.96 -2.70 L 3.96 0 L 2.89 0 L 2.89 -2.53 C 2.89 -2.83 2.84 -3.04 2.76 -3.17 C 2.67 -3.30 2.53 -3.37 2.34 -3.37 C 2.14 -3.37 1.98 -3.28 1.87 -3.10 C 1.76 -2.92 1.71 -2.68 1.71 -2.37 L 1.71 0 L 0.64 0 L 0.64 -4.15 L 1.71 -4.15 L 1.71 -3.53 C 1.78 -3.75 1.92 -3.93 2.10 -4.06 C 2.29 -4.18 2.51 -4.25 2.78 -4.25 C 3.17 -4.25 3.47 -4.11 3.67 -3.85 C 3.86 -3.59 3.96 -3.21 3.96 -2.70 Z M 3.96 -2.70 "/>
+</g>
+<g id="projet-architecture-glyph-3-14">
+<path d="M 2.28 -3.37 C 2.01 -3.37 1.81 -3.25 1.67 -3.03 C 1.52 -2.80 1.45 -2.48 1.45 -2.07 C 1.45 -1.66 1.52 -1.33 1.67 -1.10 C 1.81 -0.89 2.01 -0.78 2.28 -0.78 C 2.53 -0.78 2.74 -0.89 2.89 -1.10 C 3.04 -1.33 3.12 -1.66 3.12 -2.07 C 3.12 -2.48 3.04 -2.80 2.89 -3.03 C 2.74 -3.25 2.53 -3.37 2.28 -3.37 Z M 0.35 -2.07 C 0.35 -2.74 0.53 -3.26 0.87 -3.65 C 1.22 -4.05 1.69 -4.25 2.28 -4.25 C 2.87 -4.25 3.34 -4.05 3.68 -3.65 C 4.03 -3.26 4.20 -2.74 4.20 -2.07 C 4.20 -1.39 4.03 -0.86 3.68 -0.46 C 3.34 -0.08 2.87 0.10 2.28 0.10 C 1.69 0.10 1.22 -0.08 0.87 -0.46 C 0.53 -0.86 0.35 -1.39 0.35 -2.07 Z M 0.35 -2.07 "/>
+</g>
+<g id="projet-architecture-glyph-3-15">
+<path d="M 2.56 -3.73 C 2.64 -3.91 2.75 -4.03 2.87 -4.12 C 3 -4.20 3.14 -4.25 3.32 -4.25 C 3.69 -4.25 3.94 -4.12 4.07 -3.87 C 4.21 -3.63 4.28 -3.12 4.28 -2.34 L 4.28 0 L 3.39 0 L 3.39 -2.67 C 3.39 -2.97 3.36 -3.17 3.31 -3.28 C 3.26 -3.38 3.18 -3.43 3.06 -3.43 C 2.93 -3.43 2.84 -3.38 2.79 -3.28 C 2.75 -3.17 2.73 -2.97 2.73 -2.67 L 2.73 0 L 1.85 0 L 1.85 -2.67 C 1.85 -2.97 1.83 -3.17 1.78 -3.28 C 1.72 -3.38 1.64 -3.43 1.51 -3.43 C 1.39 -3.43 1.30 -3.38 1.25 -3.28 C 1.20 -3.17 1.18 -2.97 1.18 -2.67 L 1.18 0 L 0.29 0 L 0.29 -4.15 L 1.09 -4.15 L 1.09 -3.71 C 1.15 -3.88 1.25 -4.01 1.39 -4.10 C 1.52 -4.20 1.67 -4.25 1.84 -4.25 C 2.00 -4.25 2.16 -4.19 2.29 -4.09 C 2.44 -4 2.53 -3.87 2.56 -3.73 Z M 2.56 -3.73 "/>
+</g>
+<g id="projet-architecture-glyph-3-16">
+<path d="M 0.32 -3.43 L 0.32 -4.35 L 4.25 -2.81 L 4.25 -1.93 L 0.32 -0.40 L 0.32 -1.32 L 3.28 -2.37 Z M 0.32 -3.43 "/>
+</g>
 <g id="projet-architecture-glyph-3-17">
-<path d="M 1.43 -1.73 L 1.43 -4.93 L 0.32 -4.93 L 0.32 -5.76 L 2.51 -5.76 L 2.51 -1.73 C 2.51 -1.39 2.56 -1.16 2.67 -1.03 C 2.77 -0.89 2.94 -0.82 3.18 -0.82 L 4.06 -0.82 L 4.06 0 L 2.89 0 C 2.36 0 1.99 -0.12 1.76 -0.39 C 1.54 -0.66 1.43 -1.10 1.43 -1.73 Z M 1.43 -1.73 "/>
+<path d="M 2.98 -2.14 C 2.98 -2.51 2.91 -2.81 2.76 -3.03 C 2.62 -3.25 2.44 -3.37 2.20 -3.37 C 1.98 -3.37 1.80 -3.25 1.65 -3.03 C 1.51 -2.81 1.45 -2.51 1.45 -2.14 C 1.45 -1.76 1.51 -1.46 1.65 -1.23 C 1.80 -1.01 1.98 -0.90 2.20 -0.90 C 2.44 -0.90 2.62 -1.01 2.76 -1.23 C 2.91 -1.46 2.98 -1.76 2.98 -2.14 Z M 4.06 -0.31 C 4.06 0.35 3.91 0.83 3.60 1.12 C 3.30 1.42 2.82 1.57 2.15 1.57 C 1.92 1.57 1.69 1.55 1.46 1.51 C 1.25 1.48 1.02 1.43 0.79 1.37 L 0.79 0.37 C 1.00 0.48 1.21 0.57 1.42 0.62 C 1.64 0.67 1.85 0.70 2.07 0.70 C 2.39 0.70 2.61 0.62 2.76 0.48 C 2.91 0.33 2.98 0.11 2.98 -0.18 L 2.98 -0.64 C 2.86 -0.44 2.72 -0.28 2.54 -0.18 C 2.37 -0.09 2.16 -0.04 1.90 -0.04 C 1.43 -0.04 1.06 -0.23 0.78 -0.60 C 0.5 -0.98 0.35 -1.48 0.35 -2.12 C 0.35 -2.78 0.5 -3.30 0.78 -3.68 C 1.06 -4.07 1.43 -4.26 1.90 -4.26 C 2.14 -4.26 2.35 -4.20 2.53 -4.09 C 2.71 -3.97 2.86 -3.82 2.98 -3.62 L 2.98 -4.15 L 4.06 -4.15 Z M 4.06 -0.31 "/>
 </g>
 <g id="projet-architecture-glyph-3-18">
+<path d="M 1.43 -1.73 L 1.43 -4.93 L 0.32 -4.93 L 0.32 -5.76 L 2.51 -5.76 L 2.51 -1.73 C 2.51 -1.39 2.56 -1.16 2.67 -1.03 C 2.77 -0.89 2.94 -0.82 3.18 -0.82 L 4.06 -0.82 L 4.06 0 L 2.89 0 C 2.36 0 1.99 -0.12 1.76 -0.39 C 1.54 -0.66 1.43 -1.10 1.43 -1.73 Z M 1.43 -1.73 "/>
+</g>
+<g id="projet-architecture-glyph-3-19">
 <path d="M 0.81 -4.15 L 2.96 -4.15 L 2.96 -0.82 L 4.31 -0.82 L 4.31 0 L 0.53 0 L 0.53 -0.82 L 1.89 -0.82 L 1.89 -3.31 L 0.81 -3.31 Z M 1.89 -6.17 L 2.96 -6.17 L 2.96 -4.90 L 1.89 -4.90 Z M 1.89 -6.17 "/>
 </g>
 <g id="projet-architecture-glyph-4-0">
@@ -641,84 +644,92 @@
 </g>
 <path fill="none" stroke-width="0.79" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--fig-rouge)" stroke-opacity="1" stroke-miterlimit="10" d="M 45.35 -59.68 L 45.35 -246.46 C 45.35 -248.11 46.69 -249.45 48.34 -249.45 L 405.20 -249.45 C 406.85 -249.45 408.19 -248.11 408.19 -246.46 L 408.19 -59.68 C 408.19 -58.03 406.85 -56.69 405.20 -56.69 L 48.34 -56.69 C 46.69 -56.69 45.35 -58.03 45.35 -59.68 Z M 45.35 -59.68 " transform="matrix(0.997372, 0, 0, -0.997372, 154.057103, 4.371482)"/>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-3-4" x="203.73" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-7" x="208.30" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-2" x="212.88" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-3" x="217.46" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-0" x="222.03" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-8" x="226.61" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-2" x="231.19" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-9" x="235.76" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-10" x="240.34" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-11" x="244.92" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-7" x="203.73" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-8" x="208.30" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-9" x="212.88" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-0" x="217.46" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-2" x="222.03" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-10" x="226.61" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-0" x="231.19" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-1" x="235.76" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-2" x="240.34" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-3" x="244.92" y="71.61"/>
 <use xlink:href="#projet-architecture-glyph-3-0" x="249.49" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-12" x="254.07" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-13" x="258.65" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-14" x="263.22" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-3-15" x="267.80" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-11" x="254.07" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-2" x="258.65" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-12" x="263.22" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-7" x="267.80" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-9" x="272.38" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-0" x="276.96" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-13" x="281.53" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-14" x="286.11" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-15" x="290.69" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-25" x="274.39" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-3-16" x="295.26" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-26" x="279.90" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-27" x="285.43" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-25" x="301.84" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-22" x="293.17" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-19" x="298.23" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-26" x="307.36" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-27" x="312.89" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-28" x="303.36" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-28" x="309.10" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-29" x="314.85" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-22" x="320.63" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-19" x="325.69" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-16" x="322.34" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-5" x="327.70" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-6" x="332.91" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-9" x="338.20" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-28" x="330.82" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-28" x="336.56" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-29" x="342.31" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-19" x="343.67" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-16" x="349.80" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-5" x="355.16" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-6" x="360.37" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-9" x="365.66" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-5" x="346.70" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-6" x="351.91" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-20" x="357.20" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-8" x="361.96" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-19" x="371.13" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-30" x="366.54" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-30" x="371.90" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-5" x="374.16" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-6" x="379.37" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-20" x="384.66" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-8" x="389.42" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-16" x="379.26" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-5" x="384.62" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-6" x="389.83" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-9" x="395.11" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-30" x="394.00" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-30" x="399.35" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-31" x="400.59" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-16" x="406.72" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-5" x="412.07" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-6" x="417.28" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-9" x="422.57" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-5" x="405.53" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-19" x="410.74" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-9" x="413.85" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-31" x="428.04" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-22" x="417.10" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-5" x="432.99" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-19" x="438.20" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-9" x="441.31" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-17" x="424.17" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-7" x="429.11" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-9" x="434.46" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-22" x="444.56" y="71.61"/>
 </g>
 <g style="fill:var(--fig-rouge)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-2-22" x="437.72" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-20" x="442.78" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-20" x="447.54" y="71.61"/>
-<use xlink:href="#projet-architecture-glyph-2-22" x="452.29" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-17" x="451.63" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-7" x="456.56" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-9" x="461.92" y="71.61"/>
+</g>
+<g style="fill:var(--fig-rouge)" fill-opacity="1">
+<use xlink:href="#projet-architecture-glyph-2-22" x="465.18" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-20" x="470.24" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-20" x="474.99" y="71.61"/>
+<use xlink:href="#projet-architecture-glyph-2-22" x="479.75" y="71.61"/>
 </g>
 <path fill-rule="nonzero" style="fill:var(--fig-orange-bg);stroke:var(--fig-orange)" fill-opacity="1" stroke-width="0.79" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1" stroke-miterlimit="10" d="M 62.36 -88.02 L 62.36 -229.45 C 62.36 -231.10 63.70 -232.44 65.35 -232.44 L 388.19 -232.44 C 389.84 -232.44 391.18 -231.10 391.18 -229.45 L 391.18 -88.02 C 391.18 -86.37 389.84 -85.03 388.19 -85.03 L 65.35 -85.03 C 63.70 -85.03 62.36 -86.37 62.36 -88.02 Z M 62.36 -88.02 " transform="matrix(0.997372, 0, 0, -0.997372, 154.057103, 4.371482)"/>
 <g style="fill:var(--fig-orange)" fill-opacity="1">
@@ -734,22 +745,22 @@
 <use xlink:href="#projet-architecture-glyph-2-22" x="251.41" y="100.14"/>
 </g>
 <g style="fill:var(--fig-orange)" fill-opacity="1">
-<use xlink:href="#projet-architecture-glyph-3-7" x="258.48" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-16" x="263.06" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-17" x="267.64" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-17" x="258.48" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-8" x="263.06" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-18" x="267.64" y="100.14"/>
 <use xlink:href="#projet-architecture-glyph-3-0" x="272.21" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-11" x="276.79" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-18" x="281.37" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-9" x="276.79" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-19" x="281.37" y="100.14"/>
 <use xlink:href="#projet-architecture-glyph-3-0" x="285.94" y="100.14"/>
 <use xlink:href="#projet-architecture-glyph-3-2" x="290.52" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-9" x="295.10" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-10" x="299.68" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-11" x="304.25" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-12" x="295.10" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-7" x="299.68" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-9" x="304.25" y="100.14"/>
 <use xlink:href="#projet-architecture-glyph-3-0" x="308.83" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-12" x="313.41" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-13" x="317.98" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-14" x="322.56" y="100.14"/>
-<use xlink:href="#projet-architecture-glyph-3-15" x="327.14" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-13" x="313.41" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-14" x="317.98" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-15" x="322.56" y="100.14"/>
+<use xlink:href="#projet-architecture-glyph-3-16" x="327.14" y="100.14"/>
 </g>
 <path fill-rule="nonzero" style="fill:var(--fig-paper);stroke:var(--fig-console-field)" fill-opacity="1" stroke-width="0.79" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1" stroke-miterlimit="10" d="M 171.49 -113.58 L 83.63 -113.58 C 82.53 -113.58 81.63 -114.47 81.63 -115.57 L 81.63 -145.21 C 81.63 -146.31 82.53 -147.20 83.63 -147.20 L 171.49 -147.20 C 172.58 -147.20 173.48 -146.31 173.48 -145.21 L 173.48 -115.57 C 173.48 -114.47 172.58 -113.58 171.49 -113.58 Z M 171.49 -113.58 " transform="matrix(0.997372, 0, 0, -0.997372, 154.057103, 4.371482)"/>
 <g style="fill:var(--fig-ink)" fill-opacity="1">

@@ -219,7 +219,7 @@ Son comportement tient en quelques propriétés :
 - les modifications s'appliquent immédiatement ;
 - une ressource peut avoir plusieurs Security Groups, dont les règles s'additionnent.
 
-<Schema svg={securityGroup} num="2.6" alt="Une instance EC2 dans le Security Group sg-web-camille. Les internautes atteignent les ports 80 et 443. Votre poste atteint le port 22 et la réponse repart d'office. Un robot de balayage est bloqué sur le port 22. Le trafic sortant est autorisé. Un tableau rappelle les trois règles entrantes.">
+<Schema svg={securityGroup} num="2.6" alt="Une instance EC2 dans le Security Group pare-feu-web-camille. Les internautes atteignent les ports 80 et 443. Votre poste atteint le port 22 et la réponse repart d'office. Un robot de balayage est bloqué sur le port 22. Le trafic sortant est autorisé. Un tableau rappelle les trois règles entrantes.">
   Le Security Group d'un serveur web : le site est ouvert à tous, l'administration par SSH à une seule adresse.
 </Schema>
 

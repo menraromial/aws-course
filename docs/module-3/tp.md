@@ -13,11 +13,11 @@ import Chemin from '@site/src/components/Chemin';
 
 Vous allez lancer votre première instance, vous y connecter, y installer un serveur web et l'ouvrir dans votre navigateur. Puis vous la détruirez, et vous en relancerez une identique sans taper une seule commande dessus.
 
-<Schema svg={tp3Architecture} num="TP3" alt="Votre navigateur atteint en HTTP 80, et votre terminal en SSH 22 depuis votre adresse, la passerelle Internet du VPC par défaut (172.31.0.0/16) en région eu-west-3. Dans la zone eu-west-3a, le sous-réseau public contient l'instance web-<prenom> qui fait tourner Nginx, protégée par le Security Group sg-web-<prenom> et munie d'un volume EBS de 8 Gio.">
+<Schema svg={tp3Architecture} num="TP3" alt="Votre navigateur atteint en HTTP 80, et votre terminal en SSH 22 depuis votre adresse, la passerelle Internet du VPC par défaut (172.31.0.0/16) en région eu-west-3. Dans la zone eu-west-3a, le sous-réseau public contient l'instance web-<prenom> qui fait tourner Nginx, protégée par le Security Group pare-feu-web-<prenom> et munie d'un volume EBS de 8 Gio.">
   Ce que vous allez construire. Le VPC par défaut fournit déjà le réseau, la passerelle Internet et des sous-réseaux publics : vous n'avez qu'à y poser l'instance.
 </Schema>
 
-Vous avez besoin du Security Group `sg-web-<prenom>` créé au TP 2. S'il n'existe plus, recréez-le d'abord (TP 2, étape 6). Vérifiez aussi que votre adresse IP n'a pas changé depuis : ouvrez [checkip.amazonaws.com](https://checkip.amazonaws.com/) et comparez avec la source de la règle SSH.
+Vous avez besoin du Security Group `pare-feu-web-<prenom>` créé au TP 2. S'il n'existe plus, recréez-le d'abord (TP 2, étape 6). Vérifiez aussi que votre adresse IP n'a pas changé depuis : ouvrez [checkip.amazonaws.com](https://checkip.amazonaws.com/) et comparez avec la source de la règle SSH.
 
 :::cout
 À partir de maintenant, vous créez des ressources qui coûtent tant qu'elles existent. La dernière étape de ce TP consiste à tout résilier. Ne partez pas sans l'avoir faite.
@@ -48,7 +48,7 @@ Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et remplissez l'a
 2. **Application and OS Images** : dans *Quick Start*, choisissez **Amazon Linux**, puis l'AMI **Amazon Linux 2023** en architecture **64-bit (x86)**. Notez son identifiant `ami-...`.
 3. **Instance type** : `t3.micro`.
 4. **Key pair** : `cle-<prenom>`.
-5. **Network settings** : cliquez sur **Edit**. Laissez le VPC par défaut et le sous-réseau proposé, vérifiez que **Auto-assign public IP** est sur *Enable*, puis choisissez **Select existing security group** et sélectionnez `sg-web-<prenom>`.
+5. **Network settings** : cliquez sur **Edit**. Laissez le VPC par défaut et le sous-réseau proposé, vérifiez que **Auto-assign public IP** est sur *Enable*, puis choisissez **Select existing security group** et sélectionnez `pare-feu-web-<prenom>`.
 6. **Configure storage** : laissez le volume proposé, 8 Gio en `gp3`.
 7. **Advanced details** : dépliez la rubrique. Vous y trouverez deux réglages dont on a parlé en cours.
     - **Credit specification** : choisissez **Standard**. En cas de charge anormale, l'instance ralentira au lieu de coûter plus cher.
@@ -185,7 +185,7 @@ Vous n'avez tapé aucune commande sur cette machine, et elle sert déjà votre p
 
 Résiliez `web2-<prenom>` (<Chemin>Instance state › Terminate (delete) instance</Chemin>). Vérifiez dans la liste qu'aucune instance à votre nom n'est dans l'état `Running` ou `Stopped`.
 
-Gardez la paire de clés `cle-<prenom>` et le Security Group `sg-web-<prenom>`, qui ne coûtent rien et resserviront aux modules 4 et 5. Gardez aussi le script de l'étape 8 : il servira de point de départ la prochaine fois.
+Gardez la paire de clés `cle-<prenom>` et le Security Group `pare-feu-web-<prenom>`, qui ne coûtent rien et resserviront aux modules 4 et 5. Gardez aussi le script de l'étape 8 : il servira de point de départ la prochaine fois.
 
 ## Si ça ne marche pas
 

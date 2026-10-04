@@ -113,7 +113,7 @@ Dans le simulateur, il faut renseigner l'ARN d'une instance et la valeur du tag 
 | La création de l'utilisateur échoue sur `iam:CreateLoginProfile` | Droits de l'étudiant incomplets | Ajouter l'action à la stratégie des étudiants |
 | `describe-volumes` n'est pas refusé à l'étape 5 | Stratégie en ligne créée sur l'utilisateur de l'étudiant au lieu du groupe du stagiaire | La recréer sur le groupe `stagiaires-<prenom>` |
 | « My IP » affiche une adresse inattendue | VPN actif, ou proxy de l'école | Désactiver le VPN, ou saisir l'adresse donnée par `checkip.amazonaws.com` |
-| Deux étudiants ne voient pas le même `sg-web` | Chacun a le sien, c'est normal | Rappeler la convention du prénom dans les noms |
+| Deux étudiants ne voient pas le même `pare-feu-web` | Chacun a le sien, c'est normal | Rappeler la convention du prénom dans les noms |
 
 ## Module 3 : Calcul, Amazon EC2
 

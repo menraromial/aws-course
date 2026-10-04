@@ -124,7 +124,10 @@ Fermez la fenêtre du stagiaire. Vous allez préparer le pare-feu de la machine 
 Commencez par regarder quelle adresse IP Internet voit pour votre ordinateur : ouvrez [checkip.amazonaws.com](https://checkip.amazonaws.com/). Sur le réseau de l'école, cette adresse est probablement partagée par tous les postes, puisque le réseau sort vers Internet par une seule adresse. Autoriser « votre IP » revient donc à autoriser toute l'école, ce qui reste bien plus étroit que le monde entier. Si vous changez de réseau, en passant sur le partage de connexion de votre téléphone par exemple, votre adresse change et il faudra mettre la règle à jour.
 
 1. Ouvrez <Chemin>EC2 › Security Groups › Create security group</Chemin>.
-2. Nom : `sg-web-<prenom>`. Description : `Serveur web public, SSH restreint`. VPC : laissez le VPC par défaut.
+2. Nom : `pare-feu-web-<prenom>`. Description : `Serveur web public, SSH restreint`. VPC : laissez le VPC par défaut.
+
+    AWS refuse les noms qui commencent par `sg-` : ce préfixe est réservé aux identifiants que la console attribue elle-même à chaque groupe (`sg-0a1b2c...`). Le nom est libre pour le reste, mais il ne peut plus être modifié une fois le groupe créé, et la description non plus : relisez-les avant de valider. Ils n'acceptent que des caractères ASCII, d'où l'absence d'accent dans les descriptions.
+
 3. Ajoutez trois règles entrantes :
 
     | Type | Source | Description |
@@ -146,7 +149,7 @@ La console EC2 propose de se connecter à une instance directement dans le navig
 
 ## 7. Ranger
 
-Gardez le Security Group `sg-web-<prenom>` : il servira au module 3.
+Gardez le Security Group `pare-feu-web-<prenom>` : il servira au module 3.
 
 Supprimez tout le reste, dans cet ordre :
 
