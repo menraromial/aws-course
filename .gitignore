@@ -47,3 +47,6 @@ slides/*.vrb
 
 # Identifiants des étudiants (CSV de la feuille, etudiants.csv) : jamais dans le dépôt
 *.csv
+
+# Examen : le corrigé ne doit jamais être public
+examen/
