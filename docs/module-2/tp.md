@@ -97,7 +97,7 @@ Vous devez voir `allowed` pour `DescribeInstances` et `denied` pour les deux aut
 
 Vérifions maintenant, sur un cas concret, qu'un `Deny` l'emporte sur les `Allow`.
 
-1. Dans votre fenêtre, ouvrez le groupe `stagiaires-<prenom>` et attachez-lui, en plus, la stratégie gérée `AmazonEC2ReadOnlyAccess`. Elle autorise elle aussi `ec2:Describe*`, parmi d'autres choses.
+1. Dans votre fenêtre, ouvrez le **groupe** `stagiaires-<prenom>` (et non l'utilisateur) et attachez-lui, en plus, la stratégie gérée `AmazonEC2ReadOnlyAccess`. Elle autorise elle aussi `ec2:Describe*`, parmi d'autres choses.
 2. Toujours sur le groupe, onglet **Permissions**, choisissez <Chemin>Add permissions › Create inline policy</Chemin>. En mode JSON, saisissez :
 
     ```json
