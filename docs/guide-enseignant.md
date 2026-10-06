@@ -74,7 +74,14 @@ aws service-quotas get-service-quota --region eu-west-3 --service-code ec2 \
   --quota-code L-1216C47A --query Quota.Value
 ```
 
-S'il est inférieur au nombre d'étudiants multiplié par deux, demandez une augmentation dans <Chemin>Service Quotas › Amazon EC2</Chemin>, quelques jours à l'avance : la demande est examinée par AWS. Ce quota sert aussi de plafond global : même en cas de problème, le compte ne pourra pas faire tourner plus de vCPU que lui.
+S'il est inférieur au nombre d'étudiants multiplié par deux, demandez une augmentation quelques jours à l'avance, depuis la région de Paris : <Chemin>Service Quotas › AWS services › Amazon Elastic Compute Cloud (Amazon EC2)</Chemin>, cherchez `Running On-Demand Standard`, ouvrez le quota, puis **Request increase at account level**. La même demande en ligne de commande :
+
+```bash title="CloudShell (administrateur)"
+aws service-quotas request-service-quota-increase --region eu-west-3 \
+  --service-code ec2 --quota-code L-1216C47A --desired-value 200
+```
+
+La demande est examinée par AWS, souvent en quelques heures ; sur un compte récent, il peut accorder moins que demandé, ou demander une justification (un cours, une `t3.micro` par étudiant, les dates des séances). Un compte encore sur le plan gratuit peut devoir passer en plan payant ou ouvrir un dossier auprès du support. En attendant, un quota de 16 vCPU permet huit instances simultanées : faites travailler en binômes. Ce quota sert aussi de plafond global : même en cas de problème, le compte ne pourra pas faire tourner plus de vCPU que lui.
 
 ### Ce que les stratégies autorisent et interdisent
 
