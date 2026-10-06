@@ -201,10 +201,11 @@ Dans le simulateur, il faut renseigner l'ARN d'une instance et la valeur du tag 
 |---|---|---|
 | Le stagiaire ne peut pas se connecter | Adresse de connexion du compte mal recopiée, ou page « Root user » | Reprendre l'adresse affichée à la fin de la création de l'utilisateur |
 | CloudShell ne s'ouvre pas pour le stagiaire | `AWSCloudShellFullAccess` oubliée sur le groupe | L'attacher au groupe `stagiaires-<prenom>` |
-| La création de l'utilisateur échoue sur `iam:CreateLoginProfile` | Droits de l'étudiant incomplets | Ajouter l'action à la stratégie des étudiants |
+| La création de l'utilisateur stagiaire est refusée | Limite de permissions `aws-cours-limite-stagiaire` non choisie, ou nom autre que `stagiaire-<prenom>` | Recommencer en choisissant la limite et le nom exact |
 | `describe-volumes` n'est pas refusé à l'étape 5 | Stratégie en ligne créée sur l'utilisateur de l'étudiant au lieu du groupe du stagiaire | La recréer sur le groupe `stagiaires-<prenom>` |
 | « My IP » affiche une adresse inattendue | VPN actif, ou proxy de l'école | Désactiver le VPN, ou saisir l'adresse donnée par `checkip.amazonaws.com` |
-| Deux étudiants ne voient pas le même `pare-feu-web` | Chacun a le sien, c'est normal | Rappeler la convention du prénom dans les noms |
+| Deux étudiants ne voient pas le même `pare-feu-web` | Chacun a le sien, c'est normal | Rappeler que chacun met son nom d'utilisateur dans les noms |
+| Le stagiaire est refusé partout (`no identity-based policy allows ...`) | L'utilisateur n'a pas été ajouté au groupe `stagiaires-<prenom>`, ou la stratégie n'est pas attachée au groupe | Onglet **Permissions** de l'utilisateur : ajouter l'utilisateur au groupe, ou attacher la stratégie au groupe |
 
 ## Module 3 : Calcul, Amazon EC2
 

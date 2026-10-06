@@ -59,6 +59,8 @@ Pourquoi `"Resource": "*"` ? Parce que la plupart des actions `Describe` d'EC2 n
     Une **limite de permissions** (*permissions boundary*) fixe le maximum de ce qu'un utilisateur pourra jamais faire, quelles que soient les stratégies qu'on lui attache par la suite : ses droits réels sont l'intersection de ses stratégies et de sa limite. Le compte du cours vous oblige à en poser une, préparée par votre enseignant, sur tout utilisateur que vous créez. Sans elle, n'importe quel étudiant pourrait écrire une stratégie `"Action": "*"`, l'attacher à son stagiaire, se connecter sous ce nom et devenir administrateur du compte. Si vous oubliez cette étape, la création de l'utilisateur est refusée.
 8. Sur la page de confirmation, notez l'**adresse de connexion à la console** affichée pour cet utilisateur.
 
+Avant de continuer, ouvrez <Chemin>IAM › Users › stagiaire-<prenom></Chemin>, onglet **Permissions**. Vous devez y voir `lecture-ec2-<prenom>` et `AWSCloudShellFullAccess`, avec la mention qu'elles viennent du groupe `stagiaires-<prenom>`, et, dans la rubrique **Permissions boundary**, `aws-cours-limite-stagiaire`. Si la liste des stratégies est vide, l'utilisateur n'est pas dans le groupe : ouvrez l'onglet **Groups** et ajoutez-le. C'est l'oubli le plus fréquent de ce TP, et il se traduit, une fois connecté en stagiaire, par des refus du type `no identity-based policy allows the ec2:DescribeSecurityGroups action`.
+
 ## 3. Se mettre à la place du stagiaire
 
 Ouvrez une **fenêtre de navigation privée**, ou un autre navigateur, pour garder votre propre session ouverte à côté. Connectez-vous avec l'adresse notée, l'utilisateur `stagiaire-<prenom>` et son mot de passe. Placez-vous sur la région de Paris.
