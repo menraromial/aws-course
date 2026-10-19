@@ -12,12 +12,12 @@ import Chemin from '@site/src/components/Chemin';
 <Seance items={['Module 3', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
 :::
 
 Vous allez lancer votre première instance, vous y connecter, y installer un serveur web et l'ouvrir dans votre navigateur. Puis vous la détruirez, et vous en relancerez une identique sans taper une seule commande dessus.
 
-<Schema svg={tp3Architecture} num="TP3" alt="Votre navigateur atteint en HTTP 80, et votre terminal en SSH 22 depuis votre adresse, la passerelle Internet du VPC par défaut (172.31.0.0/16) en région eu-west-3. Dans la zone eu-west-3a, le sous-réseau public contient l'instance web-<prenom> qui fait tourner Nginx, protégée par le Security Group pare-feu-web-<prenom> et munie d'un volume EBS de 8 Gio.">
+<Schema svg={tp3Architecture} num="TP3" alt="Votre navigateur atteint en HTTP 80, et votre terminal en SSH 22 depuis votre adresse, la passerelle Internet du VPC par défaut (172.31.0.0/16) dans la région du compte. Dans la zone a, le sous-réseau public contient l'instance web-<prenom> qui fait tourner Nginx, protégée par le Security Group pare-feu-web-<prenom> et munie d'un volume EBS de 8 Gio.">
   Ce que vous allez construire. Le VPC par défaut fournit déjà le réseau, la passerelle Internet et des sous-réseaux publics : vous n'avez qu'à y poser l'instance.
 </Schema>
 
@@ -48,21 +48,23 @@ icacls .\cle-<prenom>.pem /inheritance:r /grant:r "$($env:USERNAME):(R)"
 
 Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et remplissez l'assistant de haut en bas.
 
-1. **Name and tags** : nommez l'instance `web-<prenom>`. Cliquez sur **Add additional tags** et ajoutez le tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS. Ce tag est obligatoire sur le compte du cours : sans lui, le lancement est refusé, et c'est grâce à lui que vous seul pouvez arrêter ou résilier votre instance.
+1. **Name and tags** : nommez l'instance `web-<prenom>`. Cliquez sur **Add additional tags** et ajoutez le tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS. Ce tag est obligatoire sur le compte de l'enseignant : sans lui, le lancement est refusé, et c'est grâce à lui que vous seul pouvez arrêter ou résilier votre instance. Sur un compte personnel, il sert seulement à vous repérer.
 2. **Application and OS Images** : dans *Quick Start*, choisissez **Amazon Linux**, puis l'AMI **Amazon Linux 2023** en architecture **64-bit (x86)**. Notez son identifiant `ami-...`.
 3. **Instance type** : `t3.micro`.
 4. **Key pair** : `cle-<prenom>`.
-5. **Network settings** : cliquez sur **Edit**. Laissez le VPC par défaut. Dans **Subnet**, choisissez le sous-réseau dont la zone est `eu-west-3a`. Vérifiez que **Auto-assign public IP** est sur *Enable*, puis choisissez **Select existing security group** et sélectionnez `pare-feu-web-<prenom>`.
+5. **Network settings** : cliquez sur **Edit**. Laissez le VPC par défaut. Dans **Subnet**, choisissez le sous-réseau dont la zone est `<région>a` (`eu-north-1a` à Stockholm, `eu-west-3a` à Paris). Vérifiez que **Auto-assign public IP** est sur *Enable*, puis choisissez **Select existing security group** et sélectionnez `pare-feu-web-<prenom>`.
 
-    La liste **Subnet** propose trois sous-réseaux : le VPC par défaut en contient un par zone de disponibilité de Paris (`eu-west-3a`, `eu-west-3b` et `eu-west-3c`). Ils sont tous les trois publics et équivalents pour ce TP, et la `t3.micro` est disponible dans chacun. Choisir un sous-réseau revient à choisir la zone où l'instance va tourner, et son volume EBS sera créé dans la même zone. Nous prenons tous `eu-west-3a` pour que vos résultats correspondent au schéma ; si vous laissez *No preference*, AWS choisit une zone à votre place.
+    La liste **Subnet** propose trois sous-réseaux : le VPC par défaut en contient un par zone de disponibilité de votre région. Ils sont tous les trois publics et équivalents pour ce TP, et la `t3.micro` est disponible dans chacun. Choisir un sous-réseau revient à choisir la zone où l'instance va tourner, et son volume EBS sera créé dans la même zone. Nous prenons tous la zone `a` pour que vos résultats correspondent au schéma ; si vous laissez *No preference*, AWS choisit une zone à votre place.
 6. **Configure storage** : laissez le volume proposé, 8 Gio en `gp3`.
 7. **Advanced details** : dépliez la rubrique. Vous y trouverez deux réglages dont on a parlé en cours.
     - **Credit specification** : choisissez **Standard**. En cas de charge anormale, l'instance ralentira au lieu de coûter plus cher.
     - **Metadata version** : vérifiez qu'il est indiqué **V2 only (token required)**.
 8. Dans le résumé à droite, relisez tout, puis cliquez sur **Launch instance**.
 
-:::info[Une seule instance en marche à la fois]
+:::info[Compte de l'enseignant : une seule instance en marche à la fois]
 Sur le compte du cours, chaque étudiant n'a droit qu'à **une instance en marche**. Si vous en démarrez une seconde, elle est arrêtée automatiquement moins d'une minute après son démarrage, et elle reçoit un tag `ArreteeAutomatiquement`. C'est toujours la plus récente qui est arrêtée, celle qui tournait déjà continue. Avant de lancer une nouvelle instance, résiliez donc celle dont vous n'avez plus besoin.
+
+Sur un compte personnel, cette règle n'existe pas : vous pouvez faire tourner deux ou trois instances à la fois. Chacune consomme vos crédits, avec son adresse IPv4 publique ; résiliez-les dès qu'elles ne servent plus.
 :::
 
 Revenez à la liste des instances. La vôtre passe de `Pending` à `Running` en quelques dizaines de secondes. Attendez que la colonne **Status check** affiche `2/2 checks passed` : cela signifie que la machine virtuelle et son système d'exploitation répondent.
@@ -152,7 +154,7 @@ md() { curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
 md instance-id; echo; md placement/availability-zone; echo
 ```
 
-La première commande envoie une requête `PUT` à `/latest/api/token` et reçoit un jeton valable 300 secondes, rangé dans la variable `TOKEN`. La deuxième définit une petite fonction `md` (pour *metadata*) qui interroge le chemin qu'on lui donne en joignant le jeton dans l'en-tête `X-aws-ec2-metadata-token`. La dernière ligne s'en sert : vous voyez s'afficher l'identifiant de votre instance (`i-...`) puis sa zone (`eu-west-3a`). Pour voir tout ce que le service sait de l'instance, tapez `md ; echo` : il renvoie la liste des catégories disponibles.
+La première commande envoie une requête `PUT` à `/latest/api/token` et reçoit un jeton valable 300 secondes, rangé dans la variable `TOKEN`. La deuxième définit une petite fonction `md` (pour *metadata*) qui interroge le chemin qu'on lui donne en joignant le jeton dans l'en-tête `X-aws-ec2-metadata-token`. La dernière ligne s'en sert : vous voyez s'afficher l'identifiant de votre instance (`i-...`) puis sa zone (`eu-north-1a` ou `eu-west-3a`, selon votre région). Pour voir tout ce que le service sait de l'instance, tapez `md ; echo` : il renvoie la liste des catégories disponibles.
 
 Si vous attendez plus de cinq minutes avant la suite, le jeton expire et `md` ne renvoie plus rien : relancez simplement la commande `TOKEN=...`.
 

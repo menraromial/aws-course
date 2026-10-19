@@ -7,18 +7,29 @@ description: "Stratégie sur mesure, groupe et utilisateur au moindre privilège
 import Seance from '@site/src/components/Seance';
 import Schema from '@site/src/components/Schema';
 import Chemin from '@site/src/components/Chemin';
+import Comptes from '@site/src/components/Comptes';
+import TabItem from '@theme/TabItem';
 
 <Seance items={['Module 2', 'Travaux pratiques']} />
-
-:::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
-:::
 
 Un stagiaire arrive dans l'équipe. Sa mission : faire l'inventaire des machines virtuelles et des pare-feu du compte. Il ne doit rien pouvoir créer, rien modifier, rien supprimer, et il n'a aucune raison de voir les fichiers stockés dans S3. Vous allez lui préparer un accès qui corresponde exactement à cette mission, puis vérifier, en vous mettant à sa place, qu'il ne peut rien faire de plus.
 
 Dans la seconde partie, vous préparerez le Security Group qui protégera votre serveur web au module 3.
 
+<Comptes>
+<TabItem value="personnel" label="Compte personnel AWS">
+
+Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent. IAM et les Security Groups sont gratuits ; ce TP ne consomme aucun crédit.
+
+</TabItem>
+<TabItem value="enseignant" label="Compte fourni par l'enseignant">
+
+Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+
 Le compte du cours est partagé : tout ce que vous créez porte votre nom d'utilisateur, pour que chacun retrouve ses ressources et ne touche pas à celles des autres. IAM et les Security Groups sont gratuits ; ce TP ne coûte rien.
+
+</TabItem>
+</Comptes>
 
 ## 1. Écrire la stratégie du stagiaire
 
@@ -46,7 +57,24 @@ Première idée : lui donner la stratégie gérée par AWS `ReadOnlyAccess`. Ouv
 
 Pourquoi `"Resource": "*"` ? Parce que la plupart des actions `Describe` d'EC2 ne peuvent pas être restreintes à une ressource particulière : on liste toutes les instances ou aucune. La documentation précise, pour chaque action, ce qu'on peut mettre dans `Resource`[^actions-ec2].
 
-## 2. Créer le groupe et l'utilisateur
+## 2. Créer l'utilisateur du stagiaire
+
+<Comptes>
+<TabItem value="personnel" label="Compte personnel AWS">
+
+Sur un compte personnel, AWS refuse deux choses que l'on ferait d'ordinaire ici : les groupes IAM, et l'accès à la console pour un utilisateur IAM. Les utilisateurs IAM y servent seulement aux programmes, par des clés d'accès[^acces-projet]. Vous allez donc attacher la stratégie directement à l'utilisateur, et vous mettre à sa place en ligne de commande plutôt que dans la console.
+
+1. Ouvrez <Chemin>IAM › Users › Create user</Chemin>. Nommez l'utilisateur `stagiaire-<prenom>`. Ne cochez pas l'accès à la console.
+2. À l'étape des permissions, choisissez **Attach policies directly**, filtrez sur **Customer managed** et cochez `lecture-ec2-<prenom>`. Terminez la création.
+3. Ouvrez l'utilisateur, onglet **Security credentials**, puis **Create access key**. Choisissez le cas d'usage **Command Line Interface (CLI)**, confirmez que vous avez lu l'avertissement, et créez la clé.
+4. La page affiche l'**Access key ID** (il commence par `AKIA`) et la **Secret access key**. La seconde n'est montrée qu'une fois : copiez les deux dans un fichier texte provisoire, sur votre poste, que vous supprimerez à la fin du TP.
+
+Avant de continuer, ouvrez l'onglet **Permissions** de `stagiaire-<prenom>`. Vous devez y voir `lecture-ec2-<prenom>`, avec la mention *Attached directly*.
+
+Cette clé est une clé **permanente** : quiconque la possède agit au nom du stagiaire, depuis n'importe où, jusqu'à ce qu'on la supprime. C'est pour cela qu'AWS affiche un avertissement et propose d'autres moyens à chaque création. Ne la collez jamais dans un message, un dépôt Git ou un fichier partagé. Vous la supprimerez à la fin du TP, avec l'utilisateur.
+
+</TabItem>
+<TabItem value="enseignant" label="Compte fourni par l'enseignant">
 
 1. Ouvrez <Chemin>IAM › User groups › Create group</Chemin>. Nommez le groupe `stagiaires-<prenom>`.
 2. Dans la liste des stratégies, attachez-en deux : la vôtre, `lecture-ec2-<prenom>` (le filtre **Customer managed** aide à la retrouver), et `AWSCloudShellFullAccess`, gérée par AWS. Sans cette seconde stratégie, le stagiaire ne pourrait même pas ouvrir CloudShell : chaque outil demande sa propre permission.
@@ -61,7 +89,35 @@ Pourquoi `"Resource": "*"` ? Parce que la plupart des actions `Describe` d'EC2 n
 
 Avant de continuer, ouvrez <Chemin>IAM › Users</Chemin>, puis `stagiaire-<prenom>`, onglet **Permissions**. Vous devez y voir `lecture-ec2-<prenom>` et `AWSCloudShellFullAccess`, avec la mention qu'elles viennent du groupe `stagiaires-<prenom>`, et, dans la rubrique **Permissions boundary**, `aws-cours-limite-stagiaire`. Si la liste des stratégies est vide, l'utilisateur n'est pas dans le groupe : ouvrez l'onglet **Groups** et ajoutez-le. C'est l'oubli le plus fréquent de ce TP, et il se traduit, une fois connecté en stagiaire, par des refus du type `no identity-based policy allows the ec2:DescribeSecurityGroups action`.
 
+</TabItem>
+</Comptes>
+
 ## 3. Se mettre à la place du stagiaire
+
+<Comptes>
+<TabItem value="personnel" label="Compte personnel AWS">
+
+Rangez la clé du stagiaire dans un **profil** de la CLI, dans votre propre CloudShell. Un profil est un jeu d'identifiants nommé ; la CLI ne l'utilise que si on le lui demande avec `--profile`, et vos commandes habituelles continuent de passer sous votre identité.
+
+```bash title="CloudShell"
+aws configure --profile stagiaire
+```
+
+La commande pose quatre questions : collez l'Access key ID, puis la Secret access key, tapez le nom de votre région (celui qu'affiche `echo $AWS_REGION`, par exemple `eu-north-1`), et `json` pour le format. Les deux clés sont écrites dans `~/.aws/credentials`, la région dans `~/.aws/config`.
+
+Vous pouvez maintenant parler à AWS en tant que stagiaire :
+
+```bash title="CloudShell (profil stagiaire)"
+aws sts get-caller-identity --profile stagiaire
+aws ec2 describe-security-groups --profile stagiaire --query "SecurityGroups[].GroupName" --output text
+aws ec2 create-security-group --profile stagiaire --group-name essai --description essai
+aws s3 ls --profile stagiaire
+```
+
+La première commande doit afficher un ARN qui se termine par `user/stagiaire-<prenom>` ; comparez-le avec celui de `aws sts get-caller-identity` sans profil, qui est le vôtre. La deuxième affiche la liste des Security Groups. La troisième échoue avec `UnauthorizedOperation`, la quatrième avec `AccessDenied`. Lisez ces messages en entier : ils disent précisément qui a demandé quoi.
+
+</TabItem>
+<TabItem value="enseignant" label="Compte fourni par l'enseignant">
 
 Ouvrez une **fenêtre de navigation privée**, ou un autre navigateur, pour garder votre propre session ouverte à côté. Connectez-vous avec l'adresse notée, l'utilisateur `stagiaire-<prenom>` et son mot de passe. Placez-vous sur la région de Paris.
 
@@ -80,13 +136,16 @@ aws s3 ls
 
 La première commande doit afficher un ARN qui se termine par `user/stagiaire-<prenom>`, la deuxième la liste des Security Groups. La troisième échoue avec `UnauthorizedOperation`, la quatrième avec `AccessDenied`. Lisez ces messages en entier : ils disent précisément qui a demandé quoi.
 
+</TabItem>
+</Comptes>
+
 Aucune de ces deux erreurs ne vient d'une interdiction. Aucune stratégie ne dit « le stagiaire n'a pas le droit de créer un Security Group » ; simplement, aucune ne l'y autorise. C'est le refus par défaut.
 
 ## 4. Tester sans rien exécuter
 
 Essayer chaque action à la main n'est pas très pratique, et certaines sont trop dangereuses pour qu'on les tente « pour voir ». AWS fournit un outil qui évalue des stratégies sans rien exécuter : le **simulateur de stratégies IAM**[^simulateur].
 
-1. Dans **votre** fenêtre (pas celle du stagiaire), ouvrez [policysim.aws.amazon.com](https://policysim.aws.amazon.com/).
+1. Sous votre propre identité (et non celle du stagiaire), ouvrez [policysim.aws.amazon.com](https://policysim.aws.amazon.com/).
 2. Dans la colonne de gauche, sélectionnez l'utilisateur `stagiaire-<prenom>`.
 3. En haut, choisissez le service **Amazon EC2** et cochez les actions `DescribeInstances`, `RunInstances` et `TerminateInstances`.
 4. Cliquez sur **Run Simulation**.
@@ -96,6 +155,41 @@ Vous devez voir `allowed` pour `DescribeInstances` et `denied` pour les deux aut
 ## 5. Provoquer un refus explicite
 
 Vérifions maintenant, sur un cas concret, qu'un `Deny` l'emporte sur les `Allow`.
+
+<Comptes>
+<TabItem value="personnel" label="Compte personnel AWS">
+
+1. Ouvrez l'**utilisateur** `stagiaire-<prenom>` et attachez-lui, en plus, la stratégie gérée `AmazonEC2ReadOnlyAccess` (<Chemin>Add permissions › Attach policies directly</Chemin>). Elle autorise elle aussi `ec2:Describe*`, parmi d'autres choses.
+2. Toujours sur l'utilisateur, onglet **Permissions**, choisissez <Chemin>Add permissions › Create inline policy</Chemin>. En mode JSON, saisissez :
+
+    ```json
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Deny",
+          "Action": "ec2:DescribeVolumes",
+          "Resource": "*"
+        }
+      ]
+    }
+    ```
+
+    Nommez-la `interdire-volumes` et créez-la.
+
+3. Revenez dans CloudShell :
+
+    ```bash title="CloudShell (profil stagiaire)"
+    aws ec2 describe-volumes --profile stagiaire
+    aws ec2 describe-instances --profile stagiaire --query "Reservations[].Instances[].InstanceId"
+    ```
+
+La première commande est refusée, alors que **deux** stratégies de l'utilisateur l'autorisent. La seconde fonctionne normalement. Un seul `Deny` a suffi.
+
+4. Retirez ensuite de l'utilisateur `AmazonEC2ReadOnlyAccess` et la stratégie `interdire-volumes`, pour revenir à la situation de l'étape 2.
+
+</TabItem>
+<TabItem value="enseignant" label="Compte fourni par l'enseignant">
 
 1. Dans votre fenêtre, ouvrez le **groupe** `stagiaires-<prenom>` (et non l'utilisateur) et attachez-lui, en plus, la stratégie gérée `AmazonEC2ReadOnlyAccess`. Elle autorise elle aussi `ec2:Describe*`, parmi d'autres choses.
 2. Toujours sur le groupe, onglet **Permissions**, choisissez <Chemin>Add permissions › Create inline policy</Chemin>. En mode JSON, saisissez :
@@ -126,9 +220,12 @@ La première commande est refusée, alors que **deux** stratégies du groupe l'a
 
 4. Retirez ensuite du groupe `AmazonEC2ReadOnlyAccess` et la stratégie `interdire-volumes`, pour revenir à la situation de l'étape 2.
 
+</TabItem>
+</Comptes>
+
 ## 6. Le Security Group de votre serveur web
 
-Fermez la fenêtre du stagiaire. Vous allez préparer le pare-feu de la machine que vous lancerez au module 3.
+Laissez le stagiaire de côté (fermez sa fenêtre si vous en avez ouvert une). Vous allez préparer le pare-feu de la machine que vous lancerez au module 3.
 
 Commencez par regarder quelle adresse IP Internet voit pour votre ordinateur : ouvrez [checkip.amazonaws.com](https://checkip.amazonaws.com/). Sur le réseau de l'école, cette adresse est probablement partagée par tous les postes, puisque le réseau sort vers Internet par une seule adresse. Autoriser « votre IP » revient donc à autoriser toute l'école, ce qui reste bien plus étroit que le monde entier. Si vous changez de réseau, en passant sur le partage de connexion de votre téléphone par exemple, votre adresse change et il faudra mettre la règle à jour.
 
@@ -146,7 +243,7 @@ Commencez par regarder quelle adresse IP Internet voit pour votre ordinateur : o
     | SSH | My IP | `Administration depuis mon poste` |
 
 4. Laissez la règle sortante par défaut, qui autorise tout : votre instance devra télécharger des paquets et joindre S3.
-5. Ajoutez un tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS, puis créez le groupe.
+5. Ajoutez un tag `Proprietaire` avec pour valeur votre `<prenom>`, puis créez le groupe. Sur le compte de l'enseignant, ce tag est obligatoire ; sur un compte personnel, il ne sert qu'à vous repérer.
 
 Ouvrez le groupe créé et vérifiez l'onglet **Inbound rules** : trois règles, dont une SSH dont la source se termine par `/32`.
 
@@ -160,11 +257,29 @@ La console EC2 propose de se connecter à une instance directement dans le navig
 
 Gardez le Security Group `pare-feu-web-<prenom>` : il servira au module 3.
 
+<Comptes>
+<TabItem value="personnel" label="Compte personnel AWS">
+
+Supprimez tout le reste, dans cet ordre :
+
+1. le profil du stagiaire dans CloudShell : vérifiez d'abord avec `cat ~/.aws/credentials` que ce fichier ne contient que le profil `[stagiaire]`, puis supprimez les deux fichiers avec `rm ~/.aws/credentials ~/.aws/config` ;
+2. l'utilisateur `stagiaire-<prenom>` (<Chemin>IAM › Users</Chemin>, **Delete**, puis saisissez son nom pour confirmer) : sa clé d'accès disparaît avec lui ;
+3. la stratégie `lecture-ec2-<prenom>` (<Chemin>IAM › Policies</Chemin>, filtre **Customer managed**) ;
+4. le fichier texte où vous aviez copié la clé, sur votre poste.
+
+Pour vérifier que la clé ne vaut plus rien, la commande `aws sts get-caller-identity --profile stagiaire` doit maintenant échouer.
+
+</TabItem>
+<TabItem value="enseignant" label="Compte fourni par l'enseignant">
+
 Supprimez tout le reste, dans cet ordre :
 
 1. l'utilisateur `stagiaire-<prenom>` (<Chemin>IAM › Users</Chemin>, **Delete**, puis saisissez son nom pour confirmer) ;
 2. le groupe `stagiaires-<prenom>` ;
 3. la stratégie `lecture-ec2-<prenom>` (<Chemin>IAM › Policies</Chemin>, filtre **Customer managed**).
+
+</TabItem>
+</Comptes>
 
 Un utilisateur dont personne ne se sert est une porte d'entrée que personne ne surveille.
 
@@ -174,11 +289,12 @@ Un utilisateur dont personne ne se sert est une porte d'entrée que personne ne 
 
 ## Questions
 
-1. Pourquoi attacher `lecture-ec2-<prenom>` au groupe plutôt qu'à l'utilisateur directement ?
-2. À l'étape 3, la création du Security Group a été refusée. Est-ce un refus explicite ou un refus par défaut ? Comment le savez-vous ?
+1. Sur le compte de l'enseignant, la stratégie est attachée à un groupe ; sur un compte personnel, directement à l'utilisateur. Si l'équipe accueillait vingt stagiaires, qu'apporterait le groupe ?
+2. À l'étape 3, la création du Security Group a été refusée au stagiaire. Est-ce un refus explicite ou un refus par défaut ? Comment le savez-vous ?
 3. Un collègue propose d'ouvrir le port 22 à `0.0.0.0/0`, « puisque de toute façon il faut une clé pour se connecter ». Que lui répondez-vous ?
 4. Votre Security Group n'a aucune règle sortante particulière pour les réponses HTTP. Pourquoi le site fonctionnera-t-il quand même ?
 
 [^actions-ec2]: AWS, *Actions, resources, and condition keys for Amazon EC2*, Service Authorization Reference, [docs.aws.amazon.com](https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html).
 [^simulateur]: AWS, *Testing IAM policies with the IAM policy simulator*, IAM User Guide, [docs.aws.amazon.com](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_testing-policies.html).
 [^tags]: AWS, *Controlling access to AWS resources using tags*, IAM User Guide, [docs.aws.amazon.com](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_tags.html).
+[^acces-projet]: AWS, « Compare access management », dans « Compare sign-up options », *AWS Account Management Reference Guide* : les utilisateurs IAM d'un compte créé par la nouvelle inscription « can only be used for programmatic access, not console access » ; la liste des actions IAM refusées (groupes, mots de passe) figure dans « Managed policies for your organization », [docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html](https://docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html).

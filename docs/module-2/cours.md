@@ -42,7 +42,7 @@ Il faut aussi distinguer le **compte AWS** de l'**utilisateur**. Le compte est u
 
 L'utilisateur racine (*root user*) est créé avec le compte et identifié par l'adresse électronique d'inscription. Il a tous les droits, et aucune stratégie IAM ne peut les restreindre. AWS rend obligatoire l'authentification multifacteur (MFA) pour l'utilisateur racine de tous les types de comptes depuis juin 2025[^mfa-root], et recommande de le réserver aux rares opérations qui l'exigent : fermer le compte, changer le plan de support, restaurer des droits perdus. On ne crée jamais de clé d'accès pour lui.
 
-Dans ce cours, vous travaillez avec un utilisateur IAM qui vous a été fourni ; vous n'aurez pas accès au compte racine.
+Dans ce cours, vous n'utiliserez pas d'utilisateur racine. Sur le compte fourni par l'enseignant, vous travaillez avec un utilisateur IAM qui vous a été remis. Un compte personnel créé par la nouvelle inscription d'AWS n'a pas d'utilisateur racine du tout : votre identité (Builder ID, Google, GitHub) vous ouvre une session sur un rôle d'administrateur du compte[^acces-projet].
 
 ## Utilisateurs, groupes et rôles
 
@@ -263,3 +263,4 @@ Le TP 2 met tout cela en pratique : vous créerez un utilisateur aux droits volo
 [^vpc-prix]: AWS, *Amazon VPC pricing*, [aws.amazon.com](https://aws.amazon.com/vpc/pricing/).
 [^sg]: AWS, *Control traffic to your AWS resources using security groups*, Amazon VPC User Guide, [docs.aws.amazon.com](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html).
 [^zmap]: Z. Durumeric, E. Wustrow et J. A. Halderman, « ZMap: Fast Internet-Wide Scanning and its Security Applications », *USENIX Security Symposium*, 2013, [usenix.org](https://www.usenix.org/conference/usenixsecurity13/technical-sessions/paper/durumeric).
+[^acces-projet]: AWS, « Compare access management », dans « Compare sign-up options », *AWS Account Management Reference Guide*, [docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html](https://docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html).

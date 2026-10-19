@@ -12,12 +12,12 @@ import Chemin from '@site/src/components/Chemin';
 <Seance items={['Module 4', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
 :::
 
 Ce TP assemble les trois modules précédents. Vous allez créer un bucket privé, y déposer un fichier, le partager sans ouvrir le bucket, puis donner à une instance EC2 le droit d'y lire et d'y écrire, sans lui confier la moindre clé. Vous finirez par une file SQS, pour voir de vos yeux le délai de visibilité.
 
-<Schema svg={tp4Architecture} num="TP4" alt="Dans la région eu-west-3, l'instance web-<prenom>, qui endosse le rôle role-galerie-<prenom>, lit et écrit dans le bucket galerie-<prenom>-<suffixe> (aws s3 cp, ls) et envoie des messages dans la file file-<prenom>. Depuis l'extérieur, vous téléversez des fichiers depuis la console, un navigateur accède au bucket avec une URL présignée, et un anonyme reçoit une erreur 403.">
+<Schema svg={tp4Architecture} num="TP4" alt="Dans la région du compte, l'instance web-<prenom>, qui endosse le rôle role-galerie-<prenom>, lit et écrit dans le bucket galerie-<prenom>-<suffixe> (aws s3 cp, ls) et envoie des messages dans la file file-<prenom>. Depuis l'extérieur, vous téléversez des fichiers depuis la console, un navigateur accède au bucket avec une URL présignée, et un anonyme reçoit une erreur 403.">
   Ce que vous allez construire. Le bucket, le rôle et sa stratégie resserviront tels quels au projet final.
 </Schema>
 
@@ -25,15 +25,15 @@ Vous aurez besoin de la paire de clés `cle-<prenom>`, du Security Group `pare-f
 
 ## 1. Créer le bucket
 
-1. Ouvrez <Chemin>S3 › Buckets › Create bucket</Chemin>. Vérifiez que la région affichée est **Europe (Paris) eu-west-3**.
+1. Ouvrez <Chemin>S3 › Buckets › Create bucket</Chemin>. Vérifiez que la région affichée est la vôtre : **Europe (Stockholm) eu-north-1** sur la plupart des comptes personnels, **Europe (Paris) eu-west-3** sur le compte de l'enseignant.
 2. Nom : `galerie-<prenom>-<suffixe>`, où `<suffixe>` est un nombre de quatre chiffres tiré au hasard. Le nom doit être en minuscules, sans espace ni accent. Si la console répond qu'il existe déjà, changez de suffixe : quelqu'un, quelque part dans le monde, l'a déjà pris.
 3. Parcourez les autres réglages sans les modifier, en les reconnaissant au passage. **Object Ownership** est sur *ACLs disabled*. **Block all public access** est coché. **Default encryption** indique un chiffrement côté serveur par des clés gérées par S3. C'est exactement ce que dit le cours : un bucket neuf est privé et chiffré.
-4. Ajoutez un tag `Proprietaire` avec pour valeur votre nom d'utilisateur AWS, puis cliquez sur **Create bucket**.
+4. Ajoutez un tag `Proprietaire` avec pour valeur votre `<prenom>` (obligatoire sur le compte de l'enseignant), puis cliquez sur **Create bucket**.
 
 ## 2. Déposer un fichier et essayer de le lire
 
 1. Ouvrez votre bucket, puis <Chemin>Upload › Add files</Chemin>. Choisissez votre image et cliquez sur **Upload**.
-2. Une fois le téléversement terminé, cliquez sur le nom de l'objet. La page de détails affiche sa clé, sa taille, son type (`image/jpeg` ou `image/png`), et une **Object URL** de la forme `https://galerie-<prenom>-<suffixe>.s3.eu-west-3.amazonaws.com/<nom-du-fichier>`.
+2. Une fois le téléversement terminé, cliquez sur le nom de l'objet. La page de détails affiche sa clé, sa taille, son type (`image/jpeg` ou `image/png`), et une **Object URL** de la forme `https://galerie-<prenom>-<suffixe>.s3.<région>.amazonaws.com/<nom-du-fichier>`.
 3. Copiez cette adresse et ouvrez-la dans une **fenêtre de navigation privée**.
 
 Vous obtenez un court document XML avec le code `AccessDenied`. C'est la requête d'un anonyme : elle n'est signée par personne, et le bucket est privé.
@@ -51,7 +51,7 @@ Vous venez de partager un fichier précis, pour une durée précise, sans rendre
 
 ## 4. Une instance qui n'a le droit de rien
 
-Vérifiez d'abord qu'aucune instance du TP 3 ne tourne encore à votre nom : vous n'avez droit qu'à une instance en marche. Lancez ensuite une instance comme au TP 3 : nom `web-<prenom>`, tag `Proprietaire`, Amazon Linux 2023, `t3.micro`, paire de clés `cle-<prenom>`, Security Group `pare-feu-web-<prenom>`, crédits *Standard*. Pas de user data cette fois, et surtout, dans **Advanced details**, laissez le champ **IAM instance profile** vide.
+Vérifiez d'abord qu'aucune instance du TP 3 ne tourne encore à votre nom : sur le compte de l'enseignant, vous n'avez droit qu'à une instance en marche, et sur un compte personnel, une instance oubliée consomme vos crédits. Lancez ensuite une instance comme au TP 3 : nom `web-<prenom>`, tag `Proprietaire`, Amazon Linux 2023, `t3.micro`, paire de clés `cle-<prenom>`, Security Group `pare-feu-web-<prenom>`, crédits *Standard*. Pas de user data cette fois, et surtout, dans **Advanced details**, laissez le champ **IAM instance profile** vide.
 
 Connectez-vous en SSH, puis demandez à AWS qui vous êtes :
 
@@ -93,7 +93,7 @@ Nommez-la `galerie-s3-<prenom>` et créez-la. Vous reconnaissez la stratégie é
 **Le rôle.** Ouvrez <Chemin>IAM › Roles › Create role</Chemin>.
 
 1. **Trusted entity type** : *AWS service*. **Use case** : *EC2*. Cliquez sur **Next**.
-2. Cherchez et cochez `galerie-s3-<prenom>`. Plus bas sur la même page, dépliez **Set permissions boundary**, choisissez d'utiliser une limite de permissions et sélectionnez `aws-cours-limite-role`, comme pour le stagiaire du TP 2. Cette limite plafonne le rôle à la lecture et à l'écriture dans des buckets `galerie-...` et à l'usage de files `file-...` : quoi que contienne un jour sa stratégie, une instance qui endosse ce rôle ne pourra rien faire d'autre. Sans elle, la création du rôle est refusée. Cliquez sur **Next**.
+2. Cherchez et cochez `galerie-s3-<prenom>`. Sur un compte personnel, passez directement à l'étape suivante. Sur le compte de l'enseignant, dépliez plus bas **Set permissions boundary**, choisissez d'utiliser une limite de permissions et sélectionnez `aws-cours-limite-role`, comme pour le stagiaire du TP 2. Cette limite plafonne le rôle à la lecture et à l'écriture dans des buckets `galerie-...` et à l'usage de files `file-...` : quoi que contienne un jour sa stratégie, une instance qui endosse ce rôle ne pourra rien faire d'autre. Sans elle, la création du rôle est refusée. Cliquez sur **Next**.
 3. Nommez le rôle `role-galerie-<prenom>`. Avant de valider, regardez le bloc **Trust policy** affiché par la console : c'est la stratégie de confiance du cours, qui autorise `ec2.amazonaws.com` à endosser le rôle. Créez le rôle.
 
 **L'association.** Dans la liste des instances, sélectionnez `web-<prenom>`, puis <Chemin>Actions › Security › Modify IAM role</Chemin>. Choisissez `role-galerie-<prenom>` et cliquez sur **Update IAM role**. Il n'est pas nécessaire de redémarrer l'instance.
@@ -161,11 +161,11 @@ La réponse contient une clé d'accès, une clé secrète, un jeton de session e
       "Sid": "UtiliserLaFile",
       "Effect": "Allow",
       "Action": ["sqs:GetQueueUrl", "sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage"],
-      "Resource": "arn:aws:sqs:eu-west-3:<compte>:file-<prenom>"
+      "Resource": "arn:aws:sqs:<région>:<compte>:file-<prenom>"
     }
 ```
 
-N'oubliez pas la virgule après l'accolade qui ferme la déclaration précédente. Enregistrez : la modification s'applique au rôle en quelques secondes.
+Remplacez `<région>` par votre région et `<compte>` par le numéro du compte, que `aws sts get-caller-identity` affiche. N'oubliez pas la virgule après l'accolade qui ferme la déclaration précédente. Enregistrez : la modification s'applique au rôle en quelques secondes.
 
 **Envoyer et recevoir.** Sur l'instance :
 

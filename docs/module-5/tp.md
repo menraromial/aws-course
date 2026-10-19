@@ -11,7 +11,7 @@ import Telechargement from '@site/src/components/Telechargement';
 <Seance items={['Module 5', 'Travaux pratiques']} />
 
 :::note[Votre nom dans les énoncés]
-Partout où l'énoncé écrit `<prenom>`, mettez votre nom d'utilisateur AWS, celui qui vous a été attribué, par exemple `student12`, et non votre prénom. Exemple : `cle-<prenom>` devient `cle-student12`.
+Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
 :::
 
 Ce pas-à-pas vous mène d'une instance vide à la galerie en ligne, puis vous fait vérifier, point par point, que le déploiement tient les promesses du [cahier des charges](projet.md#le-cahier-des-charges). Toutes les commandes ont été rejouées sur Amazon Linux 2023 ; si l'une d'elles ne donne pas le résultat annoncé, arrêtez-vous et comprenez pourquoi avant de continuer.
@@ -22,7 +22,7 @@ Vous avez besoin de ce que vous avez construit aux modules précédents. Vérifi
 
 | Pièce | Où la vérifier | Ce qu'il faut y voir |
 |---|---|---|
-| Le bucket `galerie-<prenom>-<suffixe>` | <Chemin>S3 › Buckets</Chemin> | région Paris, *Block all public access* activé |
+| Le bucket `galerie-<prenom>-<suffixe>` | <Chemin>S3 › Buckets</Chemin> | votre région, *Block all public access* activé |
 | La stratégie `galerie-s3-<prenom>` | <Chemin>IAM › Policies</Chemin> | exactement deux déclarations : `s3:ListBucket` sur le bucket, `s3:GetObject` et `s3:PutObject` sur `<bucket>/*` |
 | Le rôle `role-galerie-<prenom>` | <Chemin>IAM › Roles</Chemin> | entité de confiance `ec2.amazonaws.com`, stratégie `galerie-s3-<prenom>` attachée |
 | Le Security Group `pare-feu-web-<prenom>` | <Chemin>EC2 › Security Groups</Chemin> | HTTP et HTTPS depuis `0.0.0.0/0`, SSH depuis votre adresse actuelle en `/32` |
@@ -52,7 +52,7 @@ Ouvrez <Chemin>EC2 › Instances › Launch instances</Chemin> et reprenez les r
   - **Credit specification** : *Standard*.
   - **Metadata version** : *V2 only (token required)*.
 
-Si l'instance du TP 4 tourne encore, résiliez-la d'abord : vous n'avez droit qu'à une instance en marche. Lancez l'instance, attendez `2/2 checks passed`, notez son adresse IPv4 publique, puis connectez-vous en SSH.
+Si l'instance du TP 4 tourne encore, résiliez-la d'abord : sur le compte de l'enseignant, vous n'avez droit qu'à une instance en marche, et sur un compte personnel, elle consommerait vos crédits pour rien. Lancez l'instance, attendez `2/2 checks passed`, notez son adresse IPv4 publique, puis connectez-vous en SSH.
 
 ```bash title="Votre terminal"
 ssh -i ~/.ssh/cle-<prenom>.pem ec2-user@<IP-publique>
@@ -81,10 +81,12 @@ sudo tar -xzf /tmp/galerie.tar.gz -C /opt/galerie --strip-components=1
 sudo python3.12 -m venv /opt/galerie/venv
 sudo /opt/galerie/venv/bin/pip install -r /opt/galerie/requirements.txt
 sudo chown -R galerie:galerie /opt/galerie
-printf 'GALERIE_BUCKET=%s\nGALERIE_REGION=eu-west-3\n' "$B" | sudo tee /etc/galerie.env
+TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+R=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
+printf 'GALERIE_BUCKET=%s\nGALERIE_REGION=%s\n' "$B" "$R" | sudo tee /etc/galerie.env
 ```
 
-Prenez une minute pour comprendre ce que vous venez de faire. Vous avez installé Nginx et Python 3.12, récupéré l'archive depuis S3 grâce au rôle, créé un utilisateur système `galerie` qui ne peut pas ouvrir de session, décompressé l'application dans `/opt/galerie`, créé un environnement Python isolé dans lequel `pip` a installé Flask, boto3 et Gunicorn, puis donné le dossier à l'utilisateur `galerie`. Le dernier fichier, `/etc/galerie.env`, contient toute la configuration : le nom du bucket et la région. Affichez-le avec `cat /etc/galerie.env` et constatez qu'il ne contient aucun secret.
+Prenez une minute pour comprendre ce que vous venez de faire. Vous avez installé Nginx et Python 3.12, récupéré l'archive depuis S3 grâce au rôle, créé un utilisateur système `galerie` qui ne peut pas ouvrir de session, décompressé l'application dans `/opt/galerie`, créé un environnement Python isolé dans lequel `pip` a installé Flask, boto3 et Gunicorn, puis donné le dossier à l'utilisateur `galerie`. Les deux avant-dernières commandes lisent la région de l'instance dans le service de métadonnées, comme au TP 3. Le dernier fichier, `/etc/galerie.env`, contient toute la configuration : le nom du bucket et cette région. Affichez-le avec `cat /etc/galerie.env` et constatez qu'il ne contient aucun secret.
 
 Parcourez aussi le code : `less /opt/galerie/app.py`. Il fait moins de 200 lignes. Cherchez l'endroit où le client S3 est créé et vérifiez qu'aucune clé ne lui est passée.
 
@@ -183,7 +185,7 @@ C'est la fin du cours : tout ce que vous avez créé doit disparaître. Dans l'o
 4. **Le Security Group** `pare-feu-web-<prenom>`. Il ne peut être supprimé qu'une fois l'instance résiliée.
 5. **La paire de clés** `cle-<prenom>` dans <Chemin>EC2 › Key Pairs</Chemin>, et le fichier `.pem` sur votre ordinateur.
 
-Vérifiez enfin, dans <Chemin>EC2 › Global View</Chemin>, qu'aucune instance ne tourne encore à votre nom dans aucune région.
+Vérifiez enfin qu'aucune instance ne tourne encore à votre nom : dans <Chemin>EC2 › Global View</Chemin> sur le compte de l'enseignant, dans <Chemin>EC2 › Instances</Chemin> sur un compte personnel, qui n'a qu'une région.
 
 ## Pour aller plus loin
 

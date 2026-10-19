@@ -16,7 +16,10 @@ tar -xzf /tmp/galerie.tar.gz -C /opt/galerie --strip-components=1
 python3.12 -m venv /opt/galerie/venv
 /opt/galerie/venv/bin/pip install -r /opt/galerie/requirements.txt
 chown -R galerie:galerie /opt/galerie
-printf 'GALERIE_BUCKET=%s\nGALERIE_REGION=eu-west-3\n' "$B" > /etc/galerie.env
+# la région de l'instance, lue dans le service de métadonnées (IMDSv2)
+TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+R=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
+printf 'GALERIE_BUCKET=%s\nGALERIE_REGION=%s\n' "$B" "$R" > /etc/galerie.env
 
 cp /opt/galerie/deploy/galerie.service /etc/systemd/system/
 systemctl daemon-reload

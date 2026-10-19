@@ -132,7 +132,7 @@ Le choix d'une région se fait selon quatre critères, dans cet ordre de priorit
 3. **les services disponibles** dans la région ;
 4. **le prix**.
 
-Dans ce cours, tout le monde travaille dans la région de Paris, `eu-west-3`, ouverte en décembre 2017 avec trois zones de disponibilité.
+Dans ce cours, chacun travaille dans la région de son compte : Europe (Stockholm), `eu-north-1`, pour la plupart des comptes personnels, que la nouvelle inscription d'AWS attribue d'après le pays de l'adresse[^region-projet], et Europe (Paris), `eu-west-3`, ouverte en décembre 2017 avec trois zones de disponibilité, sur le compte fourni par l'enseignant.
 
 ## Deux idées reçues
 
@@ -163,7 +163,7 @@ Le point le plus important à retenir est que certaines ressources coûtent mêm
 | NAT Gateway | heure, plus gigaoctet traité | oui |
 | Objet S3 | gigaoctet par mois, plus requêtes | selon le volume stocké |
 
-D'où trois règles que l'on applique pendant tout le cours : travailler toujours dans la région de Paris, mettre son nom d'utilisateur dans le nom de chaque ressource pour la retrouver, et supprimer à la fin de chaque TP ce que l'on a créé.
+D'où trois règles que l'on applique pendant tout le cours : travailler toujours dans la région de son compte, mettre son nom dans le nom de chaque ressource pour la retrouver, et supprimer à la fin de chaque TP ce que l'on a créé.
 
 ## L'accès à AWS
 
@@ -185,10 +185,10 @@ Pour la ligne de commande, AWS fournit **CloudShell**, un terminal intégré à 
 
 ```bash title="CloudShell"
 aws sts get-caller-identity
-aws ec2 describe-availability-zones --region eu-west-3 --output table
+aws ec2 describe-availability-zones --output table
 ```
 
-La première commande indique sous quelle identité on travaille, la seconde liste les zones de disponibilité de la région de Paris. Le TP 1 commence par là.
+La première commande indique sous quelle identité on travaille, la seconde liste les zones de disponibilité de la région où l'on travaille. Le TP 1 commence par là.
 
 [^marche]: Synergy Research Group, « Cloud Market Share Trends - Big Three Together Hold 63% », données du deuxième trimestre 2026, [srgresearch.com](https://www.srgresearch.com/articles/cloud-market-share-trends-big-three-together-hold-63-while-oracle-and-the-neoclouds-inch-higher).
 [^ca]: Amazon, *Amazon.com Announces Fourth Quarter Results*, février 2026, [aboutamazon.com](https://www.aboutamazon.com/news/company-news/amazon-earnings-q4-2025-report).
@@ -203,3 +203,4 @@ La première commande indique sous quelle identité on travaille, la seconde lis
 [^panne-2025]: AWS, *Summary of the Amazon DynamoDB Service Disruption in the Northern Virginia (US-EAST-1) Region*, 2025, [aws.amazon.com](https://aws.amazon.com/message/101925/).
 [^freetier]: AWS, *AWS Free Tier*, [aws.amazon.com/free](https://aws.amazon.com/free/).
 [^ipv4]: J. Barr, « New – AWS Public IPv4 Address Charge + Public IP Insights », *AWS News Blog*, 2023, [aws.amazon.com/blogs](https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/).
+[^region-projet]: AWS, « AWS Regions for your projects », *AWS Account Management Reference Guide*, [docs.aws.amazon.com/accounts/latest/reference/project-regions.html](https://docs.aws.amazon.com/accounts/latest/reference/project-regions.html).
