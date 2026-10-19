@@ -13,6 +13,11 @@
     \node[anchor=west, font=\fontsize{36}{40}\selectfont\bfseries, text=white] at ([xshift=1.2cm,yshift=.55cm]current page.west) {INTRODUCTION À AWS};
     \node[anchor=west, font=\LARGE, text=Ligne] at ([xshift=1.2cm,yshift=-.55cm]current page.west) {IAM, EC2, S3, SQS et un projet de déploiement};
     \node[anchor=west, font=\large, text=Gris] at ([xshift=1.2cm,yshift=-3.1cm]current page.west) {Romial Menra};
+    % lien du site du cours
+    \node[anchor=south east, inner sep=0pt] (qr) at ([xshift=-.9cm,yshift=.3cm]current page.south east)
+      {\qrcode[nolink,height=1.75cm]{https://menraromial.com/aws-course/}};
+    \node[anchor=south east, font=\small, text=Gris, align=right] at ([xshift=-3mm]qr.south west)
+      {Site du cours\\\texttt{menraromial.com/aws-course}};
   \end{tikzpicture}
 \end{frame}
 
