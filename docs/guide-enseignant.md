@@ -175,6 +175,8 @@ La commande `echo $AWS_REGION` affiche `eu-west-3` sur le compte de l'enseignant
 | `describe-regions` ou `describe-availability-zones` refusé | Stratégie trop restrictive (par exemple limitée par condition de région) | Autoriser `ec2:DescribeRegions` et `ec2:DescribeAvailabilityZones`, qui ne coûtent rien |
 | Le prix n'apparaît pas dans la liste des types d'instances | Affichage compact de la console | Cliquer sur « Compare instance types », qui affiche une colonne de prix |
 | Compte personnel : l'inscription demande une carte bancaire | Nouvelle inscription pas encore ouverte à cette personne, ou identité déjà connue d'AWS | Réessayer avec une autre identité (Google, GitHub), sinon binôme ou compte de l'enseignant |
+| Compte personnel : CloudShell répond « La vérification de votre compte est en cours » | Compte créé depuis moins de deux jours, vérification d'AWS pas terminée | CLI sur le poste avec `aws login` (encadré du TP 1, CLI 2.32.0 ou plus) ; faire créer les comptes deux jours avant la séance ; au-delà de deux jours, support AWS |
+| Compte personnel : `aws` local répond `Failed to load Python shared library` | Fichier `aws` copié seul dans `/usr/local/bin` au lieu d'une installation par `sudo ./aws/install` | Supprimer le fichier copié, puis relancer l'installateur officiel avec `--update` |
 | Compte personnel : `describe-availability-zones --region us-east-1` refusé | SCP d'AWS qui interdit les autres régions | Normal ; lire le message avec les étudiants |
 
 ## Module 2 : Sécurité et gestion des accès

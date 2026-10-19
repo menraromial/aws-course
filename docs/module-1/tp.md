@@ -22,6 +22,8 @@ Ce premier TP sert à se sentir chez soi dans la console : se connecter, régler
 
 Ouvrez la page d'inscription d'AWS, [signin.aws.amazon.com/signup](https://signin.aws.amazon.com/signup?request_type=builderId), et choisissez de vous inscrire avec un AWS Builder ID ou avec un compte que vous possédez déjà (Google, GitHub, Apple)[^inscription]. Donnez votre véritable adresse postale : AWS en déduit le pays, et du pays la région où seront rangées toutes vos ressources, sans possibilité d'en changer ensuite.
 
+Créez votre compte au moins deux jours avant la première séance : AWS vérifie chaque nouveau compte, et certains services, dont CloudShell, ne s'ouvrent qu'une fois cette vérification terminée.
+
 Si l'inscription vous réclame malgré tout une carte bancaire, arrêtez-vous et prévenez votre enseignant. AWS déploie cette nouvelle inscription progressivement, et certaines personnes tombent encore sur l'ancienne, qui en demande une[^deploiement-progressif].
 
 AWS crée alors pour vous un **projet** : un compte AWS dont vous êtes l'administrateur, sans utilisateur *root* ni mot de passe propre au compte. Vous vous y connectez par [console.aws.amazon.com](https://console.aws.amazon.com/), avec l'identité choisie à l'inscription. Activez tout de suite l'authentification à deux facteurs de cette identité dans **AWS Settings** ([settings.aws.com](https://settings.aws.com)) : c'est elle qui protège tout votre compte.
@@ -72,6 +74,16 @@ Pour finir, ouvrez IAM, puis EC2, et comparez leurs adresses dans la barre du na
 ## 3. Vos premières requêtes depuis CloudShell
 
 Cliquez sur l'icône de CloudShell (3). Un terminal Linux s'ouvre en bas de la fenêtre après quelques secondes. Il est déjà authentifié avec votre identité : pas de clé à configurer, pas d'installation.
+
+:::tip[Si CloudShell refuse de s'ouvrir]
+Sur un compte personnel tout neuf, CloudShell répond parfois « Impossible de créer l'environnement. La vérification de votre compte est en cours », et AWS prévient que cette vérification peut prendre jusqu'à deux jours. En attendant, utilisez la CLI sur votre ordinateur : elle envoie les mêmes requêtes, et la commande `aws login` l'authentifie par votre navigateur, sans clé d'accès[^aws-login].
+
+1. Installez la CLI AWS en version 2.32.0 ou plus, en suivant [la page d'installation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) pour votre système. Vérifiez avec `aws --version`. Sous Linux, passez par le script `sudo ./aws/install` de l'archive : copier seul le fichier `aws` dans `/usr/local/bin` donne une erreur `Failed to load Python shared library`.
+2. Connectez-vous avec `aws login --profile cours`. À la question de la région, donnez celle de votre projet (`eu-north-1` pour la plupart d'entre vous). Le navigateur s'ouvre : choisissez votre projet, puis revenez au terminal.
+3. Pour que les commandes suivantes utilisent ce profil sans le répéter, tapez `export AWS_PROFILE=cours` sous Linux et macOS, ou `$env:AWS_PROFILE="cours"` dans PowerShell, à chaque nouveau terminal.
+
+Tapez ensuite dans votre terminal les commandes que les énoncés présentent sous le titre **CloudShell**. Deux différences : la variable `$AWS_REGION` y est vide, et `aws configure get region` affiche la région du profil ; la session dure 12 heures, après quoi on relance `aws login --profile cours`. En fin de séance, `aws logout --profile cours` efface les identifiants temporaires de votre poste. Dès que la vérification du compte est terminée, revenez à CloudShell.
+:::
 
 Première question à poser à AWS : qui suis-je ?
 
@@ -228,3 +240,4 @@ Vérifiez simplement que vous savez répondre à ces quatre questions ; nous les
 [^acces-projet]: AWS, « Compare access management », dans « Compare sign-up options », *AWS Account Management Reference Guide*, [docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html](https://docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html).
 [^scp-projets]: AWS, « Managed policies for your organization », *AWS Account Management Reference Guide*, [docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html](https://docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html).
 [^plan-gratuit]: AWS, « Choosing a plan », *AWS Billing User Guide*, [docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html).
+[^aws-login]: AWS, « Login for AWS local development using console credentials », *AWS Command Line Interface User Guide*, [docs.aws.amazon.com/cli/latest/userguide/cli-configure-sign-in.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sign-in.html) ; pour un projet de la nouvelle inscription, « Connect an AI coding tool », *AWS Account Management Reference Guide*, [docs.aws.amazon.com/accounts/latest/reference/connect-ai-coding-tool.html](https://docs.aws.amazon.com/accounts/latest/reference/connect-ai-coding-tool.html).

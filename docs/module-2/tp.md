@@ -97,13 +97,13 @@ Avant de continuer, ouvrez <Chemin>IAM › Users</Chemin>, puis `stagiaire-<pren
 <Comptes>
 <TabItem value="personnel" label="Compte personnel AWS">
 
-Rangez la clé du stagiaire dans un **profil** de la CLI, dans votre propre CloudShell. Un profil est un jeu d'identifiants nommé ; la CLI ne l'utilise que si on le lui demande avec `--profile`, et vos commandes habituelles continuent de passer sous votre identité.
+Rangez la clé du stagiaire dans un **profil** de la CLI, dans votre propre CloudShell, ou dans votre terminal si vous travaillez avec la CLI sur votre poste (voir le TP 1). Un profil est un jeu d'identifiants nommé ; la CLI ne l'utilise que si on le lui demande avec `--profile`, et vos commandes habituelles continuent de passer sous votre identité.
 
 ```bash title="CloudShell"
 aws configure --profile stagiaire
 ```
 
-La commande pose quatre questions : collez l'Access key ID, puis la Secret access key, tapez le nom de votre région (celui qu'affiche `echo $AWS_REGION`, par exemple `eu-north-1`), et `json` pour le format. Les deux clés sont écrites dans `~/.aws/credentials`, la région dans `~/.aws/config`.
+La commande pose quatre questions : collez l'Access key ID, puis la Secret access key, tapez le nom de votre région (celui qu'affiche `echo $AWS_REGION` dans CloudShell, ou `aws configure get region` sur votre poste, par exemple `eu-north-1`), et `json` pour le format. Les deux clés sont écrites dans `~/.aws/credentials`, la région dans `~/.aws/config`.
 
 Vous pouvez maintenant parler à AWS en tant que stagiaire :
 
@@ -262,7 +262,7 @@ Gardez le Security Group `pare-feu-web-<prenom>` : il servira au module 3.
 
 Supprimez tout le reste, dans cet ordre :
 
-1. le profil du stagiaire dans CloudShell : vérifiez d'abord avec `cat ~/.aws/credentials` que ce fichier ne contient que le profil `[stagiaire]`, puis supprimez les deux fichiers avec `rm ~/.aws/credentials ~/.aws/config` ;
+1. le profil du stagiaire. Dans CloudShell, vérifiez d'abord avec `cat ~/.aws/credentials` que ce fichier ne contient que le profil `[stagiaire]`, puis supprimez les deux fichiers avec `rm ~/.aws/credentials ~/.aws/config`. Sur votre poste, ne supprimez pas ces fichiers, qui contiennent aussi votre profil `cours` : ouvrez-les dans un éditeur et effacez seulement la section `[stagiaire]` du premier et la section `[profile stagiaire]` du second ;
 2. l'utilisateur `stagiaire-<prenom>` (<Chemin>IAM › Users</Chemin>, **Delete**, puis saisissez son nom pour confirmer) : sa clé d'accès disparaît avec lui ;
 3. la stratégie `lecture-ec2-<prenom>` (<Chemin>IAM › Policies</Chemin>, filtre **Customer managed**) ;
 4. le fichier texte où vous aviez copié la clé, sur votre poste.

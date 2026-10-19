@@ -53,7 +53,7 @@ Les accès au compte AWS du cours vous sont remis au début du cours : une adres
 </TabItem>
 </Comptes>
 
-Pour le reste, un ordinateur portable suffit, avec un navigateur récent et un client SSH. Linux et macOS en ont un par défaut ; sous Windows 10 ou 11, la commande `ssh` est disponible dans PowerShell. Tout ce qui concerne AWS en ligne de commande se fera dans CloudShell, le terminal intégré à la console, sans rien installer.
+Pour le reste, un ordinateur portable suffit, avec un navigateur récent et un client SSH. Linux et macOS en ont un par défaut ; sous Windows 10 ou 11, la commande `ssh` est disponible dans PowerShell. Tout ce qui concerne AWS en ligne de commande se fera dans CloudShell, le terminal intégré à la console, sans rien installer. Si CloudShell n'est pas encore disponible sur un compte personnel tout neuf, le TP 1 explique comment utiliser la CLI sur votre poste à la place.
 
 ## Comment lire les énoncés
 
