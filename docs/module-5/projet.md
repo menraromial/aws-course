@@ -9,6 +9,7 @@ import Schema from '@site/src/components/Schema';
 import projetArchitecture from '@site/src/figures/projet-architecture.svg';
 import projetRequete from '@site/src/figures/projet-requete.svg';
 import architectureCible from '@site/src/figures/architecture-cible.svg';
+import projetRepartition from '@site/src/figures/projet-repartition.svg';
 import Telechargement from '@site/src/components/Telechargement';
 
 <Seance items={['Module 5', 'Le projet']} />
@@ -32,6 +33,12 @@ L'application s'appelle **la galerie**. C'est une page web où l'on dépose des 
 - Aucune clé d'accès AWS n'existe sur l'instance, ni dans le code, ni dans un fichier de configuration.
 - Le rôle de l'instance n'a que les droits nécessaires : lister le bucket, y lire et y écrire des objets. Il ne peut rien supprimer et ne voit aucun autre bucket.
 - L'application redémarre toute seule si elle plante, et au redémarrage de l'instance.
+
+**Partie 2 : deux serveurs.** Une fois la première partie vérifiée, et si votre compte vous permet de faire tourner deux instances à la fois (c'est le cas d'un compte personnel), la galerie passe derrière un répartiteur de charge.
+
+- La galerie est servie par deux instances, dans deux zones de disponibilité différentes, derrière un Application Load Balancer. Les visiteurs n'utilisent plus qu'une adresse, le nom DNS du répartiteur.
+- Les instances n'acceptent plus le trafic web que du répartiteur ; seul le SSH reste ouvert, pour votre adresse.
+- L'arrêt de l'une des deux instances n'interrompt pas le service.
 
 ## L'architecture
 
@@ -107,15 +114,58 @@ Le cahier des charges demande HTTPS. Pour chiffrer, Nginx a besoin d'un **certif
 
 En production, on achète un nom de domaine, puis on obtient un certificat reconnu. Sur AWS, le plus simple est de placer devant l'application un répartiteur de charge ou la distribution CloudFront, et de laisser AWS Certificate Manager fournir et renouveler le certificat gratuitement. Sans service AWS supplémentaire, l'autorité de certification Let's Encrypt en délivre aussi gratuitement.
 
+## Deux serveurs derrière un répartiteur
+
+Avec une seule instance, le moindre redémarrage interrompt la galerie, et la panne d'une zone de disponibilité l'emporte entièrement. La réponse classique consiste à faire tourner plusieurs copies identiques du serveur, dans des zones différentes, et à placer devant elles un **répartiteur de charge** (*load balancer*), qui reçoit les requêtes des visiteurs et les distribue aux copies en bonne santé.
+
+### Les répartiteurs d'AWS
+
+Le service Elastic Load Balancing distribue le trafic entrant entre plusieurs cibles, instances EC2, conteneurs ou adresses IP, dans une ou plusieurs zones de disponibilité. Il surveille la santé des cibles, n'envoie de requêtes qu'à celles qui vont bien, et ajuste tout seul sa propre capacité au trafic[^elb]. Il propose quatre types de répartiteurs, qui ne travaillent pas au même niveau du réseau.
+
+| Type | Couche (modèle OSI) | Ce qu'il comprend | Usage typique |
+|---|---|---|---|
+| **Application Load Balancer** (ALB) | 7, application | les requêtes HTTP, HTTPS et gRPC : chemin, nom d'hôte, en-têtes | sites et API web ; c'est celui du projet |
+| **Network Load Balancer** (NLB) | 4, transport | les connexions TCP, UDP et TLS, sans lire leur contenu | très gros débit (des millions de requêtes par seconde), adresse IP fixe par zone |
+| **Gateway Load Balancer** (GWLB) | 3, réseau | tous les paquets IP, sur tous les ports | faire passer le trafic par des appliances virtuelles, des pare-feu par exemple |
+| **Classic Load Balancer** (CLB) | 4 et 7 | la génération précédente | aucun nouveau projet ; AWS recommande de migrer |
+
+L'ALB fonctionne à la couche application : pour chaque requête, il évalue les règles de son écouteur et choisit une cible dans le groupe correspondant[^alb]. Il peut donc envoyer `/api` à un groupe de serveurs et le reste à un autre, ou distinguer deux noms de domaine. Le NLB travaille à la couche transport ; il relaie des connexions sans les ouvrir, ce qui le rend très rapide, et il peut recevoir une adresse IP Elastic par sous-réseau, pratique quand un client doit inscrire l'adresse du service dans son pare-feu[^nlb]. Le GWLB, à la couche réseau, sert à intercaler des appliances virtuelles, pare-feu ou systèmes de détection d'intrusion, sur le chemin du trafic ; il échange les paquets avec elles par le protocole GENEVE, sur le port 6081[^gwlb]. Le Classic Load Balancer est l'ancienne génération, qu'AWS recommande de remplacer par l'un des trois autres[^elb].
+
+### Écouteur, groupe cible, contrôle de santé
+
+Un ALB s'organise en trois pièces. L'**écouteur** (*listener*) attend les connexions sur un port et un protocole, ici HTTP sur le port 80. Ses règles renvoient vers un **groupe cible** (*target group*), la liste des serveurs qui reçoivent les requêtes, ici vos deux instances, sur leur port 80, celui de Nginx. Le groupe cible fait aussi le **contrôle de santé** (*health check*) : à intervalle régulier, il demande une page à chaque cible et ne lui envoie du trafic que si elle répond correctement.
+
+Les réglages par défaut d'un groupe cible d'instances sont un contrôle toutes les 30 secondes, un délai de réponse de 5 secondes, le code `200` comme seule réponse correcte, 2 échecs consécutifs pour déclarer une cible en mauvaise santé et 5 succès consécutifs pour la réintégrer[^sante]. Une instance qui tombe peut donc recevoir des requêtes pendant une minute environ avant d'être écartée, et une instance réparée attend deux minutes et demie avant de revenir. La galerie a déjà ce qu'il faut : sa route `/sante` répond `200` quand l'application tourne et atteint son bucket, et `503` sinon. Quand on retire une cible, le répartiteur cesse de lui envoyer de nouvelles requêtes mais laisse les requêtes en cours se terminer, pendant 300 secondes au plus par défaut (*deregistration delay*)[^attributs].
+
+Un ALB doit être placé dans au moins deux zones de disponibilité, avec un sous-réseau dans chacune[^alb-creation]. Il répartit par défaut les requêtes entre les cibles de toutes les zones, et non seulement celles de la zone où la requête est arrivée : c'est la répartition entre zones (*cross-zone load balancing*), toujours active au niveau d'un ALB[^alb-creation].
+
+### Pourquoi la galerie supporte d'être dupliquée
+
+Le répartiteur peut envoyer deux requêtes successives d'un même visiteur à deux instances différentes. Cela ne marche que si aucune instance ne garde pour elle une information dont l'autre aurait besoin. C'est le cas de la galerie : les fichiers et leur liste sont dans S3, l'application ne garde aucune session, et chaque instance obtient ses propres identifiants du rôle. Les deux copies sont donc interchangeables. Une application qui rangerait les fichiers déposés sur le disque de l'instance, ou qui garderait les paniers des clients en mémoire, perdrait la moitié de ses données à chaque requête ; il faudrait d'abord déplacer cet état vers un service partagé, S3, une base de données ou un cache.
+
+Pour fabriquer la seconde instance, on ne réinstalle rien. On prend une **image** (AMI) de la première, qui contient son disque tel qu'il est, avec Nginx, l'application, sa configuration et le service systemd, et on lance la seconde à partir de cette image. Seul le rôle IAM ne fait pas partie de l'image : il faut l'associer à la nouvelle instance.
+
+### L'architecture de la partie 2
+
+<Schema svg={projetRepartition} num="5.4" alt="Des visiteurs atteignent en HTTP, à l'adresse du nom DNS du répartiteur, l'Application Load Balancer alb-galerie-<prenom>, protégé par le Security Group repartiteur-<prenom> qui autorise le port 80 pour tous. Son groupe cible cibles-galerie-<prenom>, avec un contrôle de santé sur /sante, envoie les requêtes à deux instances : galerie-<prenom> dans la zone a et galerie2-<prenom> dans la zone b de la région du compte. Les deux instances sont dans le Security Group pare-feu-web-<prenom>, qui autorise le port 80 depuis le répartiteur seulement et le port 22 depuis votre adresse. Elles endossent le rôle role-galerie-<prenom> et écrivent avec boto3 dans le bucket galerie-<prenom>-<suffixe>.">
+  La galerie sur deux instances, dans deux zones, derrière un Application Load Balancer.
+</Schema>
+
+Le Security Group des instances change de nature. Sa règle HTTP n'a plus pour source une plage d'adresses, mais un autre Security Group, celui du répartiteur : seules les machines qui portent ce groupe, c'est-à-dire les nœuds du répartiteur, peuvent joindre le port 80 des instances[^sg-reference]. On ne connaît pas à l'avance les adresses de ces nœuds, qui changent quand le répartiteur s'agrandit ou se réduit ; la référence à un groupe suit ces changements toute seule.
+
+Le répartiteur reste en HTTP. Pour qu'il accepte le HTTPS, il lui faudrait un certificat délivré par AWS Certificate Manager, qui ne délivre de certificat public que pour un nom de domaine dont on prouve qu'on le contrôle[^acm]. Le certificat autosigné de la première partie reste sur les instances, mais le port 443 n'est plus joignable depuis Internet.
+
+Un ALB se paie à l'heure, plus une part qui dépend du trafic, mesurée en unités de capacité (LCU). L'exemple de la page de tarification, en Virginie du Nord, donne 0,0225 $ par heure et 0,008 $ par LCU et par heure, soit 0,031 $ par heure pour un site modeste[^prix-elb]. Une séance de TP de trois heures coûte donc une dizaine de centimes, prélevés sur les crédits d'un compte personnel. Laissé allumé un mois, le répartiteur coûterait plus de 20 $, sans compter les deux instances.
+
 ## Ce que ce projet ne fait pas
 
-Votre galerie est sécurisée, mais elle a des limites qu'il faut savoir nommer. Elle tourne sur une seule instance, dans une seule zone : un redémarrage, et à plus forte raison la panne de la zone, interrompt le service. Son adresse IP change à chaque arrêt de l'instance. N'importe qui peut déposer des fichiers, sans compte ni limite de nombre. Le bucket n'est pas versionné, donc un fichier remplacé est perdu. Rien ne surveille l'application ni ne vous prévient si elle tombe. Et l'infrastructure a été créée à la main, dans la console, ce qui la rend difficile à reproduire à l'identique.
+Votre galerie est sécurisée, mais elle a des limites qu'il faut savoir nommer. Après la première partie, elle tourne sur une seule instance, dans une seule zone : un redémarrage, et à plus forte raison la panne de la zone, interrompt le service. La seconde partie lève cette limite, pas les suivantes : il faut toujours lancer une nouvelle instance à la main quand l'une tombe, et le nombre d'instances ne suit pas le trafic. Son adresse IP change à chaque arrêt de l'instance, tant qu'elle n'est pas derrière un répartiteur. N'importe qui peut déposer des fichiers, sans compte ni limite de nombre. Le bucket n'est pas versionné, donc un fichier remplacé est perdu. Rien ne surveille l'application ni ne vous prévient si elle tombe. Et l'infrastructure a été créée à la main, dans la console, ce qui la rend difficile à reproduire à l'identique.
 
 <Schema svg={architectureCible} num="5.3" alt="Architecture cible. Les utilisateurs résolvent le nom de l'application avec Route 53, puis atteignent un Application Load Balancer dans le VPC de la région eu-west-3. Celui-ci répartit les requêtes entre des instances EC2 d'un groupe Auto Scaling réparti sur deux zones de disponibilité. Une base RDS principale est répliquée de façon synchrone vers une base de secours dans l'autre zone. Les instances écrivent les fichiers dans S3 et envoient leurs métriques à CloudWatch.">
   Une architecture qui résisterait à la panne d'une instance, et même d'une zone entière.
 </Schema>
 
-Chacune de ces limites a une réponse sur AWS : un groupe d'instances derrière un répartiteur de charge dans plusieurs zones, un nom de domaine avec Route 53, une authentification avec Cognito, le versionnage du bucket, des alarmes CloudWatch, CloudFormation ou Terraform pour décrire l'infrastructure dans des fichiers. Ce sont les étapes suivantes, au-delà de ce cours. Pour les aborder avec méthode, AWS publie le *Well-Architected Framework*, qui passe en revue une architecture selon six piliers : excellence opérationnelle, sécurité, fiabilité, efficacité des performances, optimisation des coûts et durabilité[^wa].
+Chacune de ces limites a une réponse sur AWS : un groupe Auto Scaling qui maintient le nombre d'instances derrière le répartiteur et l'ajuste au trafic, un nom de domaine avec Route 53, une authentification avec Cognito, le versionnage du bucket, des alarmes CloudWatch, CloudFormation ou Terraform pour décrire l'infrastructure dans des fichiers. Ce sont les étapes suivantes, au-delà de ce cours. Pour les aborder avec méthode, AWS publie le *Well-Architected Framework*, qui passe en revue une architecture selon six piliers : excellence opérationnelle, sécurité, fiabilité, efficacité des performances, optimisation des coûts et durabilité[^wa].
 
 ## Ce que vous rendrez
 
@@ -130,6 +180,9 @@ Chaque exigence du cahier des charges se prouve par une observation précise. Le
 | Aucune clé | pas de dossier `~/.aws`, aucune clé dans l'application ni dans sa configuration |
 | Moindre privilège | `aws s3 rm` est refusé |
 | Résilience | l'application revient après un `kill -9` et après un redémarrage de l'instance |
+| Partie 2 : deux serveurs | le nom DNS du répartiteur sert la galerie, et le pied de page alterne entre deux identifiants d'instance, dans deux zones |
+| Partie 2 : instances fermées | `http://IP` d'une instance ne répond plus ; le Security Group n'autorise le port 80 que depuis `repartiteur-<prenom>` |
+| Partie 2 : panne d'une instance | le service de l'une est arrêté, le site répond toujours, et le groupe cible la montre `unhealthy` |
 
 À la fin du module, votre enseignant vérifiera avec vous les points suivants :
 
@@ -137,7 +190,18 @@ Chaque exigence du cahier des charges se prouve par une observation précise. Le
 2. La preuve que le port 22 est fermé à tout autre que vous, et que le port 8000 n'est joignable par personne.
 3. La preuve que le bucket est privé : l'adresse directe d'un objet renvoie `AccessDenied`, le lien présigné fonctionne, puis expire.
 4. La preuve qu'aucune clé d'accès n'existe sur l'instance, et que le rôle ne peut pas supprimer d'objet.
-5. La réponse, à l'oral, à deux questions tirées au hasard parmi celles des cinq TP.
+5. Si vous avez fait la seconde partie : la galerie servie par le répartiteur, l'alternance des deux instances, et le site qui continue de répondre quand l'une est arrêtée.
+6. La réponse, à l'oral, à deux questions tirées au hasard parmi celles des TP.
 
 [^presignee]: AWS, *Download and upload objects with presigned URLs*, [docs.aws.amazon.com](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
 [^wa]: AWS, *AWS Well-Architected Framework*, [docs.aws.amazon.com](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html).
+[^elb]: AWS, « What is Elastic Load Balancing? », *Elastic Load Balancing User Guide*, [docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html).
+[^alb]: AWS, « What is an Application Load Balancer? », *User Guide for Application Load Balancers*, [docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html).
+[^nlb]: AWS, « What is a Network Load Balancer? », *User Guide for Network Load Balancers*, [docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html).
+[^gwlb]: AWS, « What is a Gateway Load Balancer? », *User Guide for Gateway Load Balancers*, [docs.aws.amazon.com/elasticloadbalancing/latest/gateway/introduction.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/gateway/introduction.html).
+[^sante]: AWS, « Health checks for Application Load Balancer target groups », *User Guide for Application Load Balancers*, [docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html).
+[^attributs]: AWS, « Edit target group attributes for your Application Load Balancer », section *Deregistration delay*, [docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html).
+[^alb-creation]: AWS, « Application Load Balancers », *User Guide for Application Load Balancers*, sections *Availability Zones* et *Cross-zone load balancing*, [docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html).
+[^sg-reference]: AWS, « Security group rules », *Amazon VPC User Guide*, [docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html).
+[^acm]: AWS, « AWS Certificate Manager public certificates », *AWS Certificate Manager User Guide*, [docs.aws.amazon.com/acm/latest/userguide/acm-public-certificates.html](https://docs.aws.amazon.com/acm/latest/userguide/acm-public-certificates.html).
+[^prix-elb]: AWS, « Elastic Load Balancing pricing », exemple de tarification d'un Application Load Balancer, [aws.amazon.com/elasticloadbalancing/pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).

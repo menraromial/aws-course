@@ -1,0 +1,40 @@
+% Projet final, partie 2 : deux instances dans deux zones derrière un Application Load Balancer
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{web}{-38,-27}{r-users}{visiteurs \code{http://<nom DNS>}}
+  \icone[10mm]{moi}{-38,-81}{r-client}{vous \code{ssh}}
+  \draw[cadre=Ink] (0,0) rectangle (226,-114);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-cloud}};
+  \node[titrecadre=Ink] at (6,0) {AWS Cloud, région du compte};
+  \draw[cadre=Violet] (8,-10) rectangle (162,-108);
+  \node[titrecadre=Violet] at (8,-10) {VPC par défaut};
+  % le répartiteur et son Security Group
+  \draw[cadre=Rouge] (40,-16) rectangle (130,-41);
+  \node[titrecadre=Rouge] at (40,-16) {\code{repartiteur-<prenom>} : 80 pour tous};
+  \icone[9mm]{alb}{85,-27}{elb}{\code{alb-galerie-<prenom>}}
+  % deux zones
+  \foreach \z/\x in {a/14, b/90}{
+    \draw[pcadre=Bleu] (\x,-57) rectangle (\x+66,-104);
+    \node[titrecadre=Bleu] at (\x,-57) {zone \code{<région>\z}};
+  }
+  % les instances et leur Security Group
+  \draw[cadre=Rouge] (20,-65) rectangle (150,-98);
+  \node[titrecadre=Rouge] at (20,-65) {\code{pare-feu-web-<prenom>} : 80 depuis le répartiteur, 22 pour votre adresse};
+  \icone[9mm]{i1}{47,-81}{r-instance}{\code{galerie-<prenom>}}
+  \icone[9mm]{i2}{123,-81}{r-instance}{\code{galerie2-<prenom>}}
+  % le groupe cible
+  \draw[fl] (85,-41) -- (85,-51) -| (i1.north);
+  \draw[fl] (85,-51) -| (i2.north);
+  \node[etiq, anchor=west, align=left] at (87,-46) {groupe cible \code{cibles-galerie-<prenom>}\\ contrôle de santé \code{/sante}};
+  % accès
+  \draw[fl] (web.east) -- (web.east -| 40,0);
+  \draw[fl=Orange] (moi.east) -- node[etiq, above, pos=.3]{SSH} (moi.east -| 20,0);
+  % rôle et bucket
+  \icone[10mm]{role}{198,-40}{r-role}{\code{role-galerie-<prenom>}\\ List, Get, Put}
+  \icone[11mm]{s3}{198,-86}{r-bucket}{\code{galerie-<prenom>-<suffixe>}}
+  \draw[fl=Vert] (150,-86) -- node[etiq, above]{boto3} (s3.west);
+  \draw[pfl=Rouge] (role.west) -- ++(-24,0) |- node[etiq, above, pos=.8]{rôle} (150,-72);
+\end{tikzpicture}
+\end{document}

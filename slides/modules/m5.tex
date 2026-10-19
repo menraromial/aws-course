@@ -19,6 +19,8 @@
     \item Rôle limité au bucket : lister, lire, écrire, pas de suppression
     \item Redémarrage automatique de l'application (panne, redémarrage de l'instance)
   \end{itemize}
+  \medskip
+  \textbf{Partie 2} : deux instances dans deux AZ, derrière un Application Load Balancer
 \end{frame}
 
 \begin{frame}{Architecture}
@@ -84,6 +86,48 @@
   \end{tabularx}
 \end{frame}
 
+\begin{frame}{Répartition de charge : Elastic Load Balancing}
+  \begin{itemize}
+    \setlength{\itemsep}{.55em}
+    \item Distribue le trafic entrant entre plusieurs cibles : instances EC2, conteneurs, adresses IP, dans une ou plusieurs AZ
+    \item Contrôle de santé des cibles : trafic envoyé aux seules cibles en bonne santé
+    \item Capacité du répartiteur ajustée automatiquement au trafic
+    \item Un seul point d'entrée (nom DNS) devant des serveurs interchangeables
+    \item Condition : application sans état local (fichiers, sessions dans un service partagé : S3, base, cache)
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html}
+\end{frame}
+
+\begin{frame}{Les types de répartiteurs}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Type} & \textbf{Couche OSI} & \textbf{Usage} \\ \midrule
+    \textbf{Application LB} (ALB) & 7, application & HTTP, HTTPS, gRPC ; routage par chemin, nom d'hôte, en-têtes ; sites et API web \\
+    \textbf{Network LB} (NLB) & 4, transport & TCP, UDP, TLS ; millions de requêtes par seconde ; adresse IP fixe par AZ \\
+    \textbf{Gateway LB} (GWLB) & 3, réseau & tous les paquets IP ; appliances virtuelles (pare-feu, détection d'intrusion), protocole GENEVE, port 6081 \\
+    \textbf{Classic LB} (CLB) & 4 et 7 & génération précédente ; migration recommandée \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Application Load Balancer}
+  \begin{itemize}
+    \setlength{\itemsep}{.45em}
+    \item \textbf{Écouteur} (\textit{listener}) : port et protocole (HTTP:80), règles vers un groupe cible
+    \item \textbf{Groupe cible} (\textit{target group}) : les instances et leur port (80)
+    \item \textbf{Contrôle de santé} : toutes les 30 s par défaut ; 2 échecs pour écarter une cible, 5 succès pour la réintégrer
+    \item Au moins deux AZ ; répartition entre AZ toujours active
+    \item Security Group des instances : HTTP depuis le Security Group du répartiteur
+    \item Prix : à l'heure, plus unités de capacité (LCU) ; environ 0,03 \$ par heure pour un petit site
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html}
+\end{frame}
+
+\begin{frame}{Partie 2 : deux serveurs derrière un répartiteur}
+  \centering
+  \includegraphics[width=\textwidth]{projet-repartition}
+\end{frame}
+
 \begin{frame}{Limites et évolutions}
   \begin{columns}[c]
     \begin{column}{.57\textwidth}
@@ -92,7 +136,8 @@
     \begin{column}{.41\textwidth}
       \begin{itemize}
         \setlength{\itemsep}{.4em}
-        \item Une instance, une AZ : pas de haute disponibilité
+        \item Partie 1 : une instance, une AZ, pas de haute disponibilité
+        \item Partie 2 : deux AZ, mais remplacement des instances à la main
         \item Adresse IP changeante : nom de domaine, Elastic IP ou répartiteur
         \item Évolutions : ALB + groupe Auto Scaling multi-AZ, RDS Multi-AZ, alarmes CloudWatch
         \item Infrastructure décrite en code : CloudFormation, CDK, Terraform
@@ -107,6 +152,12 @@
   \item Instance avec rôle, installation, service systemd
   \item Nginx en HTTP puis en HTTPS
   \item Vérifications, puis suppression de toutes les ressources}
+
+\diapotp{5}{Partie 2 : deux serveurs}{%
+  \item Image (AMI) de la galerie, seconde instance dans une autre AZ
+  \item Groupe cible avec contrôle de santé sur \texttt{/sante}, Application Load Balancer
+  \item Accès direct aux instances fermé : HTTP depuis le répartiteur seulement
+  \item Panne simulée d'une instance, puis suppression de toutes les ressources}
 
 
 \begin{frame}{Pour aller plus loin}

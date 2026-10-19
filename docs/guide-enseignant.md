@@ -14,6 +14,32 @@ Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la p
 
 ## Avant le premier module
 
+### Comptes personnels ou compte de l'enseignant
+
+Le site affiche deux onglets, « Compte personnel AWS » et « Compte fourni par l'enseignant », partout où la marche à suivre diffère. Avec des comptes personnels, chaque étudiant crée le sien au TP 1 et il n'y a rien à préparer dans `iam/`. Avec le compte de l'enseignant, tout ce qui suit dans cette partie s'applique, des scripts de création des comptes au contrôle des coûts.
+
+### Avec des comptes personnels
+
+Les étudiants utilisent la nouvelle inscription d'AWS, ouverte en septembre 2026 : identité AWS Builder ID, Google, GitHub ou Apple, pas de carte bancaire pour la plupart des nouveaux clients, 100 $ de crédits et jusqu'à 100 $ de plus par des activités guidées. Le compte est en plan gratuit : rien n'est jamais facturé, et il se ferme seul après six mois ou quand les crédits sont épuisés ; les données sont effacées 90 jours plus tard. Les contraintes qui touchent le cours, toutes documentées dans l'*AWS Account Management Reference Guide* :
+
+- **La région est imposée** d'après le pays de l'adresse et ne peut pas changer : Europe (Stockholm), `eu-north-1`, pour le Cameroun comme pour la plupart des pays d'Afrique et d'Europe. La console n'a pas de sélecteur de région, et une politique de contrôle des services (SCP) posée par AWS refuse les autres régions. CloudShell est disponible à Stockholm.
+- **IAM est bridé.** Les utilisateurs IAM ne peuvent pas avoir d'accès console (les actions `iam:*LoginProfile*` sont refusées), et les groupes sont interdits (`CreateGroup`, `AddUserToGroup`, `AttachGroupPolicy`, `PutGroupPolicy`). D'où la version du TP 2 où la stratégie est attachée directement à l'utilisateur et où le stagiaire s'utilise par une clé d'accès. Les rôles sont autorisés, sauf sous le chemin `role/managed/`, et `role-galerie-<prenom>` se crée normalement. IAM Access Analyzer n'est pas disponible.
+- **EC2** : pas d'instances Spot, d'hôtes dédiés ni de Capacity Blocks ; rien de tout cela ne sert au cours. Plusieurs instances peuvent tourner en même temps, ce qui permet la partie 2 du projet.
+- **Aucune visibilité de l'enseignant** sur les comptes des étudiants : pas de vérification centralisée après la séance. Demandez à chacun de montrer, en fin de séance, la page <Chemin>EC2 › Instances</Chemin> et le solde des crédits dans **Billing and Cost Management**.
+
+Avant la première séance, faites créer un compte par un ou deux étudiants, ou créez-en un vous-même, et vérifiez sur ce vrai compte ce que la documentation ne dit pas explicitement :
+
+1. le VPC par défaut existe, avec un sous-réseau public par zone (l'ALB de la partie 2 en exige deux) ;
+2. l'éditeur de stratégies d'IAM et le simulateur de stratégies s'ouvrent ;
+3. la création d'une clé d'accès pour un utilisateur IAM est acceptée ;
+4. la création d'une AMI et d'un Application Load Balancer est acceptée, et leur coût apparaît en déduction des crédits.
+
+AWS déploie cette inscription progressivement, et réserve le plan gratuit aux nouveaux clients : un étudiant qui tombe sur l'inscription classique, ou qui a déjà eu un compte AWS avec la même identité, se verra demander une carte. Prévoyez de le faire travailler en binôme, ou sur le compte de l'enseignant.
+
+Les cinq TP coûtent moins de 0,30 $ de crédits par étudiant, et la partie 2 du projet une dizaine de centimes par heure de plus (deux instances, deux adresses IPv4 publiques et un répartiteur à environ 0,03 $ de l'heure). Le vrai risque est le même que sur un compte partagé, l'oubli : un répartiteur et deux instances laissés un mois consomment une cinquantaine de dollars, et un compte dont les crédits s'épuisent est fermé, avec le travail de l'étudiant.
+
+Les quatre sections suivantes ne concernent que le compte de l'enseignant.
+
 ### Préparer le compte et créer les comptes des étudiants
 
 Les comptes sont des **utilisateurs IAM** (pas IAM Identity Center) nommés `student1`, `student2`… On peut donc les créer avant de connaître la liste des étudiants, et en distribuer un à chacun le jour du premier cours. Ce nom est la valeur de `<prenom>` dans tous les énoncés, qui le rappellent en tête de chaque TP : le bucket de `student12` s'appelle `galerie-student12-4821`, sa paire de clés `cle-student12`. Les stratégies s'appuient dessus par la variable `${aws:username}`. Notez à qui vous attribuez chaque numéro.
@@ -136,7 +162,9 @@ Pour la responsabilité partagée, dessinez trois colonnes (EC2, RDS, S3) et dem
 2. IAM est un service global : ses utilisateurs, groupes et rôles valent pour toutes les régions. EC2 est régional.
 3. Avec un tarif de l'ordre de 0,012 USD par heure à Paris, environ 8,8 USD par mois ; en Virginie du Nord, le tarif est un peu plus bas (de l'ordre de 0,010 USD par heure, soit environ 7,6 USD par mois). Les valeurs exactes sont celles relevées par les étudiants dans l'assistant. Pour `m7i.4xlarge`, on dépasse plusieurs centaines de dollars par mois : c'est l'ordre de grandeur qui compte.
 
-La commande `echo $AWS_REGION` affiche `eu-west-3` : CloudShell fixe cette variable à la région choisie dans la console au moment où il s'ouvre. Si l'on change de région ensuite, il faut ouvrir un nouvel onglet CloudShell ou préciser `--region`.
+Sur un compte personnel, l'ARN de la question 1 est celui d'une session de rôle, `arn:aws:sts::<compte>:assumed-role/<rôle>/<session>`, et non d'un utilisateur : les champs se lisent de la même façon, avec le service `sts`. La commande en Virginie du Nord est refusée par la SCP d'AWS, avec un message de refus explicite ; c'est voulu, et c'est l'occasion de distinguer une stratégie de l'organisation d'une stratégie IAM. Pour la question 3, les étudiants relèvent le prix de Virginie du Nord dans le calculateur.
+
+La commande `echo $AWS_REGION` affiche `eu-west-3` sur le compte de l'enseignant, `eu-north-1` sur la plupart des comptes personnels : CloudShell fixe cette variable à la région choisie dans la console au moment où il s'ouvre. Si l'on change de région ensuite, il faut ouvrir un nouvel onglet CloudShell ou préciser `--region`.
 
 ### Pannes fréquentes
 
@@ -146,6 +174,8 @@ La commande `echo $AWS_REGION` affiche `eu-west-3` : CloudShell fixe cette varia
 | CloudShell ne s'ouvre pas | Permission CloudShell absente de la stratégie de l'étudiant | Ajouter la stratégie gérée `AWSCloudShellFullAccess` au groupe des étudiants |
 | `describe-regions` ou `describe-availability-zones` refusé | Stratégie trop restrictive (par exemple limitée par condition de région) | Autoriser `ec2:DescribeRegions` et `ec2:DescribeAvailabilityZones`, qui ne coûtent rien |
 | Le prix n'apparaît pas dans la liste des types d'instances | Affichage compact de la console | Cliquer sur « Compare instance types », qui affiche une colonne de prix |
+| Compte personnel : l'inscription demande une carte bancaire | Nouvelle inscription pas encore ouverte à cette personne, ou identité déjà connue d'AWS | Réessayer avec une autre identité (Google, GitHub), sinon binôme ou compte de l'enseignant |
+| Compte personnel : `describe-availability-zones --region us-east-1` refusé | SCP d'AWS qui interdit les autres régions | Normal ; lire le message avec les étudiants |
 
 ## Module 2 : Sécurité et gestion des accès
 
@@ -167,7 +197,7 @@ Pour les Security Groups, un rectangle (l'instance), un cadre autour (le groupe)
 
 ### Corrigé du TP 2
 
-1. Un nouveau stagiaire n'a qu'à être ajouté au groupe ; une modification des droits s'applique à tous d'un coup. On évite ainsi d'avoir des droits différents pour des personnes qui font le même travail.
+1. Un nouveau stagiaire n'a qu'à être ajouté au groupe ; une modification des droits s'applique à tous d'un coup. On évite ainsi d'avoir des droits différents pour des personnes qui font le même travail. Sur un compte personnel, où les groupes sont interdits, il faudrait attacher la stratégie à chacun des vingt utilisateurs et penser à tous les modifier ; une organisation réelle passerait plutôt par IAM Identity Center et ses ensembles d'autorisations.
 2. Un refus par défaut : le message d'erreur ne mentionne aucune stratégie de refus, et le simulateur indique `implicitly denied` (aucune stratégie ne correspond). Un refus explicite serait signalé comme tel, avec le nom de la stratégie responsable.
 3. L'authentification par clé protège contre les mots de passe devinés, pas contre une faille du serveur SSH lui-même, et elle n'empêche pas les tentatives de remplir les journaux et de consommer des ressources. Le moindre privilège vaut aussi pour le réseau : un seul administrateur, une seule adresse.
 4. Les Security Groups sont à état : les réponses à une connexion entrante autorisée sont autorisées d'office.
@@ -205,6 +235,10 @@ Dans le simulateur, il faut renseigner l'ARN d'une instance et la valeur du tag 
 | `describe-volumes` n'est pas refusé à l'étape 5 | Stratégie en ligne créée sur l'utilisateur de l'étudiant au lieu du groupe du stagiaire | La recréer sur le groupe `stagiaires-<prenom>` |
 | « My IP » affiche une adresse inattendue | VPN actif, ou proxy de l'école | Désactiver le VPN, ou saisir l'adresse donnée par `checkip.amazonaws.com` |
 | Deux étudiants ne voient pas le même `pare-feu-web` | Chacun a le sien, c'est normal | Rappeler que chacun met son nom d'utilisateur dans les noms |
+| Compte personnel : le « stagiaire » réussit à créer un Security Group | `--profile stagiaire` oublié : la commande est passée sous l'identité de l'étudiant, administrateur | Vérifier avec `aws sts get-caller-identity --profile stagiaire` ; supprimer le groupe `essai` créé par erreur |
+| Compte personnel : `You must specify a region` | Région laissée vide dans `aws configure --profile stagiaire` | Relancer `aws configure --profile stagiaire` et saisir la région |
+| Compte personnel : `InvalidClientTokenId` avec le profil | Clé mal recopiée, ou clé supprimée | Recréer une clé dans l'onglet **Security credentials** de l'utilisateur |
+| Compte personnel : la création d'un groupe ou l'accès console est refusé | SCP d'AWS sur ces comptes | Normal ; suivre l'onglet « Compte personnel » du TP |
 | Le stagiaire est refusé partout (`no identity-based policy allows ...`) | L'utilisateur n'a pas été ajouté au groupe `stagiaires-<prenom>`, ou la stratégie n'est pas attachée au groupe | Onglet **Permissions** de l'utilisateur : ajouter l'utilisateur au groupe, ou attacher la stratégie au groupe |
 
 ## Module 3 : Calcul, Amazon EC2
@@ -287,6 +321,8 @@ Pour le délai de visibilité, trois lignes horizontales (file, A, B) et une fri
 
 Déployez vous-même la galerie avec le script `deploy/user-data.sh` de l'archive : c'est la démonstration d'ouverture du module 1, et une référence si un étudiant bloque. L'application et le script ont été rejoués sur Amazon Linux 2023 (Python 3.12, Nginx 1.30), dans un conteneur avec systemd et un faux S3 ; les tests automatisés de l'application se lancent avec `pytest` dans `kits/galerie/tests`.
 
+La partie 2 (deux serveurs derrière un répartiteur) demande deux instances en marche et un répartiteur de charge. Elle se fait sur des comptes personnels. Sur le compte de l'enseignant, il faudrait désactiver la fonction « une instance par étudiant » et autoriser Elastic Load Balancing, la création d'AMI et d'instantanés dans les stratégies, ce que les fichiers de `iam/` ne prévoient pas.
+
 Le rôle `role-galerie-<prenom>` et le bucket doivent exister depuis le TP 4. Les étudiants qui les ont supprimés peuvent les recréer en dix minutes (TP 4, étapes 1 et 5).
 
 ### Grille d'évaluation proposée
@@ -304,7 +340,23 @@ Le rôle `role-galerie-<prenom>` et le bucket doivent exister depuis le TP 4. Le
 | Explication orale | deux questions tirées au hasard parmi celles des TP | 2 |
 | | **Total** | **20** |
 
-Le nettoyage se vérifie en fin de séance : instance résiliée, bucket supprimé. On peut en faire une condition de validation plutôt qu'un critère noté.
+Pour la partie 2, un barème indicatif sur 4 points, à ajouter en bonus ou à substituer aux critères HTTPS et résilience, au choix :
+
+| Critère | Vérification | Points |
+|---|---|---|
+| La répartition fonctionne | le nom DNS du répartiteur sert la galerie ; le pied de page alterne entre deux instances de deux zones | 2 |
+| L'accès direct est fermé | `http://IP` d'une instance ne répond plus ; la règle HTTP a pour source `repartiteur-<prenom>` | 1 |
+| La panne d'une instance est supportée | service arrêté sur une instance, site toujours en ligne, cible `unhealthy` | 1 |
+
+Le nettoyage se vérifie en fin de séance : instance résiliée, bucket supprimé, et pour la partie 2, répartiteur, groupe cible, AMI et instantané supprimés. On peut en faire une condition de validation plutôt qu'un critère noté.
+
+### Corrigé de la partie 2
+
+1. Une zone de disponibilité peut tomber en entier (alimentation, réseau, incendie) ; deux instances dans la même zone tomberaient ensemble. L'ALB exige d'ailleurs deux zones.
+2. Une quinzaine à une trentaine d'erreurs `502`, selon l'instant de l'arrêt par rapport aux contrôles. Le répartiteur continue d'envoyer la moitié des requêtes à l'instance malade tant qu'elle n'a pas raté 2 contrôles consécutifs, à 30 secondes d'intervalle, soit une minute au plus. Raccourcir l'intervalle et le seuil réduit la fenêtre, au prix de contrôles plus nombreux et du risque d'écarter une instance pour un ralentissement passager.
+3. Les nœuds du répartiteur n'ont pas d'adresse fixe : ils changent quand il s'agrandit, se réduit ou est remplacé. La référence au groupe suit ces changements, et elle n'ouvre le port 80 qu'aux machines de ce groupe.
+4. Le fichier ne serait que sur l'instance qui a reçu le dépôt. Une requête sur deux, servie par l'autre, afficherait une galerie sans ce fichier. Il faut un stockage partagé, ce que S3 apporte ici.
+5. Un Network Load Balancer pour l'UDP ; un Gateway Load Balancer pour intercaler un pare-feu virtuel.
 
 ### Questions à poser pendant la vérification
 
@@ -325,3 +377,10 @@ Le nettoyage se vérifie en fin de séance : instance résiliée, bucket supprim
 | `nginx -t` signale `duplicate default server` | Une autre configuration de `conf.d` revendique déjà `default_server` | Ne garder qu'un fichier avec `default_server` par port |
 | `pip install` échoue | L'instance n'a pas d'accès sortant (Security Group sortant modifié) | Rétablir la règle sortante par défaut |
 | Le lien présigné renvoie `SignatureDoesNotMatch` | Région de `/etc/galerie.env` différente de celle du bucket | Mettre `GALERIE_REGION` à la région réelle du bucket |
+| Partie 2 : cible `unhealthy`, code `503` | Seconde instance lancée sans le rôle : `/sante` n'atteint pas le bucket | <Chemin>Actions › Security › Modify IAM role</Chemin>, puis `sudo systemctl restart galerie` |
+| Partie 2 : cibles `unhealthy`, *Request timed out*, après l'étape 16 | Règle HTTP des instances dont la source n'est pas `repartiteur-<prenom>` | Corriger la source de la règle |
+| Partie 2 : cibles `unhealthy`, code `404` | Chemin du contrôle de santé mal saisi (`/health`, `/sante/`) | Onglet **Health checks** du groupe cible : chemin `/sante` |
+| Partie 2 : création du répartiteur refusée | Une seule zone cochée | En cocher deux, avec un sous-réseau chacune |
+| Partie 2 : nom refusé | Nom de répartiteur ou de groupe cible de plus de 32 caractères | Raccourcir le prénom dans le nom |
+| Partie 2 : `repartiteur-<prenom>` impossible à supprimer | Encore référencé par `pare-feu-web-<prenom>`, ou répartiteur supprimé depuis moins de quelques minutes | Supprimer d'abord `pare-feu-web-<prenom>`, ou attendre |
+| Partie 2 : les crédits baissent après le rangement | Instantané de l'AMI oublié | <Chemin>EC2 › Snapshots</Chemin>, supprimer l'instantané |

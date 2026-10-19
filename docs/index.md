@@ -28,7 +28,7 @@ Chaque module ajoute une pièce à ce schéma. Le premier vous apprend à vous r
 | 2 | [Sécurité et gestion des accès : IAM, VPC, Security Groups](module-2/cours.md) | [Un stagiaire, des droits, un pare-feu](module-2/tp.md) |
 | 3 | [Calcul : Amazon EC2](module-3/cours.md) | [Un serveur web sur EC2](module-3/tp.md) |
 | 4 | [Stockage, bases de données et messages : S3, EBS, RDS, DynamoDB, SQS](module-4/cours.md) | [Un bucket, un rôle, une file](module-4/tp.md) |
-| 5 | [Projet final : la galerie](module-5/projet.md) | [Déployer la galerie](module-5/tp.md) |
+| 5 | [Projet final : la galerie](module-5/projet.md) | [Déployer la galerie](module-5/tp.md), puis [deux serveurs derrière un répartiteur](module-5/repartition.md) |
 
 Chaque module commence par la théorie, présentée avec les diapositives du cours, puis passe à la pratique. Les pages de cours de ce site reprennent ces diapositives en les développant : vous pouvez les lire avant le cours pour le préparer, ou après pour revenir sur un point. Les TP se font dans l'ordre, chacun réutilisant parfois ce que le précédent a construit.
 
@@ -43,7 +43,7 @@ Il vous faut un accès à AWS, et il y en a deux sortes dans ce cours. Selon les
 
 Vous créez vous-même votre compte, au début du TP 1, avec la nouvelle inscription d'AWS : on s'y connecte avec un AWS Builder ID, ou avec un compte Google, GitHub ou Apple, et la plupart des nouveaux inscrits n'ont pas à donner de carte bancaire[^inscription]. Le compte reçoit 100 $ de crédits, et jusqu'à 100 $ de plus si vous faites quelques activités guidées. Tant qu'il reste dans le plan gratuit, rien ne vous est facturé ; il se ferme seul au bout de six mois, ou plus tôt si les crédits sont épuisés[^plan-gratuit].
 
-AWS place toutes vos ressources dans une région choisie d'après le pays de votre adresse, et vous ne pouvez pas en changer : Europe (Stockholm), `eu-north-1`, pour une adresse en Afrique ou en Europe[^region-projet]. Vous travaillerez dans cette région pendant tout le cours.
+AWS place toutes vos ressources dans une région choisie d'après le pays de votre adresse, et vous ne pouvez pas en changer : Europe (Stockholm), `eu-north-1`, pour une adresse au Cameroun comme dans la plupart des pays d'Afrique et d'Europe[^region-projet]. Vous travaillerez dans cette région pendant tout le cours.
 
 </TabItem>
 <TabItem value="enseignant" label="Compte fourni par l'enseignant">

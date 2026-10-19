@@ -177,6 +177,10 @@ Vous venez de tuer brutalement l'application. systemd l'a relancée aussitôt : 
 
 ## 9. Ranger, pour de bon
 
+:::tip[Vous faites la partie 2 ?]
+Ne rangez rien maintenant : passez directement à la [partie 2](repartition.md), qui part de cette instance et se termine par un rangement complet.
+:::
+
 C'est la fin du cours : tout ce que vous avez créé doit disparaître. Dans l'ordre :
 
 1. **L'instance** `galerie-<prenom>` : <Chemin>Instance state › Terminate (delete) instance</Chemin>. Attendez l'état `Terminated`.
