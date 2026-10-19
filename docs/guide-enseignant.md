@@ -240,6 +240,7 @@ Dans le simulateur, il faut renseigner l'ARN d'une instance et la valeur du tag 
 | Compte personnel : le « stagiaire » réussit à créer un Security Group | `--profile stagiaire` oublié : la commande est passée sous l'identité de l'étudiant, administrateur | Vérifier avec `aws sts get-caller-identity --profile stagiaire` ; supprimer le groupe `essai` créé par erreur |
 | Compte personnel : `You must specify a region` | Région laissée vide dans `aws configure --profile stagiaire` | Relancer `aws configure --profile stagiaire` et saisir la région |
 | Compte personnel : `InvalidClientTokenId` avec le profil | Clé mal recopiée, ou clé supprimée | Recréer une clé dans l'onglet **Security credentials** de l'utilisateur |
+| Compte personnel : dans le simulateur, tout est `denied` avec *Denied by AWS Organizations* | Le simulateur évalue la SCP `RegionFloor` sans région demandée, et la condition `StringNotEquals` sur `aws:RequestedRegion` absente refuse tout | Cliquer sur l'utilisateur et décocher **AWS Organizations SCPs**, comme l'indique le TP |
 | Compte personnel : la création d'un groupe ou l'accès console est refusé | SCP d'AWS sur ces comptes | Normal ; suivre l'onglet « Compte personnel » du TP |
 | Le stagiaire est refusé partout (`no identity-based policy allows ...`) | L'utilisateur n'a pas été ajouté au groupe `stagiaires-<prenom>`, ou la stratégie n'est pas attachée au groupe | Onglet **Permissions** de l'utilisateur : ajouter l'utilisateur au groupe, ou attacher la stratégie au groupe |
 

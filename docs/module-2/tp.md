@@ -150,6 +150,10 @@ Essayer chaque action à la main n'est pas très pratique, et certaines sont tro
 3. En haut, choisissez le service **Amazon EC2** et cochez les actions `DescribeInstances`, `RunInstances` et `TerminateInstances`.
 4. Cliquez sur **Run Simulation**.
 
+:::note[Compte personnel : « Denied by AWS Organizations »]
+Sur un compte personnel, le simulateur tient compte aussi des politiques qu'AWS pose sur l'organisation de votre projet, dont une qui refuse toute action hors de votre région. Le simulateur ne précise pas de région, si bien que même `DescribeInstances` sort `denied`, avec la mention *Denied by AWS Organizations*. Cliquez sur l'utilisateur `stagiaire-<prenom>` dans la colonne de gauche, décochez **AWS Organizations SCPs** et relancez la simulation : le simulateur n'évalue plus que les stratégies IAM, celles que vous avez écrites. Les vraies requêtes du stagiaire restent soumises à ces politiques, mais elles portent toujours votre région et passent, comme à l'étape 3.
+:::
+
 Vous devez voir `allowed` pour `DescribeInstances` et `denied` pour les deux autres. Dépliez une ligne : le simulateur indique quelle stratégie a produit la décision, ou l'absence de toute stratégie pour un refus par défaut. Essayez aussi le service **IAM** avec l'action `ListUsers` : le stagiaire peut-il voir la liste des utilisateurs du compte ?
 
 ## 5. Provoquer un refus explicite
