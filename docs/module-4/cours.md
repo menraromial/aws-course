@@ -218,7 +218,7 @@ Deux réglages complètent le fonctionnement d'une file. Une **file de lettres m
 
 SQS est facturé à la requête : le premier million de requêtes de chaque mois est gratuit, puis il en coûte environ 0,40 dollar par million pour une file standard[^sqs-prix].
 
-Le TP 4 met en pratique la partie S3 de bout en bout, puis vous fait observer le délai de visibilité sur une vraie file.
+Le TP 4 met en pratique la partie S3 de bout en bout, avec un bucket privé, une URL présignée et une instance qui y accède par son rôle.
 
 [^s3-20]: S. Stormacq, « Twenty years of Amazon S3 and building what's next », *AWS News Blog*, 2026, [aws.amazon.com/blogs](https://aws.amazon.com/blogs/aws/twenty-years-of-amazon-s3-and-building-whats-next/).
 [^faq]: AWS, *Amazon S3 FAQs*, [aws.amazon.com/s3/faqs](https://aws.amazon.com/s3/faqs/).

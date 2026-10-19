@@ -1,7 +1,7 @@
 ---
-title: "TP 4 : Un bucket, un rôle, une file"
+title: "TP 4 : Un bucket et un rôle"
 sidebar_label: "Le TP"
-description: "Bucket S3 privé, téléversement depuis la console, URL présignée, accès depuis une instance EC2 grâce à un rôle IAM, premiers messages SQS."
+description: "Bucket S3 privé, téléversement depuis la console, URL présignée, accès depuis une instance EC2 grâce à un rôle IAM."
 ---
 
 import Seance from '@site/src/components/Seance';
@@ -15,9 +15,9 @@ import Chemin from '@site/src/components/Chemin';
 Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
 :::
 
-Ce TP assemble les trois modules précédents. Vous allez créer un bucket privé, y déposer un fichier, le partager sans ouvrir le bucket, puis donner à une instance EC2 le droit d'y lire et d'y écrire, sans lui confier la moindre clé. Vous finirez par une file SQS, pour voir de vos yeux le délai de visibilité.
+Ce TP assemble les trois modules précédents. Vous allez créer un bucket privé, y déposer un fichier, le partager sans ouvrir le bucket, puis donner à une instance EC2 le droit d'y lire et d'y écrire, sans lui confier la moindre clé.
 
-<Schema svg={tp4Architecture} num="TP4" alt="Dans la région du compte, l'instance web-<prenom>, qui endosse le rôle role-galerie-<prenom>, lit et écrit dans le bucket galerie-<prenom>-<suffixe> (aws s3 cp, ls) et envoie des messages dans la file file-<prenom>. Depuis l'extérieur, vous téléversez des fichiers depuis la console, un navigateur accède au bucket avec une URL présignée, et un anonyme reçoit une erreur 403.">
+<Schema svg={tp4Architecture} num="TP4" alt="Dans la région du compte, l'instance web-<prenom>, qui endosse le rôle role-galerie-<prenom>, lit et écrit dans le bucket galerie-<prenom>-<suffixe> (aws s3 cp, ls). Depuis l'extérieur, vous téléversez des fichiers depuis la console, un navigateur accède au bucket avec une URL présignée, et un anonyme reçoit une erreur 403.">
   Ce que vous allez construire. Le bucket, le rôle et sa stratégie resserviront tels quels au projet final.
 </Schema>
 
@@ -150,54 +150,11 @@ curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
 
 La réponse contient une clé d'accès, une clé secrète, un jeton de session et une date d'expiration, quelques heures plus tard. Remarquez le début de la clé d'accès : `ASIA`. Les clés temporaires commencent par `ASIA`, les clés permanentes d'un utilisateur IAM par `AKIA`. Si vous tombez un jour sur une clé `AKIA` dans du code, vous savez ce qu'il faut faire.
 
-## 8. Une file de messages
-
-**Créer la file.** Ouvrez <Chemin>Amazon SQS › Queues › Create queue</Chemin>. Type : **Standard**. Nom : `file-<prenom>`. Laissez les autres réglages par défaut, en notant au passage le **Visibility timeout** de 30 secondes et la **Message retention period** de 4 jours. Ajoutez le tag `Proprietaire` et créez la file.
-
-**Donner le droit au rôle.** Pour l'instant, le rôle de votre instance ne connaît que S3. Ouvrez la stratégie `galerie-s3-<prenom>`, cliquez sur **Edit**, et ajoutez une troisième déclaration dans la liste `Statement`, en remplaçant le numéro du compte :
-
-```json
-    {
-      "Sid": "UtiliserLaFile",
-      "Effect": "Allow",
-      "Action": ["sqs:GetQueueUrl", "sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage"],
-      "Resource": "arn:aws:sqs:<région>:<compte>:file-<prenom>"
-    }
-```
-
-Remplacez `<région>` par votre région et `<compte>` par le numéro du compte, que `aws sts get-caller-identity` affiche. N'oubliez pas la virgule après l'accolade qui ferme la déclaration précédente. Enregistrez : la modification s'applique au rôle en quelques secondes.
-
-**Envoyer et recevoir.** Sur l'instance :
-
-```bash title="Sur l'instance"
-URL=$(aws sqs get-queue-url --queue-name file-<prenom> --query QueueUrl --output text)
-aws sqs send-message --queue-url "$URL" --message-body "miniature à faire : depuis-ec2/bonjour.txt"
-aws sqs receive-message --queue-url "$URL" --wait-time-seconds 5 --attribute-names All
-```
-
-Le message arrive, avec son corps, un `ReceiptHandle` (le reçu qui permettra de le supprimer) et un attribut `ApproximateReceiveCount` égal à `1`. Relancez aussitôt la même commande `receive-message` : elle attend cinq secondes et ne renvoie rien. Le message n'a pas disparu, il est invisible. Attendez trente secondes et relancez-la encore : le message est de retour, et `ApproximateReceiveCount` vaut maintenant `2`. Vous venez de jouer le rôle du consommateur qui plante (schéma 4.5 du cours).
-
-Supprimez-le proprement, comme le ferait un consommateur qui a fini son travail :
-
-```bash title="Sur l'instance"
-R=$(aws sqs receive-message --queue-url "$URL" --wait-time-seconds 5 \
-  --query 'Messages[0].ReceiptHandle' --output text)
-aws sqs delete-message --queue-url "$URL" --receipt-handle "$R"
-```
-
-Si la première commande n'a rien reçu (`None`), c'est que le message était encore invisible : attendez trente secondes et recommencez.
-
-Dans la console, ouvrez votre file puis **Send and receive messages** : vous pouvez aussi envoyer des messages depuis la console et les voir arriver avec **Poll for messages**. Envoyez-en un depuis la console et recevez-le depuis l'instance.
-
-## 9. Ranger
+## 8. Ranger
 
 Cette fois, une partie de ce que vous avez créé resservira au projet final.
 
-À **supprimer** :
-
-1. l'instance `web-<prenom>` (<Chemin>Instance state › Terminate (delete) instance</Chemin>) ;
-2. la file `file-<prenom>` (<Chemin>Amazon SQS › Queues</Chemin>, **Delete**) ;
-3. la déclaration `UtiliserLaFile` de la stratégie `galerie-s3-<prenom>`, qui ne sert plus.
+À **supprimer** : l'instance `web-<prenom>` (<Chemin>Instance state › Terminate (delete) instance</Chemin>).
 
 À **garder** : le bucket et son contenu (quelques kilo-octets, pour un coût négligeable), la stratégie `galerie-s3-<prenom>`, le rôle `role-galerie-<prenom>`, la paire de clés et le Security Group.
 
@@ -206,4 +163,3 @@ Cette fois, une partie de ce que vous avez créé resservira au projet final.
 1. Pourquoi l'**Object URL** d'un objet renvoie-t-elle `AccessDenied`, alors que le bouton **Open** affiche l'image ?
 2. Une URL présignée fabriquée par l'instance avec les identifiants de son rôle est valable 5 minutes. Pourrait-on la rendre valable une semaine ? Qu'est-ce qui limite sa durée ?
 3. Pourquoi `aws s3 ls` (sans nom de bucket) est-il refusé alors que `aws s3 ls s3://galerie-<prenom>-<suffixe>/` fonctionne ?
-4. Un consommateur reçoit un message, le traite, mais plante juste avant d'appeler `DeleteMessage`. Que se passe-t-il ? Qu'est-ce que cela impose au code du consommateur ?

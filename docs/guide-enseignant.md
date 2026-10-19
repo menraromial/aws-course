@@ -305,7 +305,6 @@ Pour le délai de visibilité, trois lignes horizontales (file, A, B) et une fri
 1. L'**Object URL** est une requête anonyme, non signée : le bucket étant privé, elle est refusée. Le bouton **Open** fabrique une URL présignée avec l'identité de l'utilisateur connecté à la console.
 2. Non. Une URL présignée ne peut pas survivre aux identifiants qui l'ont signée. Celle-ci est signée avec les identifiants temporaires du rôle, qui expirent au bout de quelques heures ; au-delà, l'URL devient invalide quelle que soit la durée demandée. (Avec des identifiants permanents, la durée maximale est de sept jours.)
 3. `aws s3 ls` sans argument appelle `ListBuckets`, qui demande `s3:ListAllMyBuckets` sur toutes les ressources. La stratégie n'accorde que `s3:ListBucket` sur un bucket précis.
-4. Le délai de visibilité expire et le message redevient visible : il sera traité une seconde fois. Le consommateur doit donc être idempotent, c'est-à-dire produire le même résultat s'il traite deux fois le même message.
 
 ### Pannes fréquentes
 
@@ -316,7 +315,6 @@ Pour le délai de visibilité, trois lignes horizontales (file, A, B) et une fri
 | `Unable to locate credentials` persiste après l'association | Délai de propagation, ou association échouée faute de `iam:PassRole` | Attendre une minute ; vérifier l'onglet *Security* de l'instance |
 | `aws s3 cp` vers le bucket renvoie `AccessDenied` alors que `ls` fonctionne | `/*` oublié dans la ressource de la déclaration `LireEtEcrire` | Corriger l'ARN : les objets sont `arn:aws:s3:::<bucket>/*` |
 | La console refuse d'enregistrer la stratégie modifiée | Virgule manquante entre deux déclarations | Relire le JSON ; l'éditeur signale la ligne fautive |
-| `receive-message` ne renvoie rien alors qu'un message vient d'être envoyé | Message encore invisible après une réception précédente, ou interrogation courte sans attente | Utiliser `--wait-time-seconds`, attendre la fin du délai de visibilité |
 
 ## Module 5 : Projet final
 

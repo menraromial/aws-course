@@ -1,4 +1,4 @@
-% TP 4 : bucket privé, instance avec rôle, file SQS
+% TP 4 : bucket privé, instance avec rôle
 \documentclass[border=4pt]{standalone}
 \usepackage{awsfig}
 \begin{document}
@@ -10,9 +10,7 @@
   \icone[9mm]{role}{30,-70}{r-role}{\code{role-galerie-<prenom>}}
   \draw[pfl=Rouge] (role.north) -- (inst-l.south);
   \icone[11mm]{s3}{120,-22}{r-bucket}{\code{galerie-<prenom>-<suffixe>}}
-  \icone[10mm]{q}{120,-62}{r-queue}{\code{file-<prenom>}}
   \draw[fl=Vert] (inst.east) -- ++(18,0) |- node[etiq, above, pos=.75]{\code{aws s3 cp}, \code{ls}} (s3.west);
-  \draw[fl=Rose] (inst.east) ++(18,0) |- node[etiq, below, pos=.75]{\code{send-message}} (q.west);
   \icone[9mm]{moi}{212,-10}{console}{vous, dans la console}
   \icone[9mm]{nav}{212,-40}{r-client}{navigateur, URL présignée}
   \icone[9mm]{anon}{212,-70}{r-user}{anonyme}
