@@ -139,11 +139,13 @@ Faites le même comptage qu'à la partie 2, depuis CloudShell :
 ENV=galerie-<prenom>-env
 URL=$(aws elasticbeanstalk describe-environments --environment-names $ENV \
   --query "Environments[0].CNAME" --output text)
-echo $URL
+echo "Adresse : $URL"
 for i in $(seq 1 20); do
   curl -s "http://$URL/" | grep -o "instance i-[0-9a-f]* en zone [a-z0-9-]*"
 done | sort | uniq -c
 ```
+
+L'adresse affichée doit être de la forme `galerie-<prenom>-env.<identifiant>.<région>.elasticbeanstalk.com`. Si elle est vide ou vaut `None`, le nom de l'environnement ne correspond pas à celui de la console : corrigez la variable `ENV`. Si vous travaillez avec la CLI sur votre poste plutôt que dans CloudShell, tapez d'abord `export AWS_PROFILE=cours` dans chaque nouveau terminal, comme au TP 1 ; sans cela, la CLI utilise un autre profil et répond `InvalidClientTokenId`.
 
 Deux lignes, une par instance et par zone, avec des nombres voisins de 10. C'est le résultat des étapes 10 à 16 de la partie 2, obtenu sans une seule commande sur les instances.
 
@@ -169,13 +171,14 @@ Dans le premier onglet, lancez une boucle qui affiche, toutes les deux secondes,
 ENV=galerie-<prenom>-env
 URL=$(aws elasticbeanstalk describe-environments --environment-names $ENV \
   --query "Environments[0].CNAME" --output text)
+echo "Adresse : $URL"
 for i in $(seq 1 150); do
   echo "$(date +%T) $(curl -s -o /tmp/p.html -w '%{http_code}' "http://$URL/") $(grep -o '<h1>[^<]*' /tmp/p.html | cut -c5-)"
   sleep 2
 done
 ```
 
-Chaque ligne affiche l'heure, le code HTTP et le titre de la page, soit `200 Galerie` pour l'instant.
+Chaque ligne affiche l'heure, le code HTTP et le titre de la page, soit `200 Galerie` pour l'instant. Si vous ne voyez que des `000`, l'adresse est vide : reprenez la vérification de l'étape 22.
 
 Dans le second onglet, fabriquez la version 2 et demandez à Beanstalk de la déployer :
 
