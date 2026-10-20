@@ -128,6 +128,51 @@
   \includegraphics[width=\textwidth]{projet-repartition}
 \end{frame}
 
+\begin{frame}{Elastic Beanstalk}
+  \begin{itemize}
+    \setlength{\itemsep}{.5em}
+    \item Service géré (PaaS) : une archive zip et une plateforme (Python 3.12, AL2023)
+    \item Crée instances, groupe Auto Scaling, répartiteur, Security Groups ; installe Nginx et Gunicorn
+    \item Chaque environnement est une pile CloudFormation ; versions rangées dans \texttt{elasticbeanstalk-<région>-<compte>}
+    \item Instance unique (Elastic IP) ou répartiteur (ALB) ; service gratuit, on paie les ressources
+    \item Profil d'instance obligatoire : stratégie \texttt{AWSElasticBeanstalkWebTier}
+    \item Comptes créés après le 1/10/2024 : modèles de lancement obligatoires (IMDSv1 désactivé ou volume gp3)
+  \end{itemize}
+  \lien{https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html}
+\end{frame}
+
+\begin{frame}{L'archive pour Beanstalk}
+  \small\renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{6.4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Fichier} & \textbf{Rôle (équivalent dans la partie 1)} \\ \midrule
+    \texttt{app.py}, \texttt{templates/}, \texttt{requirements.txt} & l'application, inchangée \\
+    \texttt{Procfile} & commande de Gunicorn, port 8000 (service systemd) \\
+    \texttt{.platform/nginx/conf.d/taille.conf} & \texttt{client\_max\_body\_size 20M} (\texttt{galerie-nginx.conf}) \\
+    \texttt{.ebextensions/galerie.config} & IMDSv2, contrôle de santé sur \texttt{/sante} \\
+    propriétés d'environnement & \texttt{GALERIE\_BUCKET}, \texttt{GALERIE\_REGION} (\texttt{/etc/galerie.env}) \\ \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Politiques de déploiement}
+  \small\renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Politique} & \textbf{Fonctionnement} \\ \midrule
+    All at once (défaut) & toutes les instances en même temps ; brève interruption \\
+    Rolling & par lots ; chaque lot sort du répartiteur ; capacité réduite \\
+    Rolling with additional batch & lot supplémentaire lancé d'abord ; capacité maintenue \\
+    Immutable & nouvelles instances dans un groupe Auto Scaling à part \\
+    Traffic splitting & comme Immutable, une part du trafic d'abord vers la nouvelle version \\ \bottomrule
+  \end{tabularx}
+  \lien{https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html}
+\end{frame}
+
+\begin{frame}{Partie 3 : redéployer avec Elastic Beanstalk}
+  \centering
+  \includegraphics[width=\textwidth]{projet-beanstalk}
+\end{frame}
+
 \begin{frame}{Limites et évolutions}
   \begin{columns}[c]
     \begin{column}{.57\textwidth}
@@ -158,6 +203,12 @@
   \item Groupe cible avec contrôle de santé sur \texttt{/sante}, Application Load Balancer
   \item Accès direct aux instances fermé : HTTP depuis le répartiteur seulement
   \item Panne simulée d'une instance, puis suppression de toutes les ressources}
+
+\diapotp{5}{Partie 3 : Elastic Beanstalk}{%
+  \item Rôle des instances complété par \texttt{AWSElasticBeanstalkWebTier}
+  \item Environnement avec répartiteur sur deux AZ, à partir de l'archive zip
+  \item Ressources de la pile CloudFormation, comparées à la partie 2
+  \item Version 2 en déploiement \textit{Rolling}, retour à la version 1, rangement}
 
 
 \begin{frame}{Pour aller plus loin}

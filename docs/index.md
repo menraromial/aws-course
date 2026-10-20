@@ -28,7 +28,7 @@ Chaque module ajoute une pièce à ce schéma. Le premier vous apprend à vous r
 | 2 | [Sécurité et gestion des accès : IAM, VPC, Security Groups](module-2/cours.md) | [Un stagiaire, des droits, un pare-feu](module-2/tp.md) |
 | 3 | [Calcul : Amazon EC2](module-3/cours.md) | [Un serveur web sur EC2](module-3/tp.md) |
 | 4 | [Stockage, bases de données et messages : S3, EBS, RDS, DynamoDB, SQS](module-4/cours.md) | [Un bucket et un rôle](module-4/tp.md) |
-| 5 | [Projet final : la galerie](module-5/projet.md) | [Déployer la galerie](module-5/tp.md), puis [deux serveurs derrière un répartiteur](module-5/repartition.md) |
+| 5 | [Projet final : la galerie](module-5/projet.md) | [Déployer la galerie](module-5/tp.md), puis [deux serveurs derrière un répartiteur](module-5/repartition.md) et [redéployer avec Elastic Beanstalk](module-5/beanstalk.md) |
 
 Chaque module commence par la théorie, présentée avec les diapositives du cours, puis passe à la pratique. Les pages de cours de ce site reprennent ces diapositives en les développant : vous pouvez les lire avant le cours pour le préparer, ou après pour revenir sur un point. Les TP se font dans l'ordre, chacun réutilisant parfois ce que le précédent a construit.
 

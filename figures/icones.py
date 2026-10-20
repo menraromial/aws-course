@@ -71,6 +71,8 @@ ICONES = {
     "r-git": "Res_Git-Repository_48_Light.svg",
     "r-ami": "Res_Amazon-EC2_AMI_48.svg", "r-volume": "Res_Amazon-Elastic-Block-Store_Volume-gp3_48.svg",
     "r-snapshot": "Res_Amazon-Elastic-Block-Store_Snapshot_48.svg", "r-igw": "Res_Amazon-VPC_Internet-Gateway_48.svg",
+    "r-asg": "Res_Amazon-EC2_Auto-Scaling_48.svg", "r-cfnstack": "Res_AWS-CloudFormation_Stack_48.svg",
+    "r-ebdeploy": "Res_AWS-Elastic-Beanstalk_Deployment_48.svg", "r-ebapp": "Res_AWS-Elastic-Beanstalk_Application_48.svg",
     "r-eip": "Res_Amazon-EC2_Elastic-IP-Address_48.svg", "r-instances": "Res_Amazon-EC2_Instances_48.svg",
     "r-queue": "Res_Amazon-Simple-Queue-Service_Queue_48.svg", "r-message": "Res_Amazon-Simple-Queue-Service_Message_48.svg",
     "r-rdsinst": "Res_Amazon-Aurora_Amazon-RDS-Instance_48.svg", "r-ddbitems": "Res_Amazon-DynamoDB_Items_48.svg",

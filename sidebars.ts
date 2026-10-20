@@ -31,7 +31,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: '5. Projet final',
       collapsed: false,
-      items: ['module-5/projet', 'module-5/tp', 'module-5/repartition'],
+      items: ['module-5/projet', 'module-5/tp', 'module-5/repartition', 'module-5/beanstalk'],
     },
   ],
 };

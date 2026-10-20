@@ -1,0 +1,43 @@
+% Projet final, partie 3 : la galerie redéployée par Elastic Beanstalk
+\documentclass[border=4pt]{standalone}
+\usepackage{awsfig}
+\begin{document}
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \icone[10mm]{web}{-38,-30}{r-users}{visiteurs\\ \code{http://<domaine>}}
+  \icone[10mm]{moi}{-38,-80}{r-client}{vous}
+  \draw[cadre=Ink] (0,0) rectangle (234,-124);
+  \node[anchor=north west, inner sep=0pt] at (0,0) {\ic[6mm]{g-cloud}};
+  \node[titrecadre=Ink] at (6,0) {AWS Cloud, région du compte};
+  % Elastic Beanstalk et le bucket des versions
+  \icone[10mm]{eb}{26,-80}{beanstalk}{Elastic Beanstalk\\ \code{galerie-<prenom>}}
+  \icone[9mm]{ver}{26,-108}{r-bucket}{versions v1, v2}
+  \draw[fl] (moi.east) -- node[etiq, above]{zip} (eb.west);
+  \draw[fl] (eb-l.south) -- (ver.north);
+  % la pile CloudFormation
+  \draw[cadre=Rose] (52,-12) rectangle (180,-118);
+  \node[anchor=north west, inner sep=0pt] at (52,-12) {\ic[6mm]{r-cfnstack}};
+  \node[titrecadre=Rose] at (58,-12) {pile CloudFormation créée par Beanstalk};
+  \draw[fl] (eb.east) -- node[etiq, above]{crée} (52,-80);
+  \icone[9mm]{alb}{116,-30}{elb}{Application Load Balancer}
+  \draw[fl] (web.east) -- (alb.west);
+  % deux zones et le groupe Auto Scaling
+  \foreach \z/\x in {a/58, b/120}{
+    \draw[pcadre=Bleu] (\x,-56) rectangle (\x+56,-112);
+    \node[titrecadre=Bleu] at (\x,-56) {zone \code{<région>\z}};
+  }
+  \draw[cadre=Orange] (63,-64) rectangle (171,-104);
+  \node[anchor=north west, inner sep=0pt] at (63,-64) {\ic[5mm]{r-asg}};
+  \node[titrecadre=Orange] at (68,-64) {groupe Auto Scaling};
+  \icone[9mm]{i1}{88,-82}{r-instance}{\code{t3.micro}\\ Nginx, Gunicorn}
+  \icone[9mm]{i2}{148,-82}{r-instance}{\code{t3.micro}\\ Nginx, Gunicorn}
+  \draw[fl] (alb-l.south) -- ++(0,-4) -| (i1.north);
+  \draw[fl] (alb-l.south) ++(0,-4) -| (i2.north);
+  \node[etiq, anchor=north] at (118,-47.5) {contrôle de santé \code{/sante}};
+  \draw[pfl=Vert] (63,-98) -- node[etiq, above]{version} (40,-98) |- (ver.east);
+  % rôle et bucket de la galerie
+  \icone[10mm]{role}{208,-40}{r-role}{\code{role-galerie-<prenom>}\\ + WebTier}
+  \icone[11mm]{s3}{208,-92}{r-bucket}{\code{galerie-<prenom>-<suffixe>}}
+  \draw[fl=Vert] (171,-92) -- node[etiq, above]{boto3} (s3.west);
+  \draw[pfl=Rouge] (role.west) -- ++(-16,0) |- node[etiq, above, pos=.7]{rôle} (171,-74);
+\end{tikzpicture}
+\end{document}

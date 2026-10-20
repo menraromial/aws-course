@@ -136,6 +136,10 @@ L'instance redevient `healthy` après 5 contrôles réussis, deux minutes et dem
 
 ## 18. Ranger, pour de bon
 
+:::tip[Vous faites la partie 3 ?]
+Supprimez seulement les points 1 à 5 ci-dessous, et gardez le bucket, le rôle `role-galerie-<prenom>` et la stratégie `galerie-s3-<prenom>` : la [partie 3](beanstalk.md) en a besoin, et se termine par le rangement du reste.
+:::
+
 Tout doit disparaître, et l'ordre compte, car certaines ressources en utilisent d'autres :
 
 1. **Le répartiteur** `alb-galerie-<prenom>` : <Chemin>EC2 › Load Balancers</Chemin>, <Chemin>Actions › Delete load balancer</Chemin>, puis confirmez. Il est facturé à l'heure : c'est le premier à supprimer.

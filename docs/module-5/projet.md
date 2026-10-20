@@ -10,6 +10,7 @@ import projetArchitecture from '@site/src/figures/projet-architecture.svg';
 import projetRequete from '@site/src/figures/projet-requete.svg';
 import architectureCible from '@site/src/figures/architecture-cible.svg';
 import projetRepartition from '@site/src/figures/projet-repartition.svg';
+import projetBeanstalk from '@site/src/figures/projet-beanstalk.svg';
 import Telechargement from '@site/src/components/Telechargement';
 
 <Seance items={['Module 5', 'Le projet']} />
@@ -157,6 +158,63 @@ Le répartiteur reste en HTTP. Pour qu'il accepte le HTTPS, il lui faudrait un c
 
 Un ALB se paie à l'heure, plus une part qui dépend du trafic, mesurée en unités de capacité (LCU). L'exemple de la page de tarification, en Virginie du Nord, donne 0,0225 $ par heure et 0,008 $ par LCU et par heure, soit 0,031 $ par heure pour un site modeste[^prix-elb]. Une séance de TP de trois heures coûte donc une dizaine de centimes, prélevés sur les crédits d'un compte personnel. Laissé allumé un mois, le répartiteur coûterait plus de 20 $, sans compter les deux instances.
 
+## Redéployer avec Elastic Beanstalk
+
+Dans les deux premières parties, vous avez tout monté à la main : l'installation de Python et de Nginx, le service systemd, l'utilisateur dédié, puis l'image, la seconde instance, le groupe cible, le répartiteur et ses Security Groups. AWS Elastic Beanstalk fait tout cela à partir d'une simple archive zip. On lui donne le code de l'application et on choisit une plateforme, ici Python 3.12 sur Amazon Linux 2023 ; il crée les instances, le groupe Auto Scaling, le répartiteur et les Security Groups, installe Nginx et Gunicorn sur les instances et y déploie le code. C'est un service de type PaaS (*Platform as a Service*) : vous fournissez l'application, AWS s'occupe de la plateforme qui la fait tourner.
+
+Le service lui-même est gratuit. On ne paie que les ressources qu'il crée, instances, répartiteur et stockage[^eb-prix]. Un environnement qui reprend l'architecture de la partie 2 coûte donc exactement ce qu'elle coûtait.
+
+### Application, version, environnement
+
+Beanstalk organise le travail en quelques objets, qu'on retrouve dans sa console.
+
+| Objet | Ce que c'est | Dans le projet |
+|---|---|---|
+| Application | le dossier qui regroupe tout le reste | `galerie-<prenom>` |
+| Version d'application | une archive zip déposée, avec une étiquette | `v1`, puis `v2` |
+| Environnement | les ressources qui font tourner une version : instances, répartiteur, etc. | `galerie-<prenom>-env` |
+| Plateforme | le système et les logiciels installés sur les instances | Python 3.12 sur Amazon Linux 2023 |
+
+Un environnement est soit à **instance unique** (une instance avec une adresse Elastic IP, dans un groupe Auto Scaling bloqué à une instance, sans répartiteur), soit **avec répartiteur** (*load balanced*), plusieurs instances derrière un Elastic Load Balancer[^eb-types]. Le premier convient au développement ; le second, que vous utiliserez, reproduit la partie 2.
+
+Beanstalk ne crée pas les ressources lui-même. Il décrit l'environnement dans un modèle et confie sa création à AWS CloudFormation, le service qui fabrique des ressources à partir d'une description écrite. Chaque environnement est une pile (*stack*) CloudFormation, que l'on peut ouvrir pour voir la liste exacte de ce qui a été créé[^eb-lt]. Les versions de l'application, elles, sont rangées dans un bucket que Beanstalk crée dans chaque région où il sert, nommé `elasticbeanstalk-<région>-<compte>`[^eb-s3].
+
+<Schema svg={projetBeanstalk} num="5.5" alt="Vous envoyez une archive zip à Elastic Beanstalk, application galerie-<prenom>, qui range les versions v1 et v2 dans un bucket et crée une pile CloudFormation. Cette pile contient un Application Load Balancer, qui reçoit les visiteurs et fait un contrôle de santé sur /sante, et un groupe Auto Scaling de deux instances t3.micro, une dans chacune des zones a et b, qui font tourner Nginx et Gunicorn. Les instances téléchargent la version depuis le bucket des versions, endossent le rôle role-galerie-<prenom> complété de la stratégie WebTier, et lisent et écrivent les fichiers dans le bucket galerie-<prenom>-<suffixe> avec boto3.">
+  La galerie redéployée par Elastic Beanstalk, avec l'architecture de la partie 2, créée à partir d'une archive.
+</Schema>
+
+### Ce que l'archive doit contenir
+
+L'archive de la partie 3 contient l'application, inchangée (`app.py`, `templates/`, `requirements.txt`), et trois fichiers qui disent à Beanstalk comment la faire tourner. Ils remplacent ce que vous aviez fait à la main dans la partie 1.
+
+- `Procfile` contient la commande qui lance l'application, `web: gunicorn --bind :8000 --workers 2 app:app`. Sur la plateforme Python, Nginx relaie les requêtes vers le port 8000, celui que Gunicorn doit donc écouter[^eb-procfile]. C'est l'équivalent de la ligne `ExecStart` du service systemd.
+- `.platform/nginx/conf.d/taille.conf` complète la configuration de Nginx installée par Beanstalk, qui inclut les fichiers de ce dossier dans son bloc `http`[^eb-nginx]. Il contient une seule ligne, `client_max_body_size 20M;`, sans laquelle Nginx refuserait tout fichier de plus d'un mégaoctet. C'est le réglage que contenait déjà `galerie-nginx.conf`.
+- `.ebextensions/galerie.config` fixe deux options de l'environnement, IMDSv2 obligatoire sur les instances et `/sante` comme page du contrôle de santé.
+
+Le nom du bucket et sa région ne sont pas dans l'archive. Ce sont des **propriétés d'environnement**, que Beanstalk transmet à l'application sous forme de variables d'environnement, comme le faisait `/etc/galerie.env`. Une même archive peut ainsi servir à tous les étudiants.
+
+Deux contraintes viennent d'AWS. Les instances endossent un **profil d'instance**, obligatoire, qui doit permettre de télécharger les versions depuis le bucket de Beanstalk et d'y écrire les journaux, ce que permet la stratégie gérée `AWSElasticBeanstalkWebTier`[^eb-profil]. Vous l'ajouterez à `role-galerie-<prenom>`, qui garde ainsi son accès au bucket de la galerie. Et depuis le 1er octobre 2024, Auto Scaling n'accepte plus les configurations de lancement pour les comptes créés après cette date. L'environnement doit donc utiliser un modèle de lancement, ce que l'on obtient par exemple en désactivant IMDSv1 ou en choisissant des volumes `gp3`[^eb-lt].
+
+### Déployer une nouvelle version
+
+Le grand intérêt de Beanstalk apparaît au deuxième déploiement. On dépose une nouvelle archive, on lui donne une étiquette, et on demande à l'environnement de passer à cette version. La **politique de déploiement** décide de la façon dont les instances sont mises à jour[^eb-deploiement].
+
+| Politique | Ce qui se passe | Interruption |
+|---|---|---|
+| All at once | toutes les instances reçoivent la nouvelle version en même temps | oui, brève |
+| Rolling | les instances sont mises à jour par lots ; chaque lot sort du répartiteur pendant sa mise à jour | non, mais capacité réduite |
+| Rolling with additional batch | comme Rolling, après avoir lancé un lot supplémentaire | non, capacité maintenue |
+| Immutable | un jeu complet de nouvelles instances, dans un groupe Auto Scaling à part | non |
+| Traffic splitting | comme Immutable, avec une part du trafic envoyée d'abord à la nouvelle version | non |
+
+Par défaut, un environnement déploie tout d'un coup (*All at once*). Vous choisirez *Rolling* par lots d'une instance, si bien que pendant la mise à jour de l'une, l'autre continue de servir la galerie. Revenir en arrière est un nouveau déploiement, celui de l'ancienne version, qui reste disponible dans l'application.
+
+### Ce que l'on gagne, ce que l'on cède
+
+Avec Beanstalk, la configuration de la galerie tient dans quelques fichiers et quelques choix de console ; un nouvel environnement identique se recrée en quelques minutes, et un déploiement ne demande plus de se connecter aux instances. En contrepartie, c'est Beanstalk qui décide de l'organisation des instances ; on ne choisit plus l'utilisateur sous lequel tourne l'application, ni l'emplacement de ses fichiers, et la pile CloudFormation contient des ressources qu'on n'a pas demandées une à une. Ce que vous avez appris dans les parties 1 et 2 reste nécessaire, car c'est ce qui permet de comprendre ce que Beanstalk a créé, et de réparer un environnement qui ne démarre pas.
+
+Sur le compte fourni par l'enseignant, cette partie se fait en démonstration. Pour créer un environnement, l'utilisateur doit avoir lui-même le droit de créer toutes les ressources sous-jacentes, instances, groupes Auto Scaling, répartiteurs, piles CloudFormation, et AWS indique qu'on ne sait pas l'empêcher ensuite de créer d'autres ressources dans ces services[^eb-droits]. Ce n'est pas compatible avec les garde-fous du compte partagé.
+
 ## Ce que ce projet ne fait pas
 
 Votre galerie est sécurisée, mais elle a des limites qu'il faut savoir nommer. Après la première partie, elle tourne sur une seule instance, dans une seule zone : un redémarrage, et à plus forte raison la panne de la zone, interrompt le service. La seconde partie lève cette limite, pas les suivantes : il faut toujours lancer une nouvelle instance à la main quand l'une tombe, et le nombre d'instances ne suit pas le trafic. Son adresse IP change à chaque arrêt de l'instance, tant qu'elle n'est pas derrière un répartiteur. N'importe qui peut déposer des fichiers, sans compte ni limite de nombre. Le bucket n'est pas versionné, donc un fichier remplacé est perdu. Rien ne surveille l'application ni ne vous prévient si elle tombe. Et l'infrastructure a été créée à la main, dans la console, ce qui la rend difficile à reproduire à l'identique.
@@ -205,3 +263,12 @@ Chaque exigence du cahier des charges se prouve par une observation précise. Le
 [^sg-reference]: AWS, « Security group rules », *Amazon VPC User Guide*, [docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html).
 [^acm]: AWS, « AWS Certificate Manager public certificates », *AWS Certificate Manager User Guide*, [docs.aws.amazon.com/acm/latest/userguide/acm-public-certificates.html](https://docs.aws.amazon.com/acm/latest/userguide/acm-public-certificates.html).
 [^prix-elb]: AWS, « Elastic Load Balancing pricing », exemple de tarification d'un Application Load Balancer, [aws.amazon.com/elasticloadbalancing/pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).
+[^eb-prix]: AWS, « AWS Elastic Beanstalk pricing », [aws.amazon.com/elasticbeanstalk/pricing](https://aws.amazon.com/elasticbeanstalk/pricing/).
+[^eb-types]: AWS, « Environment types », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features-managing-env-types.html).
+[^eb-lt]: AWS, « Migrating your Elastic Beanstalk environment to launch templates », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environments-cfg-autoscaling-launch-templates.html).
+[^eb-s3]: AWS, « Using Elastic Beanstalk with Amazon S3 », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.S3.html).
+[^eb-procfile]: AWS, « Configuring the WSGI server with a Procfile on Elastic Beanstalk », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/python-configuration-procfile.html).
+[^eb-nginx]: AWS, « Reverse proxy configuration », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/platforms-linux-extend.proxy.html).
+[^eb-profil]: AWS, « Elastic Beanstalk instance profile », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/concepts-roles-instance.html).
+[^eb-deploiement]: AWS, « Deployment policies and settings », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html).
+[^eb-droits]: AWS, « Managing Elastic Beanstalk user policies », *AWS Elastic Beanstalk Developer Guide*, [docs.aws.amazon.com](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.iam.managed-policies.html).

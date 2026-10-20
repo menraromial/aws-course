@@ -33,6 +33,7 @@ Avant la première séance, faites créer un compte par un ou deux étudiants, o
 2. l'éditeur de stratégies d'IAM et le simulateur de stratégies s'ouvrent ;
 3. la création d'une clé d'accès pour un utilisateur IAM est acceptée ;
 4. la création d'une AMI et d'un Application Load Balancer est acceptée, et leur coût apparaît en déduction des crédits.
+5. la création d'un environnement Elastic Beanstalk avec répartiteur (partie 3 du projet) aboutit, rôles liés à un service compris.
 
 AWS déploie cette inscription progressivement, et réserve le plan gratuit aux nouveaux clients : un étudiant qui tombe sur l'inscription classique, ou qui a déjà eu un compte AWS avec la même identité, se verra demander une carte. Prévoyez de le faire travailler en binôme, ou sur le compte de l'enseignant.
 
@@ -359,6 +360,24 @@ Le nettoyage se vérifie en fin de séance : instance résiliée, bucket supprim
 4. Le fichier ne serait que sur l'instance qui a reçu le dépôt. Une requête sur deux, servie par l'autre, afficherait une galerie sans ce fichier. Il faut un stockage partagé, ce que S3 apporte ici.
 5. Un Network Load Balancer pour l'UDP ; un Gateway Load Balancer pour intercaler un pare-feu virtuel.
 
+### Partie 3 : Elastic Beanstalk
+
+La partie 3 redéploie la galerie avec Elastic Beanstalk, dans un environnement avec répartiteur sur deux zones, puis fait déployer une version 2 et revenir à la version 1. Elle part du bucket et du rôle de la partie 2 ; le rangement de la partie 2 indique de les garder.
+
+**Comptes personnels.** Rien à préparer. Elastic Beanstalk, CloudFormation et Elastic Load Balancing font partie des services du plan gratuit de la nouvelle inscription, et la SCP de ce plan autorise `elasticbeanstalk:*`, `cloudformation:*` et `autoscaling:*` ; elle ne refuse `elasticbeanstalk:CreateEnvironment` que lorsque le compte approche de la limite de dépenses fixée par l'étudiant. Les refus IAM du plan (profils de connexion, groupes, alias, certificats serveur) ne touchent ni le rôle de service ni le profil d'instance. Avant la séance, déroulez la partie une fois sur un vrai compte personnel : les libellés de l'assistant de création changent d'une version de la console à l'autre, et il faut vérifier que la création des rôles liés à un service (Auto Scaling, Elastic Load Balancing) passe. Le coût est celui de la partie 2, Beanstalk lui-même étant gratuit.
+
+**Compte de l'enseignant.** Faites la partie en démonstration, avec votre compte administrateur, dans votre propre bucket et un rôle à vous. La stratégie `aws-cours-etudiant` ne donne pas aux étudiants les droits nécessaires, et il ne faut pas les leur donner : créer un environnement exige le droit de créer instances, groupes Auto Scaling, répartiteurs et piles CloudFormation, et AWS indique qu'on ne sait pas empêcher ensuite la création d'autres ressources dans ces services. La démonstration est sans conflit avec la fonction « une instance par étudiant », qui ignore les instances sans tag `Proprietaire`, et elle consomme 4 vCPU du quota pendant qu'elle tourne. Laissez les étudiants lancer eux-mêmes la boucle de l'étape 24 sur l'adresse de votre environnement. Voir les deux titres alterner depuis leur propre CloudShell est le moment fort de la séance.
+
+L'archive `static/kits/galerie-beanstalk.zip` se reconstruit avec `kits/construire-galerie-beanstalk.sh`, à relancer après toute modification de `kits/galerie` ou de `kits/galerie-beanstalk`. Elle a été essayée hors d'AWS. La commande du `Procfile` démarre Gunicorn et l'application sert la page, le point de contrôle et les dépôts avec un faux S3, et la configuration Nginx passe `nginx -t`.
+
+### Corrigé de la partie 3
+
+1. Le `Procfile` remplace le service systemd (la commande de Gunicorn), `.platform/nginx/conf.d/taille.conf` remplace `galerie-nginx.conf` (la taille maximale des requêtes ; le relais vers Gunicorn est déjà configuré par Beanstalk), et les propriétés d'environnement remplacent `/etc/galerie.env`.
+2. Les instances doivent télécharger la version de l'application dans le bucket `elasticbeanstalk-<région>-<compte>` et y déposer leurs journaux. La stratégie `galerie-s3-<prenom>` ne donne accès qu'au bucket de la galerie.
+3. Un groupe Auto Scaling, un modèle de lancement, des alarmes et règles de mise à l'échelle, l'écouteur et les deux Security Groups ; les instances sont remplacées automatiquement si l'une tombe, ce qu'il fallait faire à la main dans la partie 2.
+4. Une à deux minutes, le temps de mettre à jour une instance, de la réintégrer au répartiteur après ses contrôles de santé, puis de passer à la seconde. Avec *All at once*, les deux instances sont mises à jour en même temps, et la boucle aurait montré quelques réponses en erreur, puis la version 2 seule, sans période de cohabitation.
+5. Créer un environnement demande le droit de créer toutes les ressources sous-jacentes. Sur un compte partagé, ce droit permettrait de contourner les limites de type d'instance, de région et de nombre d'instances qui protègent les crédits.
+
 ### Questions à poser pendant la vérification
 
 - « Montrez-moi l'endroit du code où l'application s'authentifie auprès d'AWS. » Il n'y en a pas : c'est tout le propos.
@@ -385,3 +404,9 @@ Le nettoyage se vérifie en fin de séance : instance résiliée, bucket supprim
 | Partie 2 : nom refusé | Nom de répartiteur ou de groupe cible de plus de 32 caractères | Raccourcir le prénom dans le nom |
 | Partie 2 : `repartiteur-<prenom>` impossible à supprimer | Encore référencé par `pare-feu-web-<prenom>`, ou répartiteur supprimé depuis moins de quelques minutes | Supprimer d'abord `pare-feu-web-<prenom>`, ou attendre |
 | Partie 2 : les crédits baissent après le rangement | Instantané de l'AMI oublié | <Chemin>EC2 › Snapshots</Chemin>, supprimer l'instantané |
+| Partie 3 : création de l'environnement en échec, erreur sur une configuration de lancement (*launch configuration*) | Compte créé après le 1er octobre 2024, et ni volume `gp3` ni IMDSv1 désactivé | <Chemin>Configuration › Instances</Chemin> : *General Purpose 3*, IMDSv1 désactivé ; ou recréer l'environnement |
+| Partie 3 : environnement *Severe*, `502` sur le domaine | Propriété `GALERIE_BUCKET` absente ou mal orthographiée : l'application s'arrête au démarrage | <Chemin>Configuration › Updates, monitoring, and logging</Chemin>, propriétés d'environnement |
+| Partie 3 : déploiement en échec, accès refusé au bucket `elasticbeanstalk-...` | `AWSElasticBeanstalkWebTier` pas ajoutée au rôle | L'ajouter (étape 19), puis redéployer `v1` |
+| Partie 3 : `413 Request Entity Too Large` au dépôt | Archive recompressée par l'étudiant, sans le dossier `.platform` ou avec un dossier englobant | Redéployer l'archive téléchargée telle quelle |
+| Partie 3 : cibles `unhealthy`, code `503` | Rôle sans `galerie-s3-<prenom>`, ou `GALERIE_REGION` différente de la région du bucket | Corriger le rôle ou la propriété |
+| Partie 3 : bucket `elasticbeanstalk-...` impossible à supprimer | Stratégie de bucket posée par Beanstalk, qui interdit la suppression | Onglet **Permissions**, supprimer la stratégie, vider puis supprimer |
