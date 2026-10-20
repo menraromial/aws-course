@@ -63,42 +63,65 @@ Vous y trouvez `app.py`, `templates/` et `requirements.txt`, l'application de la
 
 ## 21. Créer l'environnement
 
-Ouvrez <Chemin>Elastic Beanstalk</Chemin> et cliquez sur **Create application**. L'assistant de création compte six pages ; seules les valeurs indiquées ci-dessous sont à changer.
+Ouvrez <Chemin>Elastic Beanstalk › Environments</Chemin> et cliquez sur **Create environment**. La console présente la création sur une seule page, découpée en sections ; parcourez-la de haut en bas. Seules les valeurs indiquées ci-dessous sont à changer, laissez les autres telles quelles. Si la page vous propose de revenir à l'ancienne console (*old console*), restez sur la nouvelle.
 
-**Configure environment**
+**Deployment mode** : *Standard*. Le mode *Cluster* fait tourner les applications sur Kubernetes (EKS) et ne sert pas ici.
 
-- **Environment tier** : *Web server environment*.
-- **Application name** : `galerie-<prenom>`. **Environment name** : `galerie-<prenom>-env`. Laissez le domaine proposé.
-- **Platform** : *Managed platform*, plateforme *Python*, branche *Python 3.12 running on 64bit Amazon Linux 2023*, version recommandée.
-- **Application code** : *Upload your code*. **Version label** : `v1`. *Local file* : choisissez `galerie-beanstalk.zip`.
-- **Presets** : *High availability*.
+**Environment details**
 
-**Configure service access**
+- **Application name** : `galerie-<prenom>`. Le champ propose les applications existantes ; s'il n'y en a pas, il crée celle-ci.
+- **Environment name** : `galerie-<prenom>-env`. Laissez vides **Domain name prefix** et **Environment description**.
 
-- **Service role** : *Create and use new service role*, nommé `aws-elasticbeanstalk-service-role`. Si la console n'affiche à la place qu'un bouton **Customize**, gardez le rôle qu'elle propose.
-- **EC2 key pair** : laissez vide. Vous n'aurez besoin de vous connecter à aucune instance.
-- **EC2 instance profile** : `role-galerie-<prenom>`.
+**Platform details**
 
-**Set up networking, database, and tags**
+- **Platform** : *Python*.
+- **Platform branch** : *Python 3.12 running on 64bit Amazon Linux 2023*. La console propose la branche la plus récente ; choisissez la 3.12, la version de Python des parties 1 et 2.
+- **Platform version** : celle marquée *Recommended*.
 
-- **VPC** : le VPC par défaut. **Public IP address** : *Activated*.
-- **Instance subnets** : cochez les sous-réseaux des zones `<région>a` et `<région>b`.
-- Pas de base de données, pas de tags.
+**Application code**
 
-**Configure instance traffic and scaling**
+- Choisissez *Local file*, puis **Choose file**, et sélectionnez `galerie-beanstalk.zip`.
+- **Version label** : `v1`.
 
-- **Instances** : **Root volume type** *General Purpose 3 (SSD)*, et cochez la désactivation d'**IMDSv1**. Sur un compte récent, l'un de ces deux réglages est indispensable, car sans lui la création échoue sur une erreur de configuration de lancement.
-- **Capacity** : **Environment type** *Load balanced*, **Instances** min `2` et max `2`. Dans **Instance types**, ne gardez que `t3.micro` et retirez les autres types proposés.
-- **Load balancer** : visibilité *Public*, sous-réseaux des zones `<région>a` et `<région>b`, type *Application load balancer*, *Dedicated*. Dans **Processes**, sélectionnez le processus `default`, puis <Chemin>Actions › Edit</Chemin>, et mettez `/sante` comme **Health check path**.
+**Environment properties** : cliquez sur **Add environment properties** et ajoutez deux propriétés. `GALERIE_BUCKET` : le nom de votre bucket, `galerie-<prenom>-<suffixe>`. `GALERIE_REGION` : votre région, `eu-north-1` à Stockholm ou `eu-west-3` à Paris. Sans la première, l'application s'arrête dès son démarrage.
 
-**Configure updates, monitoring, and logging**
+**Environment tier** : *Web server environment*. **Environment type** : *Load balanced*.
 
-- **Health reporting** : *Basic*.
-- **Managed platform updates** : décochez *Activated*. Beanstalk ne remplacera pas les instances pendant la séance pour appliquer une mise à jour de la plateforme.
-- **Rolling updates and deployments** : **Deployment policy** *Rolling*, **Batch size** *Fixed* à `1`.
-- **Environment properties** : ajoutez deux propriétés. `GALERIE_BUCKET` : le nom de votre bucket, `galerie-<prenom>-<suffixe>`. `GALERIE_REGION` : votre région, `eu-north-1` à Stockholm ou `eu-west-3` à Paris.
+**Platform-specific options** : ne changez rien. Le champ **WSGI path** est ignoré, car le `Procfile` de l'archive indique lui-même comment lancer l'application.
 
-**Review** : relisez, puis cliquez sur **Submit**.
+**Service access**
+
+- **Service role** : laissez le réglage proposé. Beanstalk crée et gère lui-même le rôle de service.
+- **EC2 instance profile** : cliquez sur **Customize** et choisissez `role-galerie-<prenom>`. Le profil que Beanstalk créerait de lui-même ne donnerait pas accès à votre bucket.
+- **EC2 key pair** : laissez vide. Vous n'aurez à vous connecter à aucune instance.
+
+**Tags** : aucun.
+
+**Infrastructure**
+
+- **Scaling** : **Min instances** `2`, **Max instances** `2`.
+- **Compute** : **Architecture** *x86_64*. Dans **Instance types**, cliquez sur **Remove** à côté de `t3.small` pour ne garder que `t3.micro`.
+- **Root volume** : **Root volume type** *General Purpose 3 (SSD)*, c'est-à-dire `gp3`. Laissez la taille par défaut.
+- **Additional infrastructure details** : vérifiez que la rubrique **IMDSv1** indique que l'environnement n'active qu'IMDSv2. Ne touchez pas à l'AMI.
+
+Sur un compte récent, le volume `gp3` ou la désactivation d'IMDSv1 est indispensable, car sans l'un des deux la création échoue sur une erreur de configuration de lancement. L'archive impose d'ailleurs les deux.
+
+**Networking**
+
+- **VPC** : le VPC par défaut.
+- **Instance subnets** : cochez les sous-réseaux des zones `<région>a` et `<région>b`. Laissez **EC2 security groups** vide : Beanstalk crée ses propres groupes.
+- **Load balancer** : **Load balancer type** *Application Load Balancer*, **Application Load Balancer type** *Dedicated*, **Visibility** *Public*.
+- **Load balancer parameters** : gardez l'écouteur `Listener: 80`, en HTTP vers le processus `default`. Dans **Process: default**, dépliez **Health check** et mettez `/sante` comme chemin.
+- **Load balancer subnets** : cochez les mêmes sous-réseaux, zones `<région>a` et `<région>b`.
+- **Additional networking details** : **Instance public IP address** *Enabled*. Les instances doivent pouvoir télécharger les bibliothèques Python au démarrage. Laissez **IPv6** désactivé.
+
+**Monitoring and updates**
+
+- **Monitoring** : *Basic*. Ne cochez pas **Enable log streaming**.
+- **Deployments** : **Deployment policy** *Rolling*. Dépliez **Additional deployment settings** et réglez la taille des lots (**Batch size**) sur *Fixed*, `1`.
+- **Managed updates** : laissez **Enable managed updates** décoché. Beanstalk ne remplacera pas les instances pendant la séance pour appliquer une mise à jour de la plateforme.
+
+**Review** : relisez le résumé, puis cliquez sur **Create**.
 
 La création prend cinq à dix minutes. Restez sur la page de l'environnement et ouvrez l'onglet **Events**, où Beanstalk raconte ce qu'il fait, de la création de la pile CloudFormation au démarrage des instances. L'environnement est prêt quand son état est *Ok*, en vert.
 
@@ -190,9 +213,8 @@ L'ordre compte ici aussi.
 
 1. **L'environnement** : dans <Chemin>Elastic Beanstalk › Environments</Chemin>, sélectionnez `galerie-<prenom>-env`, puis <Chemin>Actions › Terminate environment</Chemin> et saisissez son nom pour confirmer. Beanstalk supprime la pile CloudFormation, donc les instances, le répartiteur, le groupe cible, le groupe Auto Scaling et les deux Security Groups. Attendez que l'environnement apparaisse comme *Terminated*, une dizaine de minutes ; vérifiez dans <Chemin>CloudFormation › Stacks</Chemin> que la pile `awseb-` a disparu.
 2. **Les versions et l'application** : dans **Application versions**, cochez `v1` et `v2`, <Chemin>Actions › Delete</Chemin>, en cochant **Delete versions from Amazon S3**. Puis supprimez l'application `galerie-<prenom>`.
-3. **Le bucket de Beanstalk** `elasticbeanstalk-<région>-<compte>` : Beanstalk lui a donné une stratégie qui en interdit la suppression. Ouvrez-le, onglet **Permissions**, supprimez la **Bucket policy**, puis videz le bucket (**Empty**) et supprimez-le (**Delete**).
-4. **Le rôle de service** `aws-elasticbeanstalk-service-role`, dans <Chemin>IAM › Roles</Chemin>. Il ne coûte rien, mais il ne sert plus.
-5. **Le reste du projet**, comme à l'[étape 18 de la partie 2](repartition.md#18-ranger-pour-de-bon), point 6 : le bucket de la galerie (vidé puis supprimé), le rôle `role-galerie-<prenom>` et la stratégie `galerie-s3-<prenom>`, la paire de clés `cle-<prenom>` et son fichier `.pem`.
+3. **Le bucket de Beanstalk** `elasticbeanstalk-<région>-<compte>` : Beanstalk lui a donné une stratégie qui en interdit la suppression. Ouvrez-le, onglet **Permissions**, supprimez la **Bucket policy**, puis videz le bucket (**Empty**) et supprimez-le (**Delete**). Les rôles que Beanstalk a créés pour lui-même ne coûtent rien ; laissez-les.
+4. **Le reste du projet**, comme à l'[étape 18 de la partie 2](repartition.md#18-ranger-pour-de-bon), point 6 : le bucket de la galerie (vidé puis supprimé), le rôle `role-galerie-<prenom>` et la stratégie `galerie-s3-<prenom>`, la paire de clés `cle-<prenom>` et son fichier `.pem`.
 
 Vérifiez enfin, dans <Chemin>EC2 › Instances</Chemin>, <Chemin>EC2 › Load Balancers</Chemin> et <Chemin>CloudFormation › Stacks</Chemin>, qu'il ne reste rien, puis regardez le solde de vos crédits dans **Billing and Cost Management**.
 
