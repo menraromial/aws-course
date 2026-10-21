@@ -2,6 +2,7 @@
 title: "TP 2 : Un stagiaire, des droits, un pare-feu"
 sidebar_label: "Le TP"
 description: "Stratégie sur mesure, groupe et utilisateur au moindre privilège, simulateur de stratégies, refus explicite, Security Group du serveur web."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
@@ -9,8 +10,12 @@ import Schema from '@site/src/components/Schema';
 import Chemin from '@site/src/components/Chemin';
 import Comptes from '@site/src/components/Comptes';
 import TabItem from '@theme/TabItem';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 2', 'Travaux pratiques']} />
+
+<Verrou id="tp2">
+
 
 Un stagiaire arrive dans l'équipe. Sa mission : faire l'inventaire des machines virtuelles et des pare-feu du compte. Il ne doit rien pouvoir créer, rien modifier, rien supprimer, et il n'a aucune raison de voir les fichiers stockés dans S3. Vous allez lui préparer un accès qui corresponde exactement à cette mission, puis vérifier, en vous mettant à sa place, qu'il ne peut rien faire de plus.
 
@@ -297,6 +302,9 @@ Un utilisateur dont personne ne se sert est une porte d'entrée que personne ne 
 2. À l'étape 3, la création du Security Group a été refusée au stagiaire. Est-ce un refus explicite ou un refus par défaut ? Comment le savez-vous ?
 3. Un collègue propose d'ouvrir le port 22 à `0.0.0.0/0`, « puisque de toute façon il faut une clé pour se connecter ». Que lui répondez-vous ?
 4. Votre Security Group n'a aucune règle sortante particulière pour les réponses HTTP. Pourquoi le site fonctionnera-t-il quand même ?
+
+
+</Verrou>
 
 [^actions-ec2]: AWS, *Actions, resources, and condition keys for Amazon EC2*, Service Authorization Reference, [docs.aws.amazon.com](https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html).
 [^simulateur]: AWS, *Testing IAM policies with the IAM policy simulator*, IAM User Guide, [docs.aws.amazon.com](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_testing-policies.html).

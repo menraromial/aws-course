@@ -2,13 +2,18 @@
 title: "TP 5 : Déployer la galerie"
 sidebar_label: "Le pas-à-pas"
 description: "Déploiement pas à pas de la galerie : archive dans S3, instance avec rôle, installation, service systemd, Nginx en HTTP et HTTPS, vérifications de sécurité, nettoyage."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
 import Chemin from '@site/src/components/Chemin';
 import Telechargement from '@site/src/components/Telechargement';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 5', 'Travaux pratiques']} />
+
+<Verrou id="tp5">
+
 
 :::note[Votre nom dans les énoncés]
 Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
@@ -196,3 +201,5 @@ Vérifiez enfin qu'aucune instance ne tourne encore à votre nom : dans <Chemin>
 **Tout en une seule étape.** L'archive contient un script, `deploy/user-data.sh`, qui enchaîne toutes les commandes des étapes 4 à 7. Relancez une instance avec le rôle, collez ce script dans le champ **User data** en y remplaçant le nom du bucket, et ouvrez l'adresse de l'instance deux minutes plus tard. En cas de problème, le journal se lit dans `/var/log/cloud-init-output.log`. Vous aurez alors une application qu'on peut détruire et reconstruire à l'identique en quelques clics.
 
 **Supprimer des fichiers.** Ajoutez à l'application un bouton qui supprime un fichier. Que faut-il changer dans la stratégie du rôle ? Comment le limiter aux seuls objets du préfixe `uploads/`, pour que l'application ne puisse jamais effacer son propre code dans `deploy/` ?
+
+</Verrou>

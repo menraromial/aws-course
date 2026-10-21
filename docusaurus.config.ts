@@ -15,7 +15,11 @@ const config: Config = {
   trailingSlash: false,
   onBrokenLinks: 'throw',
   i18n: {defaultLocale: 'fr', locales: ['fr']},
-  markdown: {hooks: {onBrokenMarkdownLinks: 'throw'}},
+  markdown: {
+    // notes de bas de page (sources) : libellés en français
+    remarkRehypeOptions: {footnoteLabel: 'Sources et notes', footnoteBackLabel: 'Retour au texte'},
+    hooks: {onBrokenMarkdownLinks: 'throw'},
+  },
 
   presets: [
     [

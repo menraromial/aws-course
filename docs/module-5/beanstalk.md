@@ -2,6 +2,7 @@
 title: "TP 5, partie 3 : Redéployer avec Elastic Beanstalk"
 sidebar_label: "Partie 3 : Elastic Beanstalk"
 description: "Archive de la galerie pour Elastic Beanstalk, environnement avec répartiteur sur deux zones, ressources créées par la pile CloudFormation, déploiement progressif d'une version 2, retour à la version 1, rangement."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
@@ -11,8 +12,12 @@ import Chemin from '@site/src/components/Chemin';
 import Telechargement from '@site/src/components/Telechargement';
 import Comptes from '@site/src/components/Comptes';
 import TabItem from '@theme/TabItem';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 5', 'Partie 3']} />
+
+<Verrou id="tp5-partie3">
+
 
 :::info[Avant de commencer]
 <Comptes>
@@ -234,3 +239,5 @@ Vérifiez enfin, dans <Chemin>EC2 › Instances</Chemin>, <Chemin>EC2 › Load B
 3. Qu'est-ce que la pile CloudFormation de l'environnement contient de plus que ce que vous aviez construit à la main dans la partie 2 ?
 4. Pendant le déploiement de la version 2, combien de temps les deux versions ont-elles cohabité ? Qu'aurait-on vu avec la politique *All at once* ?
 5. Sur le compte fourni par l'enseignant, pourquoi les étudiants ne peuvent-ils pas créer leur propre environnement Beanstalk ?
+
+</Verrou>

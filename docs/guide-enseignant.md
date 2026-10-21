@@ -2,6 +2,7 @@
 title: "Guide de l'enseignant"
 sidebar_label: "Guide de l'enseignant"
 description: "Points à dessiner au tableau, questions à poser, corrigés et pannes fréquentes des TP."
+hide_table_of_contents: true
 ---
 
 <head>
@@ -9,10 +10,30 @@ description: "Points à dessiner au tableau, questions à poser, corrigés et pa
 </head>
 
 import Chemin from '@site/src/components/Chemin';
+import Verrou from '@site/src/components/Verrou';
+
+<Verrou id="guide">
+
 
 Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la peine de dessiner au tableau, les questions qui font réagir une salle, les corrigés et les pannes que l'on rencontre le plus souvent en TP. Elle suit l'ordre des modules.
 
 ## Avant le premier module
+
+### Mots de passe des TP
+
+Chaque TP s'ouvre avec un mot de passe que vous donnez au début de la séance ; la page n'affiche avant cela qu'un champ de saisie. Les verrous s'appellent `tp1` à `tp5`, `tp5-partie2` et `tp5-partie3`. Le mot de passe `enseignant` ouvre tous les TP et cette page, qui n'a pas de mot de passe propre. Un verrou ouvert le reste dans le navigateur de l'étudiant.
+
+Le site ne contient que les empreintes des mots de passe (PBKDF2, 200 000 itérations), dans `src/verrous.json`. Pour en changer, lancez depuis le dépôt :
+
+```bash title="Votre terminal"
+python3 outils/verrous.py               # nouveaux mots de passe pour tous les verrous
+python3 outils/verrous.py tp3           # pour un seul verrou
+python3 outils/verrous.py --choisir tp3 # en saisissant vous-même le mot de passe
+```
+
+Le script affiche les nouveaux mots de passe une seule fois : notez-les, ils ne se retrouvent pas à partir du fichier. Reconstruisez ensuite le site, puis poussez.
+
+C'est une protection légère. Le texte des TP n'est plus dans les pages HTML et le sommaire de chaque TP est masqué, mais le texte reste dans les fichiers Markdown du dépôt public et dans les fichiers JavaScript du site, pour qui sait les chercher. Elle suffit à garder les TP fermés jusqu'à la séance, pas à protéger un sujet d'examen.
 
 ### Comptes personnels ou compte de l'enseignant
 
@@ -410,3 +431,5 @@ L'archive `static/kits/galerie-beanstalk.zip` se reconstruit avec `kits/construi
 | Partie 3 : `413 Request Entity Too Large` au dépôt | Archive recompressée par l'étudiant, sans le dossier `.platform` ou avec un dossier englobant | Redéployer l'archive téléchargée telle quelle |
 | Partie 3 : cibles `unhealthy`, code `503` | Rôle sans `galerie-s3-<prenom>`, ou `GALERIE_REGION` différente de la région du bucket | Corriger le rôle ou la propriété |
 | Partie 3 : bucket `elasticbeanstalk-...` impossible à supprimer | Stratégie de bucket posée par Beanstalk, qui interdit la suppression | Onglet **Permissions**, supprimer la stratégie, vider puis supprimer |
+
+</Verrou>

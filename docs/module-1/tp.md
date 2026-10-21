@@ -2,6 +2,7 @@
 title: "TP 1 : Prendre ses marques"
 sidebar_label: "Le TP"
 description: "Connexion au compte, réglages de la console, premiers appels depuis CloudShell, prix et caractéristiques des instances, vue globale du compte."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
@@ -10,8 +11,12 @@ import consoleBarre from '@site/src/figures/console-barre.svg';
 import Chemin from '@site/src/components/Chemin';
 import Comptes from '@site/src/components/Comptes';
 import TabItem from '@theme/TabItem';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 1', 'Travaux pratiques']} />
+
+<Verrou id="tp1">
+
 
 Ce premier TP sert à se sentir chez soi dans la console : se connecter, régler deux ou trois choses qui vous feront gagner du temps pendant tout le cours, envoyer vos premières requêtes depuis un terminal et regarder combien coûte une machine avant d'en lancer une. Ce TP ne crée aucune ressource.
 
@@ -233,6 +238,9 @@ Vérifiez simplement que vous savez répondre à ces quatre questions ; nous les
 2. Pourquoi la page d'IAM n'affiche-t-elle pas de région, alors que celle d'EC2 en affiche une ?
 3. Combien coûterait une `t3.micro` oubliée un mois dans votre région ? Et en Virginie du Nord ?
 4. D'où viennent les identifiants qu'utilise la CLI dans CloudShell, et combien de temps restent-ils valables, à votre avis ?
+
+
+</Verrou>
 
 [^inscription]: AWS, « AWS reimagines the getting started experience », *AWS News Blog*, 16 septembre 2026, [aws.amazon.com/blogs/aws/aws-reimagines-the-getting-started-experience](https://aws.amazon.com/blogs/aws/aws-reimagines-the-getting-started-experience).
 [^deploiement-progressif]: AWS, « Compare sign-up options », *AWS Account Management Reference Guide*, qui précise que la nouvelle inscription est ouverte à un nombre limité de clients, [docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html](https://docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html).

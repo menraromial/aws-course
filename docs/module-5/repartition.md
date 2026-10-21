@@ -2,14 +2,19 @@
 title: "TP 5, partie 2 : Deux serveurs derrière un répartiteur"
 sidebar_label: "Partie 2 : deux serveurs"
 description: "Image de la galerie, seconde instance dans une autre zone, groupe cible et contrôle de santé, Application Load Balancer, Security Group référencé, panne simulée."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
 import Schema from '@site/src/components/Schema';
 import projetRepartition from '@site/src/figures/projet-repartition.svg';
 import Chemin from '@site/src/components/Chemin';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 5', 'Partie 2']} />
+
+<Verrou id="tp5-partie2">
+
 
 :::info[Avant de commencer]
 Cette partie demande deux instances en marche à la fois. Un compte personnel le permet ; le compte fourni par l'enseignant n'en autorise qu'une par étudiant, et votre enseignant vous dira s'il lève cette règle pour la séance.
@@ -164,3 +169,5 @@ Vérifiez enfin, dans <Chemin>EC2 › Instances</Chemin>, <Chemin>EC2 › Load B
 3. Pourquoi la règle HTTP des instances désigne-t-elle un Security Group plutôt que des adresses IP ?
 4. Imaginez que l'application range les fichiers déposés sur le disque de l'instance, dans `/opt/galerie/uploads`, et non dans S3. Que verrait un visiteur qui dépose un fichier puis recharge la page derrière le répartiteur ?
 5. Quel type de répartiteur choisiriez-vous pour un serveur de jeu en UDP ? Pour faire passer tout le trafic d'un VPC par un pare-feu virtuel d'un éditeur tiers ?
+
+</Verrou>

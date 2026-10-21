@@ -2,14 +2,19 @@
 title: "TP 4 : Un bucket et un rôle"
 sidebar_label: "Le TP"
 description: "Bucket S3 privé, téléversement depuis la console, URL présignée, accès depuis une instance EC2 grâce à un rôle IAM."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
 import Schema from '@site/src/components/Schema';
 import tp4Architecture from '@site/src/figures/tp4-architecture.svg';
 import Chemin from '@site/src/components/Chemin';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 4', 'Travaux pratiques']} />
+
+<Verrou id="tp4">
+
 
 :::note[Votre nom dans les énoncés]
 Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
@@ -163,3 +168,5 @@ Cette fois, une partie de ce que vous avez créé resservira au projet final.
 1. Pourquoi l'**Object URL** d'un objet renvoie-t-elle `AccessDenied`, alors que le bouton **Open** affiche l'image ?
 2. Une URL présignée fabriquée par l'instance avec les identifiants de son rôle est valable 5 minutes. Pourrait-on la rendre valable une semaine ? Qu'est-ce qui limite sa durée ?
 3. Pourquoi `aws s3 ls` (sans nom de bucket) est-il refusé alors que `aws s3 ls s3://galerie-<prenom>-<suffixe>/` fonctionne ?
+
+</Verrou>

@@ -2,14 +2,19 @@
 title: "TP 3 : Un serveur web sur EC2"
 sidebar_label: "Le TP"
 description: "Paire de clés, lancement d'une instance Amazon Linux 2023, connexion SSH, installation de Nginx, métadonnées, arrêt et redémarrage, relance par user data."
+hide_table_of_contents: true
 ---
 
 import Seance from '@site/src/components/Seance';
 import Schema from '@site/src/components/Schema';
 import tp3Architecture from '@site/src/figures/tp3-architecture.svg';
 import Chemin from '@site/src/components/Chemin';
+import Verrou from '@site/src/components/Verrou';
 
 <Seance items={['Module 3', 'Travaux pratiques']} />
+
+<Verrou id="tp3">
+
 
 :::note[Votre nom dans les énoncés]
 Partout où l'énoncé écrit `<prenom>`, mettez votre prénom, en minuscules et sans accent, sur un compte personnel ; sur le compte de l'enseignant, mettez votre nom d'utilisateur AWS, par exemple `student12`. Exemple : `cle-<prenom>` devient `cle-camille` ou `cle-student12`.
@@ -271,6 +276,8 @@ Le navigateur tourne sans fin sur `http://<IP>` : vérifiez l'adresse (elle chan
 3. Que se serait-il passé si vous aviez perdu le fichier `cle-<prenom>.pem` avant l'étape 3 ?
 4. Quel avantage voyez-vous à l'instance `web2` par rapport à `web` ? Et quel inconvénient ?
 
+
+</Verrou>
+
 [^linklocal]: S. Cheshire, B. Aboba, E. Guttman, *Dynamic Configuration of IPv4 Link-Local Addresses*, RFC 3927, IETF, 2005, [rfc-editor.org](https://www.rfc-editor.org/rfc/rfc3927).
 [^imds-tp]: AWS, *Use instance metadata to manage your EC2 instance* et *Use the Instance Metadata Service to access instance metadata*, [docs.aws.amazon.com](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
-
