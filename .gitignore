@@ -50,3 +50,6 @@ slides/*.vrb
 
 # Examen : le corrigé ne doit jamais être public
 examen/
+
+# Projet de sélection des stagiaires : document de référence du jury
+stage/
