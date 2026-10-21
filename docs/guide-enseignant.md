@@ -11,6 +11,7 @@ hide_table_of_contents: true
 
 import Chemin from '@site/src/components/Chemin';
 import Verrou from '@site/src/components/Verrou';
+import MotsDePasse from '@site/src/components/MotsDePasse';
 
 <Verrou id="guide">
 
@@ -23,7 +24,11 @@ Cette page rassemble ce qui ne s'adresse pas aux étudiants : ce qu'il vaut la p
 
 Chaque TP s'ouvre avec un mot de passe que vous donnez au début de la séance ; la page n'affiche avant cela qu'un champ de saisie. Les verrous s'appellent `tp1` à `tp5`, `tp5-partie2` et `tp5-partie3`. Le mot de passe `enseignant` ouvre tous les TP et cette page, qui n'a pas de mot de passe propre. Un verrou ouvert le reste dans le navigateur de l'étudiant.
 
-Le site ne contient que les empreintes des mots de passe (PBKDF2, 200 000 itérations), dans `src/verrous.json`. Pour en changer, lancez depuis le dépôt :
+Les mots de passe en vigueur :
+
+<MotsDePasse />
+
+Le site ne contient que les empreintes des mots de passe (PBKDF2, 200 000 itérations), dans `src/verrous.json`, et leur liste chiffrée avec le mot de passe de l'enseignant, que le champ ci-dessus déchiffre dans votre navigateur. Aucun n'est écrit en clair, ni dans le dépôt ni dans les fichiers du site. Pour en changer, lancez depuis le dépôt :
 
 ```bash title="Votre terminal"
 python3 outils/verrous.py               # nouveaux mots de passe pour tous les verrous
@@ -32,7 +37,7 @@ python3 outils/verrous.py --choisir tp3 # en saisissant vous-même le mot de pas
 python3 outils/verrous.py --definir tp3=<mot> tp4=<mot>   # en les fixant directement
 ```
 
-Le script affiche les nouveaux mots de passe une seule fois : notez-les, ils ne se retrouvent pas à partir du fichier. Le site ignore les majuscules et les espaces autour du mot de passe saisi. Reconstruisez ensuite le site, puis poussez.
+Le script affiche les nouveaux mots de passe et met à jour la liste chiffrée ; il demande pour cela le mot de passe de l'enseignant. Ne citez jamais un mot de passe dans un message de commit : le dépôt est public. Le site ignore les majuscules et les espaces autour du mot de passe saisi. Reconstruisez ensuite le site, puis poussez.
 
 C'est une protection légère. Le texte des TP n'est plus dans les pages HTML et le sommaire de chaque TP est masqué, mais le texte reste dans les fichiers Markdown du dépôt public et dans les fichiers JavaScript du site, pour qui sait les chercher. Elle suffit à garder les TP fermés jusqu'à la séance, pas à protéger un sujet d'examen.
 
