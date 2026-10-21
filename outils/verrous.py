@@ -4,6 +4,10 @@
     python3 outils/verrous.py              nouveaux mots de passe pour tous les verrous
     python3 outils/verrous.py tp3 tp4      nouveaux mots de passe pour ces verrous seulement
     python3 outils/verrous.py --choisir tp3   saisir soi-même le mot de passe de tp3
+    python3 outils/verrous.py --definir tp1=ada tp2=grace   fixer les mots de passe
+
+Les mots de passe sont mis en minuscules : le site ignore les majuscules et
+les espaces autour du mot de passe saisi.
 
 Le script affiche les mots de passe une seule fois et n'écrit dans
 src/verrous.json que leurs empreintes PBKDF2-SHA-256. Notez-les : on ne peut
@@ -47,6 +51,13 @@ def nouveau_mot_de_passe() -> str:
 def main() -> int:
     args = sys.argv[1:]
     choisir = "--choisir" in args
+    definis = {}
+    if "--definir" in args:
+        for a in args:
+            if "=" in a:
+                cle, _, valeur = a.partition("=")
+                definis[cle] = valeur.strip().lower()
+        args = list(definis)
     ids = [a for a in args if a != "--choisir"] or VERROUS
     inconnus = [i for i in ids if i not in VERROUS]
     if inconnus:
@@ -55,7 +66,12 @@ def main() -> int:
     empreintes = donnees.get("empreintes", {})
     print(f"{'verrou':<14} mot de passe")
     for id_ in ids:
-        mdp = getpass.getpass(f"Mot de passe pour {id_} : ") if choisir else nouveau_mot_de_passe()
+        if id_ in definis:
+            mdp = definis[id_]
+        elif choisir:
+            mdp = getpass.getpass(f"Mot de passe pour {id_} : ").strip().lower()
+        else:
+            mdp = nouveau_mot_de_passe()
         empreintes[id_] = empreinte(id_, mdp)
         print(f"{id_:<14} {'(saisi)' if choisir else mdp}")
     FICHIER.write_text(json.dumps({"sel": SEL, "iterations": ITERATIONS, "empreintes": empreintes}, indent=2) + "\n")

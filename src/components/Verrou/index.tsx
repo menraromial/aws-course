@@ -56,7 +56,7 @@ export default function Verrou({id, children}: {id: string; children: ReactNode}
       ['enseignant', attendue('enseignant')],
     ] as const;
     for (const [nom, attendu] of candidats) {
-      if (attendu && (await empreinte(nom, saisie.trim())) === attendu) {
+      if (attendu && (await empreinte(nom, saisie.trim().toLowerCase())) === attendu) {
         try {
           localStorage.setItem(CLE(id), attendu);
         } catch {
