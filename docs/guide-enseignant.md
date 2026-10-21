@@ -29,7 +29,7 @@ Le site ne contient que les empreintes des mots de passe (PBKDF2, 200 000 itéra
 python3 outils/verrous.py               # nouveaux mots de passe pour tous les verrous
 python3 outils/verrous.py tp3           # pour un seul verrou
 python3 outils/verrous.py --choisir tp3 # en saisissant vous-même le mot de passe
-python3 outils/verrous.py --definir tp3=linus tp4=margaret   # en les fixant directement
+python3 outils/verrous.py --definir tp3=<mot> tp4=<mot>   # en les fixant directement
 ```
 
 Le script affiche les nouveaux mots de passe une seule fois : notez-les, ils ne se retrouvent pas à partir du fichier. Le site ignore les majuscules et les espaces autour du mot de passe saisi. Reconstruisez ensuite le site, puis poussez.

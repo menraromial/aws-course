@@ -4,7 +4,7 @@
     python3 outils/verrous.py              nouveaux mots de passe pour tous les verrous
     python3 outils/verrous.py tp3 tp4      nouveaux mots de passe pour ces verrous seulement
     python3 outils/verrous.py --choisir tp3   saisir soi-même le mot de passe de tp3
-    python3 outils/verrous.py --definir tp1=ada tp2=grace   fixer les mots de passe
+    python3 outils/verrous.py --definir tp1=<mot> tp2=<mot>   fixer les mots de passe
 
 Les mots de passe sont mis en minuscules : le site ignore les majuscules et
 les espaces autour du mot de passe saisi.
