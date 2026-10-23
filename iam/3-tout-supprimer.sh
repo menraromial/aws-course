@@ -5,7 +5,7 @@
 #   - les ressources IAM créées par les étudiants pendant les TP
 #     (stagiaire-studentN, stagiaires-studentN, role-galerie-studentN,
 #     stratégies lecture-ec2-studentN et galerie-s3-studentN) ;
-#   - les trois stratégies aws-cours-*.
+#   - les quatre stratégies aws-cours-*.
 # Avec --avec-ressources, supprime aussi les ressources des étudiants à Paris :
 # instances au tag Proprietaire=studentN, buckets galerie-studentN-*, files
 # file-studentN, paires de clés cle-studentN, groupes pare-feu-web-studentN.
@@ -28,7 +28,7 @@ UTILISATEURS=$(liste iam list-users --query 'Users[].UserName' | grep -E '^(stud
 GROUPES=$(liste iam list-groups --query 'Groups[].GroupName' | grep -E '^(etudiants|stagiaires-student[0-9]+)$')
 ROLES=$(liste iam list-roles --query 'Roles[].RoleName' | grep -E "^(role-galerie-student[0-9]+|$FONCTION)\$")
 STRATEGIES=$(aws iam list-policies --scope Local --query 'Policies[].[PolicyName,Arn]' --output text 2>/dev/null \
-  | awk '$1 ~ /^(aws-cours-(etudiant|limite-stagiaire|limite-role)|lecture-ec2-student[0-9]+|galerie-s3-student[0-9]+)$/ {print $2}')
+  | awk '$1 ~ /^(aws-cours-(etudiant|etudiant-interdits|limite-stagiaire|limite-role)|lecture-ec2-student[0-9]+|galerie-s3-student[0-9]+)$/ {print $2}')
 FONCTION_PRESENTE=$(aws lambda get-function --region $REGION --function-name $FONCTION >/dev/null 2>&1 && echo oui || echo non)
 
 INSTANCES=$(aws ec2 describe-instances --region $REGION \

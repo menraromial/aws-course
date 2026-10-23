@@ -1,0 +1,138 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PasLesInstancesDesAutres",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:DescribeInstanceAttribute",
+        "ec2:GetConsoleOutput",
+        "ec2:GetConsoleScreenshot",
+        "ec2:GetPasswordData",
+        "ec2:GetLaunchTemplateData"
+      ],
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEqualsIgnoreCase": {"aws:ResourceTag/Proprietaire": "${aws:username}"}
+      }
+    },
+    {
+      "Sid": "SecurityGroupAMonNom",
+      "Effect": "Deny",
+      "Action": "ec2:CreateSecurityGroup",
+      "Resource": "arn:aws:ec2:*:*:security-group/*",
+      "Condition": {
+        "StringNotEqualsIgnoreCase": {"aws:RequestTag/Proprietaire": "${aws:username}"}
+      }
+    },
+    {
+      "Sid": "PasLesSecurityGroupsDesAutres",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:DeleteSecurityGroup",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:ModifySecurityGroupRules",
+        "ec2:UpdateSecurityGroupRuleDescriptions*"
+      ],
+      "Resource": "arn:aws:ec2:*:*:security-group/*",
+      "Condition": {
+        "StringNotEqualsIgnoreCase": {"aws:ResourceTag/Proprietaire": "${aws:username}"}
+      }
+    },
+    {
+      "Sid": "InstancesT3MicroOuT2Micro",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEquals": {"ec2:InstanceType": ["t3.micro", "t2.micro"]}
+      }
+    },
+    {
+      "Sid": "PasDeMaterielDedie",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEqualsIfExists": {"ec2:Tenancy": "default"}
+      }
+    },
+    {
+      "Sid": "TagProprietaireObligatoire",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEqualsIgnoreCase": {"aws:RequestTag/Proprietaire": "${aws:username}"}
+      }
+    },
+    {
+      "Sid": "ImagesAmazonSeulement",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*::image/*",
+      "Condition": {
+        "StringNotEquals": {"ec2:Owner": "amazon"}
+      }
+    },
+    {
+      "Sid": "Disques16GioAuPlus",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:volume/*",
+      "Condition": {
+        "NumericGreaterThan": {"ec2:VolumeSize": "16"}
+      }
+    },
+    {
+      "Sid": "DisquesGp3OuGp2",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:volume/*",
+      "Condition": {
+        "StringNotEqualsIfExists": {"ec2:VolumeType": ["gp3", "gp2"]}
+      }
+    },
+    {
+      "Sid": "ProtegerLesLimites",
+      "Effect": "Deny",
+      "Action": [
+        "iam:DeleteUserPermissionsBoundary",
+        "iam:DeleteRolePermissionsBoundary",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:DeletePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:user/*",
+        "arn:aws:iam::*:role/*",
+        "arn:aws:iam::*:policy/aws-cours-*"
+      ]
+    },
+    {
+      "Sid": "BucketsAParis",
+      "Effect": "Deny",
+      "Action": "s3:CreateBucket",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {"s3:LocationConstraint": "eu-west-3"}
+      }
+    },
+    {
+      "Sid": "BucketsPrivesSansOptionPayante",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutBucketPolicy",
+        "s3:PutBucketAcl",
+        "s3:PutObjectAcl",
+        "s3:PutReplicationConfiguration",
+        "s3:PutAccelerateConfiguration"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

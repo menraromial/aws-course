@@ -10,7 +10,8 @@ Trois scripts, à lancer dans CloudShell avec un compte administrateur :
 
 | Fichier | Rôle |
 |---|---|
-| `aws-cours-etudiant.json` | stratégie `aws-cours-etudiant` : groupe `etudiants`, et limite de permissions de chaque étudiant |
+| `aws-cours-etudiant.json` | stratégie `aws-cours-etudiant`, les autorisations : groupe `etudiants`, et limite de permissions de chaque étudiant |
+| `aws-cours-etudiant-interdits.json` | stratégie `aws-cours-etudiant-interdits`, les refus (types d'instance, disques, régions, buckets publics, instances des autres) : groupe `etudiants` |
 | `aws-cours-limite-stagiaire.json` | stratégie `aws-cours-limite-stagiaire` : limite posée par l'étudiant sur l'utilisateur du TP 2 |
 | `aws-cours-limite-role.json` | stratégie `aws-cours-limite-role` : limite posée par l'étudiant sur le rôle du TP 4 |
 | `une-instance-par-etudiant/` | fonction Lambda (et ses tests) qui arrête la seconde instance en marche d'un étudiant |

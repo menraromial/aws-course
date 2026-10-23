@@ -1,7 +1,8 @@
 #!/bin/bash
 # 1/3 Prépare le compte AWS pour le cours, une fois pour toutes :
-#   - les trois stratégies aws-cours-* (créées, ou mises à jour si elles existent) ;
-#   - le groupe « etudiants », qui porte la stratégie aws-cours-etudiant ;
+#   - les quatre stratégies aws-cours-* (créées, ou mises à jour si elles existent) ;
+#   - le groupe « etudiants », qui porte aws-cours-etudiant (les autorisations)
+#     et aws-cours-etudiant-interdits (les refus) ;
 #   - les crédits CPU des t3 en mode standard par défaut à Paris ;
 #   - la fonction « une seule instance en marche par étudiant ».
 # À lancer dans CloudShell avec un compte administrateur, depuis le dépôt :
@@ -35,19 +36,21 @@ strategie() {  # nom fichier
   fi
 }
 
-echo "1/4 Stratégies"
+echo "1/4 Stratégies et groupe $GROUPE"
 strategie aws-cours-limite-stagiaire aws-cours-limite-stagiaire.json
 strategie aws-cours-limite-role aws-cours-limite-role.json
-strategie aws-cours-etudiant aws-cours-etudiant.json
-
-echo "2/4 Groupe $GROUPE"
+# Les refus sont attachés au groupe avant la mise à jour des autorisations,
+# pour qu'un compte déjà en service ne passe jamais un instant sans eux.
+strategie aws-cours-etudiant-interdits aws-cours-etudiant-interdits.json
 aws iam get-group --group-name $GROUPE >/dev/null 2>&1 || aws iam create-group --group-name $GROUPE >/dev/null
+aws iam attach-group-policy --group-name $GROUPE --policy-arn "arn:aws:iam::$COMPTE:policy/aws-cours-etudiant-interdits"
+strategie aws-cours-etudiant aws-cours-etudiant.json
 aws iam attach-group-policy --group-name $GROUPE --policy-arn "arn:aws:iam::$COMPTE:policy/aws-cours-etudiant"
 
-echo "3/4 Crédits CPU des t3 en mode standard par défaut ($REGION)"
+echo "2/4 Crédits CPU des t3 en mode standard par défaut ($REGION)"
 aws ec2 modify-default-credit-specification --region $REGION --instance-family t3 --cpu-credits standard >/dev/null
 
-echo "4/4 Fonction « une seule instance en marche par étudiant »"
+echo "3/4 Fonction « une seule instance en marche par étudiant »"
 ./une-instance-par-etudiant/deployer.sh | sed 's/^/   /'
 
 QUOTA=$(aws service-quotas get-service-quota --region $REGION --service-code ec2 \

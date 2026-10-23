@@ -80,11 +80,12 @@ Tout se trouve dans le dossier [`iam/`](https://github.com/menraromial/aws-cours
 | `2-creer-etudiants.sh` | crée les comptes `studentN` et enregistre leurs identifiants dans `etudiants.csv` |
 | `3-tout-supprimer.sh` | à la fin du cours, supprime tout ce que les deux premiers ont créé, et ce que les étudiants ont créé dans IAM |
 
-Les trois stratégies, dans le même dossier :
+Les quatre stratégies, dans le même dossier :
 
 | Fichier | Rôle |
 |---|---|
-| `aws-cours-etudiant.json` | droits de l'étudiant, et limite de permissions de son propre utilisateur |
+| `aws-cours-etudiant.json` | ce que l'étudiant a le droit de faire ; c'est aussi la limite de permissions de son propre utilisateur |
+| `aws-cours-etudiant-interdits.json` | les refus qui s'appliquent par-dessus (types d'instance, disques, régions, buckets publics, ressources des autres étudiants) ; attachée au groupe `etudiants` |
 | `aws-cours-limite-stagiaire.json` | limite que l'étudiant doit poser sur l'utilisateur créé au TP 2 |
 | `aws-cours-limite-role.json` | limite que l'étudiant doit poser sur le rôle créé au TP 4 |
 
@@ -109,7 +110,7 @@ aws-course/iam/3-tout-supprimer.sh                     # comptes et IAM seulemen
 aws-course/iam/3-tout-supprimer.sh --avec-ressources   # et les ressources des étudiants
 ```
 
-Le script dresse d'abord l'inventaire de ce qu'il va supprimer et demande de taper `SUPPRIMER` pour continuer. Il supprime la fonction « une instance par étudiant » (règle, fonction, rôle, journaux), les utilisateurs `studentN`, le groupe `etudiants`, les ressources IAM créées par les étudiants pendant les TP (`stagiaire-studentN`, `stagiaires-studentN`, `role-galerie-studentN`, `lecture-ec2-studentN`, `galerie-s3-studentN`) et les trois stratégies `aws-cours-*`. Avec `--avec-ressources`, il résilie aussi les instances dont le tag `Proprietaire` est un `studentN`, puis supprime les buckets `galerie-studentN-*`, les files `file-studentN`, les paires de clés `cle-studentN` et les Security Groups `pare-feu-web-studentN`, tous à Paris. Il ne touche qu'aux noms qui suivent exactement ces modèles : vos propres utilisateurs, buckets ou instances ne risquent rien. Les groupes `launch-wizard-...` créés par l'assistant de lancement ne portent pas de nom d'étudiant ; supprimez-les à la main s'il en reste.
+Le script dresse d'abord l'inventaire de ce qu'il va supprimer et demande de taper `SUPPRIMER` pour continuer. Il supprime la fonction « une instance par étudiant » (règle, fonction, rôle, journaux), les utilisateurs `studentN`, le groupe `etudiants`, les ressources IAM créées par les étudiants pendant les TP (`stagiaire-studentN`, `stagiaires-studentN`, `role-galerie-studentN`, `lecture-ec2-studentN`, `galerie-s3-studentN`) et les quatre stratégies `aws-cours-*`. Avec `--avec-ressources`, il résilie aussi les instances dont le tag `Proprietaire` est un `studentN`, puis supprime les buckets `galerie-studentN-*`, les files `file-studentN`, les paires de clés `cle-studentN` et les Security Groups `pare-feu-web-studentN`, tous à Paris. Il ne touche qu'aux noms qui suivent exactement ces modèles : vos propres utilisateurs, buckets ou instances ne risquent rien. Les groupes `launch-wizard-...` créés par l'assistant de lancement ne portent pas de nom d'étudiant ; supprimez-les à la main s'il en reste.
 
 ### Une seule instance en marche par étudiant
 
@@ -139,12 +140,21 @@ La demande est examinée par AWS, souvent en quelques heures ; sur un compte ré
 
 ### Ce que les stratégies autorisent et interdisent
 
-- **Lecture** partout : EC2, IAM, CloudWatch, prix, tableau de bord de santé, CloudShell, et la validation des stratégies par IAM Access Analyzer, que l'éditeur de stratégies de la console appelle à chaque saisie. Elle ne coûte rien et sert au TP 1 (zones de la Virginie du Nord, vue globale d'EC2) et au simulateur de stratégies.
-- **EC2 à Paris uniquement** : instances `t3.micro` ou `t2.micro`, AMI publiées par Amazon, matériel partagé (pas d'instance dédiée), disques `gp3` ou `gp2` de 16 Gio au plus, tag `Proprietaire` égal au nom d'utilisateur obligatoire au lancement. Un étudiant ne peut arrêter, redémarrer, résilier ou modifier que les instances qui portent son nom, et ne peut pas changer ce tag. Une seule instance en marche à la fois (voir plus haut). Les Security Groups et les paires de clés sont modifiables par tous, ce qui ne coûte rien.
+- **Lecture** : EC2, CloudWatch, prix, tableau de bord de santé, CloudShell, IAM limité à ses propres ressources (voir plus bas), et la validation des stratégies par IAM Access Analyzer, que l'éditeur de stratégies de la console appelle à chaque saisie. Elle ne coûte rien et sert au TP 1 (zones de la Virginie du Nord, vue globale d'EC2) et au simulateur de stratégies.
+- **EC2 à Paris uniquement** : instances `t3.micro` ou `t2.micro`, AMI publiées par Amazon, matériel partagé (pas d'instance dédiée), disques `gp3` ou `gp2` de 16 Gio au plus, tag `Proprietaire` égal au nom d'utilisateur obligatoire au lancement. Un étudiant ne peut arrêter, redémarrer, résilier ou modifier que les instances qui portent son nom, et ne peut pas changer ce tag. Une seule instance en marche à la fois (voir plus haut). Un Security Group ne peut être créé qu'avec le tag `Proprietaire` au nom de l'étudiant, et seul cet étudiant peut ensuite le modifier ou le supprimer. La seule paire de clés qu'un étudiant peut créer ou supprimer est `cle-<prenom>`.
 - **IAM** : seulement les ressources des TP, à son nom (`lecture-ec2-<prenom>`, `galerie-s3-<prenom>`, `stagiaires-<prenom>`, `stagiaire-<prenom>`, `role-galerie-<prenom>`). L'utilisateur stagiaire et le rôle ne peuvent être créés qu'avec leur limite, qui les plafonne respectivement à `ec2:Describe*` et CloudShell, et à S3 sur les buckets `galerie-*` et SQS sur les files `file-*`. Aucune limite ne peut être retirée, aucune stratégie `aws-cours-*` modifiée. Pas de clé d'accès : CloudShell suffit.
 - **S3** : tout, mais seulement sur les buckets `galerie-<prenom>-*`, créés à Paris. Stratégies de bucket, ACL, réplication et accélération de transfert sont interdites : un bucket ne peut pas devenir public, et donc pas servir de point de téléchargement payant pour le monde entier.
 - **SQS** : tout, sur sa file `file-<prenom>`.
 - Tout le reste (RDS, NAT Gateway, adresses Elastic IP, Lambda, répartiteurs de charge, autres régions…) est refusé par défaut, puisque rien ne l'autorise.
+
+**Ce que les étudiants voient les uns des autres.** Sur un compte partagé, certaines listes restent visibles par tous, parce qu'AWS ne permet pas de les filtrer par ressource. Les actions `iam:ListUsers`, `iam:ListGroups`, `iam:ListRoles`, `iam:ListPolicies`, `ec2:DescribeInstances`, `ec2:DescribeSecurityGroups` et `s3:ListAllMyBuckets` renvoient tout ou rien, et la console en a besoin pour les pages des TP (choix d'un groupe à la création du stagiaire, choix d'une stratégie, liste des instances). Un étudiant voit donc les noms des autres comptes, de leurs stratégies, de leurs buckets, ainsi que les instances et les Security Groups de la région, avec leurs règles. Il ne voit pas le contenu :
+
+- le texte d'une stratégie, le détail d'un utilisateur, d'un groupe ou d'un rôle ne sont lisibles que pour ses propres ressources, plus les stratégies gérées par AWS et les stratégies `aws-cours-*` ;
+- l'export complet du compte (`iam:GetAccountAuthorizationDetails`) et le rapport des identifiants (`iam:GetCredentialReport`) lui sont refusés ;
+- le user data, la sortie console et la capture d'écran d'une instance ne sont lisibles que si elle porte son nom dans le tag `Proprietaire` ;
+- il ne peut lire les objets que de ses propres buckets `galerie-<prenom>-*`.
+
+Masquer aussi les listes demande un compte AWS par étudiant, dans une organisation AWS Organizations. C'est la seule isolation complète, mais elle change toute la préparation : création des comptes, quotas, garde-fous à reporter dans des SCP.
 
 ### Ce qui coûte, et comment s'en protéger
 
@@ -265,6 +275,8 @@ Dans le simulateur, il faut renseigner l'ARN d'une instance et la valeur du tag 
 | `describe-volumes` n'est pas refusé à l'étape 5 | Stratégie en ligne créée sur l'utilisateur de l'étudiant au lieu du groupe du stagiaire | La recréer sur le groupe `stagiaires-<prenom>` |
 | « My IP » affiche une adresse inattendue | VPN actif, ou proxy de l'école | Désactiver le VPN, ou saisir l'adresse donnée par `checkip.amazonaws.com` |
 | Deux étudiants ne voient pas le même `pare-feu-web` | Chacun a le sien, c'est normal | Rappeler que chacun met son nom d'utilisateur dans les noms |
+| Compte de l'enseignant : la création du Security Group est refusée | Tag `Proprietaire` absent, ou valeur différente du nom d'utilisateur | Ajouter le tag `Proprietaire` = `studentN` avant de valider |
+| Compte de l'enseignant : impossible de modifier ou supprimer son propre Security Group | Groupe créé sans le tag `Proprietaire`, avant que le tag soit exigé | Avec votre compte administrateur, onglet **Tags** du groupe : ajouter `Proprietaire` = `studentN` |
 | Compte personnel : le « stagiaire » réussit à créer un Security Group | `--profile stagiaire` oublié : la commande est passée sous l'identité de l'étudiant, administrateur | Vérifier avec `aws sts get-caller-identity --profile stagiaire` ; supprimer le groupe `essai` créé par erreur |
 | Compte personnel : `You must specify a region` | Région laissée vide dans `aws configure --profile stagiaire` | Relancer `aws configure --profile stagiaire` et saisir la région |
 | Compte personnel : `InvalidClientTokenId` avec le profil | Clé mal recopiée, ou clé supprimée | Recréer une clé dans l'onglet **Security credentials** de l'utilisateur |
@@ -304,7 +316,9 @@ Pour l'authentification SSH, un dessin à trois colonnes (vous, EC2, l'instance)
 | Symptôme | Cause | Remède |
 |---|---|---|
 | `Connection timed out` en SSH | Adresse de l'étudiant différente de la règle, ou port 22 bloqué par le réseau de l'établissement | Mettre à jour la règle ; tester depuis un partage de connexion |
+| Compte de l'enseignant : la création de la paire de clés est refusée | Nom autre que `cle-studentN` (majuscule, prénom au lieu du nom d'utilisateur) | Recommencer avec le nom exact |
 | `Permission denied (publickey)` | Mauvaise clé, utilisateur `root` au lieu de `ec2-user`, ou instance lancée sans paire de clés | Vérifier la paire dans l'onglet *Details* de l'instance |
+| Compte de l'enseignant : l'assistant refuse le lancement en citant `ec2:CreateSecurityGroup` | **Create security group** laissé coché à l'étape *Network settings* : le groupe `launch-wizard-...` n'a pas le tag `Proprietaire` | Choisir **Select existing security group** et `pare-feu-web-<prenom>` |
 | L'assistant refuse le lancement (`UnauthorizedOperation`) | Type d'instance ou région non autorisés par la stratégie des étudiants, ou tag obligatoire manquant | Lire le message décodé : `aws sts decode-authorization-message --encoded-message <message>` |
 | La page de `web2` n'apparaît pas | Le script de user data a échoué, ou n'est pas encore terminé | `sudo cat /var/log/cloud-init-output.log` sur l'instance |
 | `http://IP` ne répond pas mais `curl localhost` fonctionne | Règle HTTP absente du Security Group, ou mauvais Security Group choisi au lancement | Onglet *Security* de l'instance |

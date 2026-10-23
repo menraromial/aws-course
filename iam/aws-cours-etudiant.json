@@ -7,10 +7,17 @@
       "Action": [
         "ec2:Describe*",
         "ec2:Get*",
-        "iam:Get*",
-        "iam:List*",
-        "iam:Simulate*",
-        "iam:GenerateServiceLastAccessedDetails",
+        "iam:ListUsers",
+        "iam:ListGroups",
+        "iam:ListRoles",
+        "iam:ListPolicies",
+        "iam:ListInstanceProfiles",
+        "iam:ListAccountAliases",
+        "iam:GetAccountSummary",
+        "iam:GetAccountPasswordPolicy",
+        "iam:SimulateCustomPolicy",
+        "iam:GetContextKeysForCustomPolicy",
+        "iam:GetServiceLastAccessedDetails",
         "access-analyzer:ValidatePolicy",
         "access-analyzer:ListAnalyzers",
         "access-analyzer:ListPolicyGenerations",
@@ -31,6 +38,32 @@
       "Resource": "*"
     },
     {
+      "Sid": "LireMesIdentites",
+      "Effect": "Allow",
+      "Action": [
+        "iam:Get*",
+        "iam:List*",
+        "iam:SimulatePrincipalPolicy",
+        "iam:GetContextKeysForPrincipalPolicy",
+        "iam:GenerateServiceLastAccessedDetails"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:user/${aws:username}",
+        "arn:aws:iam::*:user/stagiaire-${aws:username}",
+        "arn:aws:iam::*:group/stagiaires-${aws:username}",
+        "arn:aws:iam::*:role/role-galerie-${aws:username}",
+        "arn:aws:iam::*:instance-profile/role-galerie-${aws:username}",
+        "arn:aws:iam::*:policy/lecture-ec2-${aws:username}",
+        "arn:aws:iam::*:policy/galerie-s3-${aws:username}"
+      ]
+    },
+    {
+      "Sid": "LireLesStrategiesCommunes",
+      "Effect": "Allow",
+      "Action": ["iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions"],
+      "Resource": ["arn:aws:iam::aws:policy/*", "arn:aws:iam::*:policy/aws-cours-*"]
+    },
+    {
       "Sid": "MonMotDePasse",
       "Effect": "Allow",
       "Action": "iam:ChangePassword",
@@ -48,15 +81,18 @@
         "ec2:AuthorizeSecurityGroupEgress",
         "ec2:RevokeSecurityGroupEgress",
         "ec2:ModifySecurityGroupRules",
-        "ec2:UpdateSecurityGroupRuleDescriptions*",
-        "ec2:CreateKeyPair",
-        "ec2:ImportKeyPair",
-        "ec2:DeleteKeyPair"
+        "ec2:UpdateSecurityGroupRuleDescriptions*"
       ],
       "Resource": "*",
       "Condition": {
         "StringEquals": {"aws:RequestedRegion": "eu-west-3"}
       }
+    },
+    {
+      "Sid": "MaPaireDeCles",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateKeyPair", "ec2:ImportKeyPair", "ec2:DeleteKeyPair"],
+      "Resource": "arn:aws:ec2:eu-west-3:*:key-pair/cle-${aws:username}"
     },
     {
       "Sid": "TagsALaCreation",
@@ -87,60 +123,6 @@
       "Condition": {
         "StringEquals": {"aws:RequestedRegion": "eu-west-3"},
         "StringEqualsIgnoreCase": {"aws:ResourceTag/Proprietaire": "${aws:username}"}
-      }
-    },
-    {
-      "Sid": "InstancesT3MicroOuT2Micro",
-      "Effect": "Deny",
-      "Action": "ec2:RunInstances",
-      "Resource": "arn:aws:ec2:*:*:instance/*",
-      "Condition": {
-        "StringNotEquals": {"ec2:InstanceType": ["t3.micro", "t2.micro"]}
-      }
-    },
-    {
-      "Sid": "PasDeMaterielDedie",
-      "Effect": "Deny",
-      "Action": "ec2:RunInstances",
-      "Resource": "arn:aws:ec2:*:*:instance/*",
-      "Condition": {
-        "StringNotEqualsIfExists": {"ec2:Tenancy": "default"}
-      }
-    },
-    {
-      "Sid": "TagProprietaireObligatoire",
-      "Effect": "Deny",
-      "Action": "ec2:RunInstances",
-      "Resource": "arn:aws:ec2:*:*:instance/*",
-      "Condition": {
-        "StringNotEqualsIgnoreCase": {"aws:RequestTag/Proprietaire": "${aws:username}"}
-      }
-    },
-    {
-      "Sid": "ImagesAmazonSeulement",
-      "Effect": "Deny",
-      "Action": "ec2:RunInstances",
-      "Resource": "arn:aws:ec2:*::image/*",
-      "Condition": {
-        "StringNotEquals": {"ec2:Owner": "amazon"}
-      }
-    },
-    {
-      "Sid": "Disques16GioAuPlus",
-      "Effect": "Deny",
-      "Action": "ec2:RunInstances",
-      "Resource": "arn:aws:ec2:*:*:volume/*",
-      "Condition": {
-        "NumericGreaterThan": {"ec2:VolumeSize": "16"}
-      }
-    },
-    {
-      "Sid": "DisquesGp3OuGp2",
-      "Effect": "Deny",
-      "Action": "ec2:RunInstances",
-      "Resource": "arn:aws:ec2:*:*:volume/*",
-      "Condition": {
-        "StringNotEqualsIfExists": {"ec2:VolumeType": ["gp3", "gp2"]}
       }
     },
     {
@@ -228,23 +210,6 @@
       ]
     },
     {
-      "Sid": "ProtegerLesLimites",
-      "Effect": "Deny",
-      "Action": [
-        "iam:DeleteUserPermissionsBoundary",
-        "iam:DeleteRolePermissionsBoundary",
-        "iam:CreatePolicyVersion",
-        "iam:DeletePolicyVersion",
-        "iam:SetDefaultPolicyVersion",
-        "iam:DeletePolicy"
-      ],
-      "Resource": [
-        "arn:aws:iam::*:user/*",
-        "arn:aws:iam::*:role/*",
-        "arn:aws:iam::*:policy/aws-cours-*"
-      ]
-    },
-    {
       "Sid": "MesBuckets",
       "Effect": "Allow",
       "Action": "s3:*",
@@ -252,27 +217,6 @@
         "arn:aws:s3:::galerie-${aws:username}-*",
         "arn:aws:s3:::galerie-${aws:username}-*/*"
       ]
-    },
-    {
-      "Sid": "BucketsAParis",
-      "Effect": "Deny",
-      "Action": "s3:CreateBucket",
-      "Resource": "*",
-      "Condition": {
-        "StringNotEquals": {"s3:LocationConstraint": "eu-west-3"}
-      }
-    },
-    {
-      "Sid": "BucketsPrivesSansOptionPayante",
-      "Effect": "Deny",
-      "Action": [
-        "s3:PutBucketPolicy",
-        "s3:PutBucketAcl",
-        "s3:PutObjectAcl",
-        "s3:PutReplicationConfiguration",
-        "s3:PutAccelerateConfiguration"
-      ],
-      "Resource": "*"
     },
     {
       "Sid": "MaFile",
